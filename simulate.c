@@ -602,13 +602,24 @@ extern void readUserConditions(char * a_fname)
 #define DECAY_MODE_BETA_MINUS_AND_4NEWTRON 20
 #define DECAY_MODE_BETA_MINUS_AND_ALPHA 21 
 #define DECAY_MODE_NEWTRON_EMISSION 22 
-#define DECAY_MODE_SELF_FISSION_80KR 23 //Don't use it! It is not programmed! // 180Tl -> 100Ru +  80Kr
+#define DECAY_MODE_SELF_FISSION_80KR 23 // 180Tl -> 100Ru +  80Kr
 #define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_2PROTON 24 // only use in the situation, can't use in isotopes table
 #define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_3PROTON 25 // only use in the situation, can't use in isotopes table
 #define DECAY_MODE_DOUBLE_ELECTRON_CAPTURE 26
 #define DECAY_MODE_DOUBLE_BETA_PLUS 27
 #define DECAY_MODE_DOUBLE_ELECTRON_CAPTURE_DEGRADE 28
-#define MAX_DECAY_MODE DECAY_MODE_DOUBLE_ELECTRON_CAPTURE_DEGRADE
+#define DECAY_MODE_CLUSTER_DECAY_14C 29
+//#define DECAY_MODE_CLUSTER_DECAY_20O 30
+//#define DECAY_MODE_CLUSTER_DECAY_23F 31
+//#define DECAY_MODE_CLUSTER_DECAY_24Ne 32
+//#define DECAY_MODE_CLUSTER_DECAY_25Ne_24Ne 33
+//#define DECAY_MODE_CLUSTER_DECAY_26Ne_24Ne 34
+//#define DECAY_MODE_CLUSTER_DECAY_28Mg 35
+//#define DECAY_MODE_CLUSTER_DECAY_30Mg 36
+//#define DECAY_MODE_CLUSTER_DECAY_30Mg_28Mg 37
+//#define DECAY_MODE_CLUSTER_DECAY_32Si 38
+//#define DECAY_MODE_CLUSTER_DECAY_34Si 39
+#define MAX_DECAY_MODE DECAY_MODE_CLUSTER_DECAY_14C
 extern const char * getCollideName(int a_collideType);
 extern const char * getDecayModeText(int a_decayMode)
 {
@@ -642,6 +653,7 @@ extern const char * getDecayModeText(int a_decayMode)
 		case DECAY_MODE_DOUBLE_ELECTRON_CAPTURE: modeText = "DOUBLE_ELECTRON_CAPTURE"; break;
 		case DECAY_MODE_DOUBLE_BETA_PLUS: modeText = "DOUBLE_BETA_PLUS"; break;
 		case DECAY_MODE_DOUBLE_ELECTRON_CAPTURE_DEGRADE: modeText = "DOUBLE_ELECTRON_CAPTURE_DEGRADE"; break;
+		case DECAY_MODE_CLUSTER_DECAY_14C: modeText = "CLUSTER_DECAY_14C"; break;
 		default:
 			if(a_decayMode > MAX_DECAY_MODE){
 				modeText = getCollideName(a_decayMode);
@@ -749,11 +761,15 @@ struct atomProperty {
 #define MASSNUMBER_HELIUM 4
 #define ATOMICNUMBER_Li 3
 #define MASSNUMBER_Li4 4
+#define ATOMICNUMBER_CARBON 6
+#define MASSNUMBER_CARBON14 14
 #define ATOMICNUMBER_Fe 26
 #define ATOMICNUMBER_Co 27
 #define ATOMICNUMBER_Ni 28
 #define ATOMICNUMBER_Cu 29
 #define ATOMICNUMBER_Zn 30
+#define ATOMICNUMBER_Kr 36
+#define MASSNUMBER_Kr80 80
 #define ATOMICNUMBER_Os 76
 #define ATOMICNUMBER_Ir 77
 #define ATOMICNUMBER_Pt 78
@@ -1098,6 +1114,9 @@ extern void initAtomProperty(int a_atomicNumber, char * a_symbol, char * a_name,
 }
 struct isotopeProperty * e_hydrogenPtr;
 struct isotopeProperty * e_helium4Ptr;
+struct isotopeProperty * e_C14Ptr;
+struct isotopeProperty * e_Kr80Ptr;
+
 extern void initAtomProperties()
 {
 	e_atomPropertyPtr = (struct atomProperty *)clearAlloc(sizeof(struct atomProperty) * (MAX_ATOM_NUMBER + 1), "atomPropertyPtr");
@@ -5449,8 +5468,7 @@ extern void initAtomProperties()
 		initDecayMode(81, 177, DECAY_MODE_PROTON_EMISSION);
 		initDecayMode(81, 178, DECAY_MODE_ALPHA);
 		initDecayMode(81, 179, DECAY_MODE_ALPHA);
-		initDecayMode2(81, 180, DECAY_MODE_ALPHA, 75., DECAY_MODE_BETA_PLUS);
-		//initDecayMode3(81, 180, DECAY_MODE_ALPHA, 75. - 10.0e-4, DECAY_MODE_BETA_PLUS, 25., DECAY_MODE_SELF_FISSION_80KR);
+		initDecayMode3(81, 180, DECAY_MODE_ALPHA, 75.0 - 10.0e-4, DECAY_MODE_BETA_PLUS, 25.0, DECAY_MODE_SELF_FISSION_80KR);
 		initDecayMode2(81, 181, DECAY_MODE_ALPHA, (75. + 96.) * .5, DECAY_MODE_BETA_PLUS);
 		initDecayMode2(81, 182, DECAY_MODE_BETA_PLUS, 96., DECAY_MODE_ALPHA);
 		initDecayMode2(81, 183, DECAY_MODE_BETA_PLUS, 98., DECAY_MODE_ALPHA);
@@ -5857,7 +5875,7 @@ extern void initAtomProperties()
 		initDecayMode(87, 218, DECAY_MODE_ALPHA);
 		initDecayMode(87, 219, DECAY_MODE_ALPHA);
 		initDecayMode2(87, 220, DECAY_MODE_ALPHA, 99.65, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(87, 221, DECAY_MODE_ALPHA, 99.9, DECAY_MODE_BETA_MINUS);//ignores the cluster decay, 8.79e-11% (207Tl, 14C)
+		initDecayMode3(87, 221, DECAY_MODE_ALPHA, 99.9 - 8.79e-11, DECAY_MODE_BETA_MINUS, 0.1, DECAY_MODE_CLUSTER_DECAY_14C);
 		initDecayMode(87, 222, DECAY_MODE_BETA_MINUS);
 		initDecayMode2(87, 223, DECAY_MODE_BETA_MINUS, 100.0 - 0.006, DECAY_MODE_ALPHA);
 		initDecayMode(87, 224, DECAY_MODE_BETA_MINUS);
@@ -5870,7 +5888,7 @@ extern void initAtomProperties()
 		initDecayMode(87, 231, DECAY_MODE_BETA_MINUS);
 		initDecayMode(87, 232, DECAY_MODE_BETA_MINUS);
 
-		initAtomProperty(88, "Ra", " radium", "ラジウム", 203, 234, 203, 234, 20.786);//heat capacity is unknown
+		initAtomProperty(88, "Ra", "radium", "ラジウム", 203, 234, 203, 234, 20.786);//heat capacity is unknown
 		initIsotopeProperty(88, 203, 203.00927, 4.0e-3, HLU_SECOND, 0.0);
 		initIsotopeProperty(88, 204, 204.006500, 60.0e-3, HLU_SECOND, 0.0);
 		initIsotopeProperty(88, 205, 205.00627, 220.0e-3, HLU_SECOND, 0.0);
@@ -5921,12 +5939,12 @@ extern void initAtomProperties()
 		initDecayMode2(88, 218, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_DOUBLE_BETA_PLUS);
 		initDecayMode(88, 219, DECAY_MODE_ALPHA);
 		initDecayMode(88, 220, DECAY_MODE_ALPHA);
-		initDecayMode(88, 221, DECAY_MODE_ALPHA);//igonre cluster decay(1.2e-10%, 207Pb & 14C)
-		initDecayMode(88, 222, DECAY_MODE_ALPHA);//igonre cluster decay(3.0e-8%, 208Pb & 14C)
-		initDecayMode(88, 223, DECAY_MODE_ALPHA);//igonre cluster decay(6.4e-8%, 209Pb & 14C)
-		initDecayMode(88, 224, DECAY_MODE_ALPHA);//igonre cluster decay(4.3e-9%, 210Pb & 14C)
+		initDecayMode2(88, 221, DECAY_MODE_ALPHA, 100.0 - 1.2e-10, DECAY_MODE_CLUSTER_DECAY_14C);
+		initDecayMode2(88, 222, DECAY_MODE_ALPHA, 100.0 - 3.0e-8, DECAY_MODE_CLUSTER_DECAY_14C);
+		initDecayMode2(88, 223, DECAY_MODE_ALPHA, 100.0 - 6.4e-8, DECAY_MODE_CLUSTER_DECAY_14C);
+		initDecayMode2(88, 224, DECAY_MODE_ALPHA, 100.0 - 4.3e-9, DECAY_MODE_CLUSTER_DECAY_14C);
 		initDecayMode(88, 225, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(88, 226, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_DOUBLE_BETA_MINUS);//igonre cluster decay(2.6e-9%, 212Pb & 14C)
+		initDecayMode3(88, 226, DECAY_MODE_ALPHA, 99.999 - 2.6e-9, DECAY_MODE_DOUBLE_BETA_MINUS, 0.001, DECAY_MODE_CLUSTER_DECAY_14C);
 		initDecayMode(88, 227, DECAY_MODE_BETA_MINUS);
 		initDecayMode(88, 228, DECAY_MODE_BETA_MINUS);
 		initDecayMode(88, 229, DECAY_MODE_BETA_MINUS);
@@ -5936,6 +5954,406 @@ extern void initAtomProperties()
 		initDecayMode(88, 233, DECAY_MODE_BETA_MINUS);
 		initDecayMode(88, 234, DECAY_MODE_BETA_MINUS);
 
+		initAtomProperty(89, "Ac", "actinium", "アクチニウム", 207, 236, 207, 236, 27.2);
+		initIsotopeProperty(89, 207, 207.01195, 31.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 208, 208.01155, 97.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 209, 209.00949, 92.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 210, 210.00944, 350.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 211, 211.00773, 213.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 212, 212.00781, 920.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 213, 213.00661, 731.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 214, 214.006902, 8.2, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 215, 215.006454, 0.17, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 216, 216.008720, 0.440e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 217, 217.009347, 69.0e-9, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 218, 218.01164, 1.08e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 219, 219.01242, 11.8e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 220, 220.014763, 26.36e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 221, 221.01559, 52.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 222, 222.017844, 5.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 223, 223.019137, 2.10, HLU_MINUTE, 0.0);
+		initIsotopeProperty(89, 224, 224.021723, 2.78, HLU_HOUR, 0.0);
+		initIsotopeProperty(89, 225, 225.023230, 10.0, HLU_DAY, 0.0);
+		initIsotopeProperty(89, 226, 226.026098, 29.37, HLU_HOUR, 0.0);
+		initIsotopeProperty(89, 227, 227.0277521, 21.772, HLU_YEAR, 0.0);
+		initIsotopeProperty(89, 228, 228.0310211, 6.13, HLU_HOUR, 0.0);
+		initIsotopeProperty(89, 229, 229.03302, 62.7, HLU_MINUTE, 0.0);
+		initIsotopeProperty(89, 230, 230.03629, 122.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 231, 231.03856, 7.5, HLU_MINUTE, 0.0);
+		initIsotopeProperty(89, 232, 232.04203, 119.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 233, 233.04455, 145.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 234, 234.04842, 44.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 235, 235.05123, 40.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(89, 236, 236.05530, 2.0, HLU_MINUTE, 0.0);
+		initDecayMode(89, 207, DECAY_MODE_ALPHA);
+		initDecayMode2(89, 208, DECAY_MODE_ALPHA, 99.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 209, DECAY_MODE_ALPHA, 99.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 210, DECAY_MODE_ALPHA, 96.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 211, DECAY_MODE_ALPHA, 99.8, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 212, DECAY_MODE_ALPHA, 97.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 213, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 214, DECAY_MODE_ALPHA, 89.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 215, DECAY_MODE_ALPHA, 99.91, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 216, DECAY_MODE_ALPHA, 100.0 - 7.0e-5, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 217, DECAY_MODE_ALPHA, 98.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode(89, 218, DECAY_MODE_ALPHA);
+		initDecayMode2(89, 219, DECAY_MODE_ALPHA, 100.0 - 1.0e-6, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(89, 220, DECAY_MODE_ALPHA, 100.0 - 5.0e-4, DECAY_MODE_BETA_PLUS);
+		initDecayMode(89, 221, DECAY_MODE_ALPHA);
+		initDecayMode2(89, 222, DECAY_MODE_ALPHA, 99.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode3(89, 223, DECAY_MODE_ALPHA, 99.0 - 3.2e-9, DECAY_MODE_ELECTRON_CAPTURE, 1.0, DECAY_MODE_CLUSTER_DECAY_14C);
+		initDecayMode3(89, 224, DECAY_MODE_BETA_PLUS, 100.0 - 9.1 - 1.6, DECAY_MODE_ALPHA, 9.1, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(89, 225, DECAY_MODE_ALPHA, 100.0 - 6.0e-10, DECAY_MODE_CLUSTER_DECAY_14C);
+		initDecayMode3(89, 226, DECAY_MODE_BETA_MINUS, 83.0 - 0.006, DECAY_MODE_ELECTRON_CAPTURE, 17.0, DECAY_MODE_ALPHA);
+		initDecayMode2(89, 227, DECAY_MODE_BETA_MINUS, 98.61, DECAY_MODE_ALPHA);
+		initDecayMode2(89, 228, DECAY_MODE_BETA_MINUS, 100.0 - 5.5e-6, DECAY_MODE_ALPHA);
+		initDecayMode(89, 229, DECAY_MODE_BETA_MINUS);
+		initDecayMode(89, 230, DECAY_MODE_BETA_MINUS);
+		initDecayMode(89, 231, DECAY_MODE_BETA_MINUS);
+		initDecayMode(89, 232, DECAY_MODE_BETA_MINUS);
+		initDecayMode(89, 233, DECAY_MODE_BETA_MINUS);
+		initDecayMode(89, 234, DECAY_MODE_BETA_MINUS);
+		initDecayMode(89, 235, DECAY_MODE_BETA_MINUS);
+		initDecayMode(89, 236, DECAY_MODE_BETA_MINUS);
+
+		initAtomProperty(90, "Th", "thorium", "トリウム", 210, 238, 210, 238, 26.230);
+		initIsotopeProperty(90, 210, 210.015075, 17.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 211, 211.01493, 48.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 212, 212.01298, 36.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 213, 213.01301, 140.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 214, 214.011500, 100.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 215, 215.011730, 1.2, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 216, 216.011062, 26.8e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 217, 217.013114, 240.0e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 218, 218.013284, 109.0e-9, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 219, 219.01554, 1.05e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 220, 220.015748, 9.7e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 221, 221.018184, 1.73e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 222, 222.018468, 2.237e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 223, 223.020811, 0.60, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 224, 224.021467, 1.05, HLU_SECOND, 0.0);
+		initIsotopeProperty(90, 225, 225.023951, 8.72, HLU_MINUTE, 0.0);
+		initIsotopeProperty(90, 226, 226.024903, 30.57, HLU_MINUTE, 0.0);
+		initIsotopeProperty(90, 227, 227.0277041, 18.68, HLU_DAY, 0.0);
+		initIsotopeProperty(90, 228, 228.0287411, 1.9116, HLU_YEAR, 0.0);
+		initIsotopeProperty(90, 229, 229.031762, 7.34e3, HLU_YEAR, 0.0);
+		initIsotopeProperty(90, 230, 230.0331338, 7.538e4, HLU_YEAR, 0.0);
+		initIsotopeProperty(90, 231, 231.0363043, 25.52, HLU_HOUR, 0.0);
+		initIsotopeProperty(90, 232, 232.0380553, 1.405e10, HLU_YEAR, 1.0);
+		initIsotopeProperty(90, 233, 233.0415818, 21.83, HLU_MINUTE, 0.0);
+		initIsotopeProperty(90, 234, 234.043601, 24.10, HLU_DAY, 0.0);
+		initIsotopeProperty(90, 235, 235.04751, 7.2, HLU_MINUTE, 0.0);
+		initIsotopeProperty(90, 236, 236.04987, 37.5, HLU_MINUTE, 0.0);
+		initIsotopeProperty(90, 237, 237.05389, 4.8, HLU_MINUTE, 0.0);
+		initIsotopeProperty(90, 238, 238.0565, 9.4, HLU_MINUTE, 0.0);
+		initDecayMode2(90, 210, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(90, 211, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(90, 212, DECAY_MODE_ALPHA, 99.7, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(90, 213, DECAY_MODE_ALPHA,  99.999, DECAY_MODE_BETA_PLUS);
+		initDecayMode(90, 214, DECAY_MODE_ALPHA);
+		initDecayMode(90, 215, DECAY_MODE_ALPHA);
+		initDecayMode2(90, 216, DECAY_MODE_ALPHA, 100.0 - 0.006, DECAY_MODE_BETA_PLUS);
+		initDecayMode(90, 217, DECAY_MODE_ALPHA);
+		initDecayMode(90, 218, DECAY_MODE_ALPHA);
+		initDecayMode2(90, 219, DECAY_MODE_ALPHA, 100.0 - 1.0e-7, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(90, 220, DECAY_MODE_ALPHA, 100.0 - 2.0e-7, DECAY_MODE_ELECTRON_CAPTURE);
+		initDecayMode(90, 221, DECAY_MODE_ALPHA);
+		initDecayMode2(90, 222, DECAY_MODE_ALPHA, 100.0 - 1.3e-8, DECAY_MODE_ELECTRON_CAPTURE);
+		initDecayMode(90, 223, DECAY_MODE_ALPHA);
+		initDecayMode2(90, 224, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_DOUBLE_BETA_PLUS);
+		initDecayMode2(90, 225, DECAY_MODE_ALPHA, 90.0, DECAY_MODE_ELECTRON_CAPTURE);
+		initDecayMode(90, 226, DECAY_MODE_ALPHA);
+		initDecayMode(90, 227, DECAY_MODE_ALPHA);
+		initDecayMode(90, 228, DECAY_MODE_ALPHA);//ignore, DECAY_MODE_CLUSTER_DECAY_20O(1.3e-11)
+		initDecayMode(90, 229, DECAY_MODE_ALPHA);
+		initDecayMode(90, 230, DECAY_MODE_ALPHA);//ignore, DECAY_MODE_CLUSTER_DECAY_24Ne(5.6e-11), SELF_FISSION(various 5.0e-11)
+		initDecayMode2(90, 231, DECAY_MODE_BETA_MINUS, 100.0 - 1.0e-8, DECAY_MODE_ALPHA);
+		initDecayMode2(90, 232, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_DOUBLE_BETA_MINUS);//ignore, SELF_FISSION(various 1.1e-9), DECAY_MODE_CLUSTER_DECAY_26Ne_24Ne(2.78e-10)
+		initDecayMode(90, 233, DECAY_MODE_BETA_MINUS);
+		initDecayMode(90, 234, DECAY_MODE_BETA_MINUS);
+		initDecayMode(90, 235, DECAY_MODE_BETA_MINUS);
+		initDecayMode(90, 236, DECAY_MODE_BETA_MINUS);
+		initDecayMode(90, 237, DECAY_MODE_BETA_MINUS);
+		initDecayMode(90, 238, DECAY_MODE_BETA_MINUS);
+
+		initAtomProperty(91, "Pa", "protactinium", "プロトアクチニウム", 213, 240, 213, 240, 26.230);//heat capacity is unknown
+		initIsotopeProperty(91, 213, 213.02111, 7.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 214, 214.02092, 17.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 215, 215.01919, 14.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 216, 216.01911, 105.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 217, 217.01832, 3.48e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 218, 218.020042, 0.113e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 219, 219.01988, 53.0e-9, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 220, 220.02188, 780.0e-9, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 221, 221.02188, 4.9e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 222, 222.02374, 3.2e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 223, 223.02396, 5.1e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 224, 224.025626, 844.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 225, 225.02613, 1.7, HLU_SECOND, 0.0);
+		initIsotopeProperty(91, 226, 226.027948, 1.8, HLU_MINUTE, 0.0);
+		initIsotopeProperty(91, 227, 227.028805, 38.3, HLU_MINUTE, 0.0);
+		initIsotopeProperty(91, 228, 228.031051, 22.0, HLU_HOUR, 0.0);
+		initIsotopeProperty(91, 229, 229.0320968, 1.50, HLU_DAY, 0.0);
+		initIsotopeProperty(91, 230, 230.034541, 17.4, HLU_DAY, 0.0);
+		initIsotopeProperty(91, 231, 231.0358840, 3.276e4, HLU_YEAR, 1.0000);
+		initIsotopeProperty(91, 232, 232.038592, 1.31, HLU_DAY, 0.0);
+		initIsotopeProperty(91, 233, 233.0402473, 26.975, HLU_DAY, 0.0);
+		initIsotopeProperty(91, 234, 234.043308, 6.70, HLU_HOUR, 0.0);
+		initIsotopeProperty(91, 235, 235.04544, 24.44, HLU_MINUTE, 0.0);
+		initIsotopeProperty(91, 236, 236.04868, 9.1, HLU_MINUTE, 0.0);
+		initIsotopeProperty(91, 237, 237.05115, 8.7, HLU_MINUTE, 0.0);
+		initIsotopeProperty(91, 238, 238.05450, 2.27, HLU_MINUTE, 0.0);
+		initIsotopeProperty(91, 239, 239.05726, 1.8, HLU_HOUR, 0.0);
+		initIsotopeProperty(91, 240, 240.06098, 2.0, HLU_MINUTE, 0.0);
+		initDecayMode(91, 213, DECAY_MODE_ALPHA);
+		initDecayMode(91, 214, DECAY_MODE_ALPHA);
+		initDecayMode(91, 215, DECAY_MODE_ALPHA);
+		initDecayMode2(91, 216, DECAY_MODE_ALPHA, 80.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode(91, 217, DECAY_MODE_ALPHA);
+		initDecayMode(91, 218, DECAY_MODE_ALPHA);
+		initDecayMode2(91, 219, DECAY_MODE_ALPHA, 100.0 - 5.0e-9, DECAY_MODE_BETA_PLUS);
+		initDecayMode(91, 220, DECAY_MODE_ALPHA);
+		initDecayMode(91, 221, DECAY_MODE_ALPHA);
+		initDecayMode(91, 222, DECAY_MODE_ALPHA);
+		initDecayMode2(91, 223, DECAY_MODE_ALPHA, 100.0 - 0.001, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(91, 224, DECAY_MODE_ALPHA, 99.9, DECAY_MODE_BETA_PLUS);
+		initDecayMode(91, 225, DECAY_MODE_ALPHA);
+		initDecayMode2(91, 226, DECAY_MODE_ALPHA, 74.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(91, 227, DECAY_MODE_ALPHA, 85.0, DECAY_MODE_ELECTRON_CAPTURE);
+		initDecayMode2(91, 228, DECAY_MODE_BETA_PLUS, 98.15, DECAY_MODE_ALPHA);
+		initDecayMode2(91, 229, DECAY_MODE_ELECTRON_CAPTURE, 99.52, DECAY_MODE_ALPHA);
+		initDecayMode3(91, 230, DECAY_MODE_BETA_PLUS, 91.6 - 0.00319, DECAY_MODE_BETA_MINUS, 8.4, DECAY_MODE_ALPHA);
+		initDecayMode(91, 231, DECAY_MODE_ALPHA);//ignore, DECAY_MODE_CLUSTER_DECAY_24Ne(1.34e-9), SELF_FISSION(various, 3.0e-10), DECAY_MODE_CLUSTER_DECAY_23F(1.0e-12)
+		initDecayMode2(91, 232, DECAY_MODE_BETA_MINUS, 100.0 - 0.003, DECAY_MODE_ELECTRON_CAPTURE);
+		initDecayMode(91, 233, DECAY_MODE_BETA_MINUS);
+		initDecayMode(91, 234, DECAY_MODE_BETA_MINUS);//ignore, SELF_FISSION(various, 3.0e-10)
+		initDecayMode(91, 235, DECAY_MODE_BETA_MINUS);
+		initDecayMode(91, 236, DECAY_MODE_BETA_MINUS);//ignore, BETA_MINUS_SELF_FISSION(various, 6.0e-8)
+		initDecayMode(91, 237, DECAY_MODE_BETA_MINUS);
+		initDecayMode(91, 238, DECAY_MODE_BETA_MINUS);//ignore, BETA_MINUS_SELF_FISSION(various, 2.6e-6)
+		initDecayMode(91, 239, DECAY_MODE_BETA_MINUS);
+		initDecayMode(91, 240, DECAY_MODE_BETA_MINUS);
+
+		initAtomProperty(92, "U", "uranium", "ウラン", 217, 242, 217, 242, 27.665);
+		initIsotopeProperty(92, 217, 217.02437, 26.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 218, 218.02354, 6.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 219, 219.02492, 55.0e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 220, 220.02472, 60.0e-9, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 221, 221.02640, 700.0e-9, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 222, 222.02609, 1.4e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 223, 223.02774, 21.0e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 224, 224.027605, 940.0e-6, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 225, 225.02939, 61.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 226, 226.029339, 269.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(92, 227, 227.031156, 1.1, HLU_MINUTE, 0.0);
+		initIsotopeProperty(92, 228, 228.031374, 9.1, HLU_MINUTE, 0.0);
+		initIsotopeProperty(92, 229, 229.033506, 58.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(92, 230, 230.033940, 20.8, HLU_DAY, 0.0);
+		initIsotopeProperty(92, 231, 231.036294, 4.2, HLU_DAY, 0.0);
+		initIsotopeProperty(92, 232, 232.0371562, 68.9, HLU_YEAR, 0.0);
+		initIsotopeProperty(92, 233, 233.0396352, 1.59e5, HLU_YEAR, 0.0);
+		initIsotopeProperty(92, 234, 234.0409521, 2.455e5, HLU_YEAR, 0.000054);
+		initIsotopeProperty(92, 235, 235.0439299, 7.04e8, HLU_YEAR, 0.007204);
+		initIsotopeProperty(92, 236, 236.045568, 2.342e7, HLU_YEAR, 0.0);
+		initIsotopeProperty(92, 237, 237.0487302, 6.75, HLU_DAY, 0.0);
+		initIsotopeProperty(92, 238, 238.0507882, 4.468e9, HLU_YEAR, 0.992742);
+		initIsotopeProperty(92, 239, 239.0542933, 23.45, HLU_MINUTE, 0.0);
+		initIsotopeProperty(92, 240, 240.056592, 14.1, HLU_HOUR, 0.0);
+		initIsotopeProperty(92, 241, 241.06033, 5.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(92, 242, 242.06293, 16.8, HLU_MINUTE, 0.0);
+		initDecayMode(92, 217, DECAY_MODE_ALPHA);
+		initDecayMode(92, 218, DECAY_MODE_ALPHA);
+		initDecayMode(92, 219, DECAY_MODE_ALPHA);
+		initDecayMode2(92, 220, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(92, 221, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(92, 222, DECAY_MODE_ALPHA, 100.0 - 1.0e-6, DECAY_MODE_BETA_PLUS);
+		initDecayMode(92, 223, DECAY_MODE_ALPHA);
+		initDecayMode(92, 224, DECAY_MODE_ALPHA);
+		initDecayMode(92, 225, DECAY_MODE_ALPHA);
+		initDecayMode(92, 226, DECAY_MODE_ALPHA);
+		initDecayMode2(92, 227, DECAY_MODE_ALPHA, 100.0 - 0.001, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(92, 228, DECAY_MODE_ALPHA, 95.0, DECAY_MODE_ELECTRON_CAPTURE);
+		initDecayMode2(92, 229, DECAY_MODE_BETA_PLUS, 80.0, DECAY_MODE_ALPHA);
+		initDecayMode2(92, 230, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_DOUBLE_BETA_PLUS);//ignore, SELF_FISSION(various, 1.4e-10) 
+		initDecayMode2(92, 231, DECAY_MODE_ELECTRON_CAPTURE, 100.0 - 0.004, DECAY_MODE_ALPHA);
+		initDecayMode(92, 232, DECAY_MODE_ALPHA);//ignore, DECAY_MODE_CLUSTER_DECAY_24Ne(8.9e-10), DECAY_MODE_CLUSTER_DECAY_28Mg(5.0e-12), SELF_FISSION(various, 1.0e-11) 
+		initDecayMode(92, 233, DECAY_MODE_ALPHA);//ignore SELF_FISSION(various, 6.0e-9), DECAY_MODE_CLUSTER_DECAY_24Ne(7.2e-11), DECAY_MODE_CLUSTER_DECAY_28Mg(1.3e-13)
+		initDecayMode(92, 234, DECAY_MODE_ALPHA);//ignore SELF_FISSION(various, 1.73e-9), DECAY_MODE_CLUSTER_DECAY_28Mg(1.4e-11), DECAY_MODE_CLUSTER_DECAY_26Ne_24Ne(9.0e-12)
+		initDecayMode(92, 235, DECAY_MODE_ALPHA);//ignore SELF_FISSION(various, 7.0e-9), DECAY_MODE_CLUSTER_DECAY_25Ne_24Ne(8.0e-10)
+		initDecayMode(92, 236, DECAY_MODE_ALPHA);//ignore SELF_FISSION(various, 9.6e-8)
+		initDecayMode(92, 237, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(92, 238, DECAY_MODE_ALPHA, 100.0 - 2.19e-10, DECAY_MODE_DOUBLE_BETA_MINUS);//ignore SELF_FISSION(various, 5.45e-5)
+		initDecayMode(92, 239, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(92, 240, DECAY_MODE_BETA_MINUS, 100.0 - 1.0e-10, DECAY_MODE_ALPHA);
+		initDecayMode(92, 241, DECAY_MODE_BETA_MINUS);
+		initDecayMode(92, 242, DECAY_MODE_BETA_MINUS);
+
+		initAtomProperty(93, "Np", "neptunium", "ネプツニウム", 225, 244, 225, 244, 29.46);
+		initIsotopeProperty(93, 225, 225.03391, 3.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(93, 226, 226.03515, 35.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(93, 227, 227.03496, 510.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(93, 228, 228.03618, 61.4, HLU_SECOND, 0.0);
+		initIsotopeProperty(93, 229, 229.03626, 4.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 230, 230.03783, 4.6, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 231, 231.03825, 48.8, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 232, 232.04011, 14.7, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 233, 233.04074, 36.2, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 234, 234.042895, 4.4, HLU_DAY, 0.0);
+		initIsotopeProperty(93, 235, 235.0440633, 396.1, HLU_DAY, 0.0);
+		initIsotopeProperty(93, 236, 236.04657, 1.54e5, HLU_YEAR, 0.0);
+		initIsotopeProperty(93, 237, 237.0481734, 2.144e6, HLU_YEAR, 0.0);
+		initIsotopeProperty(93, 238, 238.0509464, 2.117, HLU_DAY, 0.0);
+		initIsotopeProperty(93, 239, 239.0529390, 2.356, HLU_DAY, 0.0);
+		initIsotopeProperty(93, 240, 240.056162, 61.9, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 241, 241.05825, 13.9, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 242, 242.06164, 2.2, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 243, 243.06428, 1.85, HLU_MINUTE, 0.0);
+		initIsotopeProperty(93, 244, 244.06785, 2.29, HLU_MINUTE, 0.0);
+		initDecayMode(93, 225, DECAY_MODE_ALPHA);
+		initDecayMode(93, 226, DECAY_MODE_ALPHA);
+		initDecayMode2(93, 227, DECAY_MODE_ALPHA, 99.95, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(93, 228, DECAY_MODE_BETA_PLUS, 59.0, DECAY_MODE_ALPHA);//ignore,  BETA_PLUS_SELF_FISSION(various, 0.012)
+		initDecayMode2(93, 229, DECAY_MODE_ALPHA, 51.0, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(93, 230, DECAY_MODE_BETA_PLUS, 97.0, DECAY_MODE_ALPHA);
+		initDecayMode2(93, 231, DECAY_MODE_BETA_PLUS, 98.0, DECAY_MODE_ALPHA);
+		initDecayMode2(93, 232, DECAY_MODE_BETA_PLUS, 99.997, DECAY_MODE_ALPHA);
+		initDecayMode2(93, 233, DECAY_MODE_BETA_PLUS, 99.999, DECAY_MODE_ALPHA);
+		initDecayMode(93, 234, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(93, 235, DECAY_MODE_ELECTRON_CAPTURE, 100.0 - 0.0026, DECAY_MODE_ALPHA);
+		initDecayMode3(93, 236, DECAY_MODE_ELECTRON_CAPTURE, 100.0 - 12.5 - 0.16, DECAY_MODE_BETA_MINUS, 12.5, DECAY_MODE_ALPHA);
+		initDecayMode(93, 237, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 2.0e-10), DECAY_MODE_CLUSTER_DECAY_30Mg(4.0e-12)
+		initDecayMode(93, 238, DECAY_MODE_BETA_MINUS);
+		initDecayMode(93, 239, DECAY_MODE_BETA_MINUS);
+		initDecayMode(93, 240, DECAY_MODE_BETA_MINUS);
+		initDecayMode(93, 241, DECAY_MODE_BETA_MINUS);
+		initDecayMode(93, 242, DECAY_MODE_BETA_MINUS);
+		initDecayMode(93, 243, DECAY_MODE_BETA_MINUS);
+		initDecayMode(93, 244, DECAY_MODE_BETA_MINUS);
+
+		initAtomProperty(94, "Pu", "plutonium", "プルトニウム", 228, 247, 228, 247, 35.5);
+		initIsotopeProperty(94, 228, 228.03874, 1.1, HLU_SECOND, 0.0);
+		initIsotopeProperty(94, 229, 229.04015, 120.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(94, 230, 230.039650, 1.70, HLU_MINUTE, 0.0);
+		initIsotopeProperty(94, 231, 231.041101, 8.6, HLU_MINUTE, 0.0);
+		initIsotopeProperty(94, 232, 232.041187, 33.7, HLU_MINUTE, 0.0);
+		initIsotopeProperty(94, 233, 233.04300, 20.9, HLU_MINUTE, 0.0);
+		initIsotopeProperty(94, 234, 234.043317, 8.8, HLU_HOUR, 0.0);
+		initIsotopeProperty(94, 235, 235.045286, 25.3, HLU_MINUTE, 0.0);
+		initIsotopeProperty(94, 236, 236.0460580, 2.858, HLU_YEAR, 0.0);
+		initIsotopeProperty(94, 237, 237.0484097, 45.2, HLU_DAY, 0.0);
+		initIsotopeProperty(94, 238, 238.0495599, 87.7, HLU_YEAR, 0.0);
+		initIsotopeProperty(94, 239, 239.0521634, 2.411e4, HLU_YEAR, 0.0);
+		initIsotopeProperty(94, 240, 240.0538135, 6.561e3, HLU_YEAR, 0.0);
+		initIsotopeProperty(94, 241, 241.0568515, 14.290, HLU_YEAR, 0.0);
+		initIsotopeProperty(94, 242, 242.0587426, 3.75e5, HLU_YEAR, 0.0);
+		initIsotopeProperty(94, 243, 243.062003, 4.956, HLU_HOUR, 0.0);
+		initIsotopeProperty(94, 244, 244.064204, 8.00e7, HLU_YEAR, 0.0);
+		initIsotopeProperty(94, 245, 245.067747, 10.5, HLU_HOUR, 0.0);
+		initIsotopeProperty(94, 246, 246.070205, 10.84, HLU_DAY, 0.0);
+		initIsotopeProperty(94, 247, 247.07407, 2.27, HLU_DAY, 0.0);
+		initDecayMode2(94, 228, DECAY_MODE_ALPHA, 99.9, DECAY_MODE_BETA_PLUS);
+		initDecayMode(94, 229, DECAY_MODE_ALPHA);
+		initDecayMode2(94, 230, DECAY_MODE_ALPHA, 99.999, DECAY_MODE_BETA_PLUS);
+		initDecayMode2(94, 231, DECAY_MODE_BETA_PLUS, 99.999, DECAY_MODE_ALPHA);
+		initDecayMode2(94, 232, DECAY_MODE_ELECTRON_CAPTURE, 89.0, DECAY_MODE_ALPHA);
+		initDecayMode2(94, 233, DECAY_MODE_BETA_PLUS, 99.88, DECAY_MODE_ALPHA);
+		initDecayMode2(94, 234, DECAY_MODE_ELECTRON_CAPTURE, 94.0, DECAY_MODE_ALPHA);
+		initDecayMode2(94, 235, DECAY_MODE_BETA_PLUS, 100.00 - 0.0027, DECAY_MODE_ALPHA);
+		initDecayMode2(94, 236, DECAY_MODE_ALPHA, 99.999999, DECAY_MODE_DOUBLE_BETA_PLUS);//ignore, SELF_FISSION(various, 1.37e-7), DECAY_MODE_CLUSTER_DECAY_28Mg(2.0e-12)
+		initDecayMode2(94, 237, DECAY_MODE_ELECTRON_CAPTURE, 100.0 - 0.0042, DECAY_MODE_ALPHA);
+		initDecayMode(94, 238, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 1.9e-7), DECAY_MODE_CLUSTER_DECAY_32Si(1.4e-14), DECAY_MODE_CLUSTER_DECAY_30Mg_28Mg(6.0e-15)
+		initDecayMode(94, 239, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 3.1e-10)
+		initDecayMode(94, 240, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 5.7e-6), DECAY_MODE_CLUSTER_DECAY_34Si(1.3e-13)
+		initDecayMode2(94, 241, DECAY_MODE_BETA_MINUS, 100.0 - 0.00245, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 2.4e-14)
+		initDecayMode(94, 242, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 5.5e-4)
+		initDecayMode(94, 243, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(94, 244, DECAY_MODE_ALPHA, 100.0 - 7.3e-9, DECAY_MODE_DOUBLE_BETA_MINUS);//ignore, SELF_FISSION(various, 0.123)
+		initDecayMode(94, 245, DECAY_MODE_BETA_MINUS);
+		initDecayMode(94, 246, DECAY_MODE_BETA_MINUS);
+		initDecayMode(94, 247, DECAY_MODE_BETA_MINUS);
+
+		initAtomProperty(95, "Am", "americium", "アメリシウム", 231, 249, 231, 249, 62.7);
+		initIsotopeProperty(95, 231, 231.04556, 30.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(95, 232, 232.04659, 79.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(95, 233, 233.04635, 3.2, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 234, 234.04781, 2.32, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 235, 235.04795, 9.9, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 236, 236.04958, 3.6, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 237, 237.05000, 73.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 238, 238.05198, 98.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 239, 239.0530245, 11.9, HLU_HOUR, 0.0);
+		initIsotopeProperty(95, 240, 240.055300, 50.8, HLU_HOUR, 0.0);
+		initIsotopeProperty(95, 241, 241.0568291, 432.2, HLU_YEAR, 0.0);
+		initIsotopeProperty(95, 242, 242.0595492, 16.02, HLU_HOUR, 0.0);
+		initIsotopeProperty(95, 243, 243.0613811, 7370.0, HLU_YEAR, 0.0);
+		initIsotopeProperty(95, 244, 244.0642848, 10.1, HLU_HOUR, 0.0);
+		initIsotopeProperty(95, 245, 245.066452, 2.05, HLU_HOUR, 0.0);
+		initIsotopeProperty(95, 246, 246.069775, 39.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 247, 247.07209, 23.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 248, 248.07575, 3.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(95, 249, 249.07848, 1.0, HLU_MINUTE, 0.0);
+		initDecayMode2(95, 231, DECAY_MODE_BETA_PLUS, 99.999, DECAY_MODE_ALPHA);
+		initDecayMode2(95, 232, DECAY_MODE_BETA_PLUS, 98.0, DECAY_MODE_ALPHA);//ignore, BETA_PLUS_SELF_FISSION(various, 0.069)
+		initDecayMode2(95, 233, DECAY_MODE_BETA_PLUS, 98.0, DECAY_MODE_ALPHA);
+		initDecayMode2(95, 234, DECAY_MODE_BETA_PLUS, 100.0 - 0.04, DECAY_MODE_ALPHA);//ignore, BETA_PLUS_SELF_FISSION(various, 0.0066)
+		initDecayMode2(95, 235, DECAY_MODE_BETA_PLUS, 99.999, DECAY_MODE_ALPHA);
+		initDecayMode2(95, 236, DECAY_MODE_BETA_PLUS, 99.9, DECAY_MODE_ALPHA);
+		initDecayMode2(95, 237, DECAY_MODE_BETA_PLUS, 100.0 - 0.025, DECAY_MODE_ALPHA);
+		initDecayMode2(95, 238, DECAY_MODE_BETA_PLUS, 100.0 - 1.0e-4, DECAY_MODE_ALPHA);
+		initDecayMode2(95, 239, DECAY_MODE_ELECTRON_CAPTURE, 99.99, DECAY_MODE_ALPHA);
+		initDecayMode2(95, 240, DECAY_MODE_BETA_PLUS, 100.0 - 1.9e-4, DECAY_MODE_ALPHA);
+		initDecayMode(95, 241, DECAY_MODE_ALPHA);//ignore, DECAY_MODE_CLUSTER_DECAY_34Si(7.4e-10), SELF_FISSION(various, 4.3e-10)
+		initDecayMode2(95, 242, DECAY_MODE_BETA_MINUS, 82.7, DECAY_MODE_ELECTRON_CAPTURE);
+		initDecayMode(95, 243, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 3.7e-9)
+		initDecayMode(95, 244, DECAY_MODE_BETA_MINUS);
+		initDecayMode(95, 245, DECAY_MODE_BETA_MINUS);
+		initDecayMode(95, 246, DECAY_MODE_BETA_MINUS);
+		initDecayMode(95, 247, DECAY_MODE_BETA_MINUS);
+		initDecayMode(95, 248, DECAY_MODE_BETA_MINUS);
+		initDecayMode(95, 249, DECAY_MODE_BETA_MINUS);
+
+		initAtomProperty(96, "Cm", "curium", "キュリウム", 233, 252, 233, 252, 62.7);//heat apacity is unknown
+		initIsotopeProperty(96, 233, 233.05077, 1.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(96, 234, 234.05016, 51.0, HLU_SECOND, 0.0);
+		initIsotopeProperty(96, 235, 235.05143, 5.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(96, 236, 236.05141, 10.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(96, 237, 237.05290, 20.0, HLU_MINUTE, 0.0);
+		initIsotopeProperty(96, 238, 238.05303, 2.4, HLU_HOUR, 0.0);
+		initIsotopeProperty(96, 239, 239.05496, 2.9, HLU_HOUR, 0.0);
+		initIsotopeProperty(96, 240, 240.0555295, 27.0, HLU_DAY, 0.0);
+		initIsotopeProperty(96, 241, 241.0576530, 32.8, HLU_DAY, 0.0);
+		initIsotopeProperty(96, 242, 242.0588358, 162.8, HLU_DAY, 0.0);
+		initIsotopeProperty(96, 243, 243.0613891, 29.1, HLU_YEAR, 0.0);
+		initIsotopeProperty(96, 244, 244.0627526, 18.10, HLU_YEAR, 0.0);
+		initIsotopeProperty(96, 245, 245.0654912, 8.5e3, HLU_YEAR, 0.0);
+		initIsotopeProperty(96, 246, 246.0672237, 4.76e3, HLU_YEAR, 0.0);
+		initIsotopeProperty(96, 247, 247.070354, 1.56e7, HLU_YEAR, 0.0);
+		initIsotopeProperty(96, 248, 248.072349, 3.48e5, HLU_YEAR, 0.0);
+		initIsotopeProperty(96, 249, 249.075953, 64.15, HLU_MINUTE, 0.0);
+		initIsotopeProperty(96, 250, 250.078357, 8300.0, HLU_YEAR, 0.0);
+		initIsotopeProperty(96, 251, 251.082285, 16.8, HLU_MINUTE, 0.0);
+		initIsotopeProperty(96, 252, 252.08487, 1.0, HLU_DAY, 0.0);
+		initDecayMode2(96, 233, DECAY_MODE_BETA_PLUS, 50.0, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 234, DECAY_MODE_BETA_PLUS, 50.0, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 235, DECAY_MODE_BETA_PLUS, 50.0, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 236, DECAY_MODE_BETA_PLUS, 50.0, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 237, DECAY_MODE_BETA_PLUS, 50.0, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 238, DECAY_MODE_ELECTRON_CAPTURE, 90.0, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 239, DECAY_MODE_BETA_PLUS, 99.9, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 240, DECAY_MODE_ALPHA, 99.5, DECAY_MODE_ELECTRON_CAPTURE);//ignore, SELF_FISSION(various, 3.9e-6)
+		initDecayMode2(96, 241, DECAY_MODE_ELECTRON_CAPTURE, 99.0, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 242, DECAY_MODE_ALPHA, 99.999999, DECAY_MODE_DOUBLE_BETA_PLUS);//ignore, SELF_FISSION(various, 6.33e-6), DECAY_MODE_CLUSTER_DECAY_34Si(1.0e-14)
+		initDecayMode2(96, 243, DECAY_MODE_ALPHA, 99.71, DECAY_MODE_ELECTRON_CAPTURE);//ignore, SELF_FISSION(various, 5.3e-9)
+		initDecayMode(96, 244, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 1.34e-4)
+		initDecayMode(96, 245, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 6.1e-7)
+		initDecayMode(96, 246, DECAY_MODE_ALPHA);//ignore, SELF_FISSION(various, 0.0261)
+		initDecayMode(96, 247, DECAY_MODE_ALPHA);
+		initDecayMode2(96, 248, DECAY_MODE_ALPHA, 99.9999, DECAY_MODE_DOUBLE_BETA_MINUS);//ignore, SELF_FISSION(various, 8.26)
+		initDecayMode(96, 249, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(96, 250, DECAY_MODE_ALPHA, 55.0, DECAY_MODE_BETA_MINUS);//ignore, SELF_FISSION(various, 80.0)
+		initDecayMode(96, 251, DECAY_MODE_BETA_MINUS);
+		initDecayMode(96, 252, DECAY_MODE_BETA_MINUS);
+
 		e_hydrogenPtr = getIsotopePropertyPtr(ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN);
 		if(!e_hydrogenPtr){
 			fprintf(stderr, "FATAL ERROR:%s:NO hydrogen\n", __FUNCTION__);
@@ -5943,6 +6361,14 @@ extern void initAtomProperties()
 		e_helium4Ptr = getIsotopePropertyPtr(ATOMICNUMBER_HELIUM, MASSNUMBER_HELIUM);
 		if(!e_helium4Ptr){
 			fprintf(stderr, "FATAL ERROR:%s:NO helium4\n", __FUNCTION__);
+		}
+		e_C14Ptr = getIsotopePropertyPtr(ATOMICNUMBER_CARBON, MASSNUMBER_CARBON14);
+		if(!e_C14Ptr){
+			fprintf(stderr, "FATAL ERROR:%s:NO C14\n", __FUNCTION__);
+		}
+		e_Kr80Ptr = getIsotopePropertyPtr(ATOMICNUMBER_Kr, MASSNUMBER_Kr80);
+		if(!e_Kr80Ptr){
+			fprintf(stderr, "FATAL ERROR:%s:NO Kr80\n", __FUNCTION__);
 		}
 	}
 }
@@ -8910,10 +9336,54 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 						}else{
 							showErrorOfUndefinedDaughter = 1;
 						}
+					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_CLUSTER_DECAY_14C){
+						daughterAtomicNumber = a_isotopePropertyPtr->atomicNumber - ATOMICNUMBER_CARBON;
+						daughterMassNumber = a_isotopePropertyPtr->massNumber - MASSNUMBER_CARBON14;
+						daughterIsotopePropertyPtr = getIsotopePropertyPtr(daughterAtomicNumber, daughterMassNumber);
+						if(daughterIsotopePropertyPtr){
+							massDefectMeV = a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + e_C14Ptr->massMeV);
+							if(massDefectMeV > 0.0){
+								snprintf(nuclearReactionStr, REACTION_LEN,
+									"%s(%lg) -> %s(%lg) + 14C(%lg) + %lg[MeV/c^2]", 
+										a_isotopePropertyPtr->symbol, a_isotopePropertyPtr->massMeV,
+										daughterIsotopePropertyPtr->symbol, daughterIsotopePropertyPtr->massMeV,
+										e_C14Ptr->massMeV, massDefectMeV);
+								checkMassInNuclearReaction(a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + e_C14Ptr->massMeV), massDefectMeV, nuclearReactionStr);
+								registNuclearReaction(a_electrodePtr, REACTION_DETECT, a_isotopePropertyPtr->decayMode[i], nuclearReactionStr, massDefectMeV, partialMol, 0.0, 0.0);
+								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
+								increaseAtom(a_electrodePtr, ATOMICNUMBER_CARBON, MASSNUMBER_CARBON14, partialMol);
+								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_C14Ptr->massMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+							}else{
+								showErrorNegativeMassDefect = 1;
+							}
+						}else{
+							showErrorOfUndefinedDaughter = 1;
+						}
 					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_SELF_FISSION_80KR){
-						fprintf(stderr, "ERROR:%s:not programmed decay mode:DECAY_MODE_SELF_FISSION_80KR\n", __FUNCTION__);
-						fprintf(e_logFp, "ERROR:%s:not programmed decay mode:DECAY_MODE_SELF_FISSION_80KR\n", __FUNCTION__);
-						exit(1);
+						daughterAtomicNumber = a_isotopePropertyPtr->atomicNumber - ATOMICNUMBER_Kr;
+						daughterMassNumber = a_isotopePropertyPtr->massNumber - MASSNUMBER_Kr80;
+						daughterIsotopePropertyPtr = getIsotopePropertyPtr(daughterAtomicNumber, daughterMassNumber);
+						if(daughterIsotopePropertyPtr){
+							massDefectMeV = a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + e_Kr80Ptr->massMeV);
+							if(massDefectMeV > 0.0){
+								snprintf(nuclearReactionStr, REACTION_LEN,
+									"%s(%lg) -> %s(%lg) + 80Kr(%lg) + %lg[MeV/c^2]", 
+										a_isotopePropertyPtr->symbol, a_isotopePropertyPtr->massMeV,
+										daughterIsotopePropertyPtr->symbol, daughterIsotopePropertyPtr->massMeV,
+										e_Kr80Ptr->massMeV, massDefectMeV);
+								checkMassInNuclearReaction(a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + e_Kr80Ptr->massMeV), massDefectMeV, nuclearReactionStr);
+								registNuclearReaction(a_electrodePtr, REACTION_DETECT, a_isotopePropertyPtr->decayMode[i], nuclearReactionStr, massDefectMeV, partialMol, 0.0, 0.0);
+								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
+								increaseAtom(a_electrodePtr, ATOMICNUMBER_Kr, MASSNUMBER_Kr80, partialMol);
+								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_Kr80Ptr->massMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+							}else{
+								showErrorNegativeMassDefect = 1;
+							}
+						}else{
+							showErrorOfUndefinedDaughter = 1;
+						}
 					}else{
 						fprintf(stderr, "ERROR:%s:unknown decay mode:%d\n", __FUNCTION__, a_isotopePropertyPtr->decayMode[i]);
 						fprintf(e_logFp, "ERROR:%s:unknown decay mode:%d\n", __FUNCTION__, a_isotopePropertyPtr->decayMode[i]);
