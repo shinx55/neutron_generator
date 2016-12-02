@@ -45,8 +45,14 @@ double e_massProtonKg = 1.672621898E-27;//[kg], the mass of a proton
 double e_massProtonMeV = 938.2720813;//[MeV/C^2], the mass of a proton
 double e_massElectronKg = 9.10938356E-31; //[kg], the mass of an electron
 double e_massElectronMeV = 0.5109989461;//[MeV/C^2], the mass of an electron
+double e_r0 = 1.2E-15;//[m], radius zero in "R = r0 * pow(A, 1/3)", alomost radius of proton
+//double e_radiusOfProtonByPion = 1.4138E-15;//[m], radius of proton by pion(pi-meson)
+double e_radiusOfProtonByRmsCharge = 0.8751E-15;//[m], radius of proton by RMS(root mean square) charge 
+double e_radiusOfDeuteronByRmsCharge = 2.1413E-15;//[m], radius of deuteron by RMS(root mean square) charge
+double e_radiusOfElectronByWeakBoson = 2.4547e-18;//[m], radius of electron by weak boson, also radius of up-quark / down-quark by weak boson
 //[calcuated Physics constants]
 double e_coefElectroPotentialMeV;//(e_elementaryCharge * e_elementaryCharge) / (4.0 * M_PI * e_vacuumPermittivity * e_energyJouleOfeV * 1.0E6)
+double e_relativeRadiusOfElectronByWeakBoson;//(e_radiusOfElectronByWeakBoson / e_r0)
 double e_coefMassUToMeV;
 double e_coefMeVtoMassU;
 double e_massNeutronMassU;//[u], the mass of a neutron
@@ -54,6 +60,8 @@ double e_massProtonMassU;//[u], the mass of a proton
 double e_massElectronMassU;//[u], the mass of an electron
 double e_betaEnergyMassU;//
 double e_betaEnergyMeV;// the kinetic energy that is released in beta decay, (It is random split into electrons and the anti-electron neutrino)
+double e_coulombBarrierOf2Protons;// 0.822743 = e_coefElectroPotentialMeV / (e_radiusOfProtonByRmsCharge + e_radiusOfProtonByRmsCharge);
+//0.822743 / 0.782333 = 1.0516531962731983 
 //---------------------------------------------------------------------
 //[User conditions]
 int e_rangeDecimalDigitPrecision;//2 - 6;//The precision expressed by the number of dicimal digit, 6 means that the tolelance rate is 10^-6 = 0.000001, 2 means 10^-2 = 0.01. The function "registOutput" will treat that a gamma ray is almost equal to another gamma ray with in the tolelance specified by "e_rangeDecimalDigitPrecision". Why 2 and not 6? If you use 6, there are too many grades of strength of gamma, the program need very large memories and take long time of the computation of simulation.
@@ -71,7 +79,7 @@ char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS];
 double e_appliedVoltageScale;
 double e_emittedElectronMol;//The number of moles of electrons emitted per one(1) second from the negative electrode by high-voltage pulse like the Cockcroft-Walton voltage multiplier circuit.
 
-double e_collideElectronRateOnElectrode;//Probability to collide between (the electron emitted from the negative electrode) and (the nucleus in the positive electrode), the electron has large kinetic energy than the energy of beta decay, the electron emitted from the negative electrode, that reaches on the positive electrode
+double e_collideElectronRateOnElectrode;//Probability to collide between (the electron emitted from the negative electrode) and (the particles in the positive electrode), the electron has large kinetic energy than the energy of beta decay, the electron emitted from the negative electrode, that reaches on the positive electrode
 double e_collideElectronRateForMidiMeV;//This is paired with 'e_collideElectronMidiMeV'
 double e_collideElectronRateForMiniMeV;//This is paired with 'e_collideElectronMiniMeV'
 double e_emittedProtonMol;//The number of moles of protons emitted per one(1) second from the by positive electrode by high-voltage pulse like the Cockcroft-Walton voltage multiplier circuit.
@@ -87,19 +95,19 @@ int e_useComptonEffect;// 1 (dafault) or 0
 extern void initUserConditionsByDefault()
 {
 	e_rangeDecimalDigitPrecision = 2;
-	e_detectLimitRateForIsotope = 1.0E-15; 
-	strcpy(e_negativeElectrodeAtomicMols, "Ni=1.0");
+	e_detectLimitRateForIsotope = 1.0E-21; //1.0E-15;
+	strcpy(e_negativeElectrodeAtomicMols, "H=0.6, Ni=1.0");
 	strcpy(e_positiveElectrodeAtomicMols, "H=0.6, Ni=1.0");
-	e_appliedVoltageScale = 1.01;
-	e_emittedElectronMol = 1.0E-10;
-	e_collideElectronRateOnElectrode = 0.2;
-	e_collideElectronRateForMidiMeV = 0.1;
-	e_collideElectronRateForMiniMeV = 0.01;
+	e_appliedVoltageScale = 1.06;// > 1.0516 = e_coulombBarrierOf2Protons / e_betaEnergyMeV
+	e_emittedElectronMol = 0.04E-10;
+	e_collideElectronRateOnElectrode = 1.0;
+	e_collideElectronRateForMidiMeV = 1.0;
+	e_collideElectronRateForMiniMeV = 1.0;
 	e_emittedProtonMol = 0.4E-10;
-	e_neutronGenInSpaceProtonRate = 0.01;
+	e_neutronGenInSpaceProtonRate = 2 * (e_radiusOfElectronByWeakBoson * e_radiusOfElectronByWeakBoson) / (e_r0 * e_r0);
 	e_neutronGenInSpaceFallRate = 0.95;
-	e_hydrogenGenInSpaceProtonRate = 0.01;
-	e_collideProtonRateOnElectrode = 0.2;
+	e_hydrogenGenInSpaceProtonRate = 0.001;
+	e_collideProtonRateOnElectrode = 1.0;
 	e_collideElectronMidiMeV = 0.36;
 	e_collideElectronMiniMeV = 0.01;
 	e_usebulletCrossSection = 1;
@@ -241,6 +249,7 @@ extern void initiallyCalculatePhysicsContants()
 {
 	//[calculated Physics constants]
 	e_coefElectroPotentialMeV = (e_elementaryCharge * e_elementaryCharge) / (4.0 * M_PI * e_vacuumPermittivity * e_energyJouleOfeV * 1.0E6);
+	e_relativeRadiusOfElectronByWeakBoson = e_radiusOfElectronByWeakBoson / e_r0;
 	e_coefMassUToMeV = e_massNeutronMeV * ( e_unifiedAtomicMassUnitKg / e_massNeutronKg);
 	e_coefMeVtoMassU = 1 / e_coefMassUToMeV;
 	e_massNeutronMassU = e_massNeutronMeV * e_coefMeVtoMassU;
@@ -248,6 +257,9 @@ extern void initiallyCalculatePhysicsContants()
 	e_massElectronMassU = e_massElectronMeV * e_coefMeVtoMassU;
 	e_betaEnergyMassU = e_massNeutronMassU - (e_massProtonMassU + e_massElectronMassU);
 	e_betaEnergyMeV = e_massNeutronMeV - (e_massProtonMeV + e_massElectronMeV);	
+	e_coulombBarrierOf2Protons = e_coefElectroPotentialMeV / (e_radiusOfProtonByRmsCharge + e_radiusOfProtonByRmsCharge);
+	//fprintf(stderr, "e_betaEnergyMeV %lg e_coulombBarrierOf2Protons %lg\n", e_betaEnergyMeV, e_coulombBarrierOf2Protons);
+	//exit(1);//debug
 }
 
 extern void initiallyCalculateUserContants()
@@ -260,6 +272,9 @@ extern void initiallyCalculateUserContants()
 	if(e_appliedVoltageScale < 0.05){
 		fprintf(stderr,"FATAL ERROR:%s:too small e_appliedVoltageScale:%lg\n", __FUNCTION__, e_appliedVoltageScale);
 		exit(1);
+	}
+	if(e_appliedVoltageScale < e_coulombBarrierOf2Protons / e_betaEnergyMeV){
+		fprintf(stderr,"WARNING:%s:e_appliedVoltageScale:%lg < %lg = %lg / %lg\n", __FUNCTION__, e_appliedVoltageScale, e_coulombBarrierOf2Protons / e_betaEnergyMeV, e_coulombBarrierOf2Protons, e_betaEnergyMeV);
 	}
 	e_stepsOfLostingEnergy = (int)(e_appliedVoltageScale * 2.0);
 	e_appliedVoltageMassU = e_betaEnergyMassU * e_appliedVoltageScale;
@@ -347,6 +362,11 @@ extern void printContants(FILE * a_fp)
 	fprintf(a_fp, "P%d e_massProtonMeV %lg [MeV/C^2]\n", i++, e_massProtonMeV);
 	fprintf(a_fp, "P%d e_massElectronKg  %lg [kg]\n", i++, e_massElectronKg);
 	fprintf(a_fp, "P%d e_massElectronMeV %lg [MeV/C^2]\n", i++, e_massElectronMeV);
+	fprintf(a_fp, "P%d e_r0 %lg [m]\n", i++, e_r0);
+	//fprintf(a_fp, "P%d e_radiusOfProtonByPion %lg [m]\n", i++, e_radiusOfProtonByPion);
+	fprintf(a_fp, "P%d e_radiusOfProtonByRmsCharge %lg [m]\n", i++, e_radiusOfProtonByRmsCharge);
+	fprintf(a_fp, "P%d e_radiusOfDeuteronByRmsCharge %lg [m]\n", i++, e_radiusOfDeuteronByRmsCharge);
+	fprintf(a_fp, "P%d e_radiusOfElectronByWeakBoson %lg [m]\n", i++, e_radiusOfElectronByWeakBoson);
 	
 	fprintf(a_fp, "[calculated Physics constants]\n");
 	i = 1;
@@ -355,7 +375,8 @@ extern void printContants(FILE * a_fp)
 	fprintf(a_fp, "Q%d coefMeVtoKg(by Electron) %lg [kg]/[MeV/C^2]\n", i++, e_massElectronKg / e_massElectronMeV);
 	
 	fprintf(a_fp, "Q%d e_coefElectroPotentialMeV %lg\n", i++, e_coefElectroPotentialMeV);
-
+	fprintf(a_fp, "Q%d e_relativeRadiusOfElectronByWeakBoson %lg\n", i++, e_relativeRadiusOfElectronByWeakBoson);
+	
 	fprintf(a_fp, "Q%d e_coefMassUToMeV %lg\n", i++, e_coefMassUToMeV);
 	fprintf(a_fp, "Q%d e_coefMeVtoMassU %lg\n", i++, e_coefMeVtoMassU);
 	fprintf(a_fp, "Q%d e_massNeutronMassU  %lg [u]\n", i++, e_massNeutronMassU);
@@ -363,6 +384,7 @@ extern void printContants(FILE * a_fp)
 	fprintf(a_fp, "Q%d e_massElectronMassU %lg [u]\n", i++, e_massElectronMassU);
 	fprintf(a_fp, "Q%d e_betaEnergyMassU %lg [u]\n", i++, e_betaEnergyMassU);
 	fprintf(a_fp, "Q%d e_betaEnergyMeV   %lg [MeV/C^2]\n", i++, e_betaEnergyMeV);
+	fprintf(a_fp, "Q%d e_coulombBarrierOf2Protons %lg [MeV/C^2]\n", i++, e_coulombBarrierOf2Protons);
 
 	fprintf(a_fp, "[User conditions]\n");
 	i = 1;
@@ -579,47 +601,50 @@ extern void readUserConditions(char * a_fname)
 	}
 }
 //---------------------------------------------------------------------
+#define MIN_DECAY_MODE   101
+#define DECAY_MODE_ALPHA 101
+#define DECAY_MODE_BETA_PLUS         111 
+#define DECAY_MODE_DOUBLE_BETA_PLUS  112
+#define DECAY_MODE_BETA_PLUS_ALPHA   113
+#define DECAY_MODE_BETA_PLUS_PROTON  114
+#define DECAY_MODE_BETA_PLUS_2PROTON 115
+#define DECAY_MODE_BETA_PLUS_3PROTON 116
+#define DECAY_MODE_ELECTRON_CAPTURE        121
+#define DECAY_MODE_DOUBLE_ELECTRON_CAPTURE 122
+#define DECAY_MODE_ELECTRON_CAPTURE_ALPHA  123
+#define DECAY_MODE_ELECTRON_CAPTURE_PROTON 124
+#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE         131 // only use in the situation, can't use in isotopes table
+#define DECAY_MODE_DOUBLE_ELECTRON_CAPTURE_DEGRADE  132 // only use in the situation, can't use in isotopes table
+#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_ALPHA   133 // only use in the situation, can't use in isotopes table
+#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_PROTON  134 // only use in the situation, can't use in isotopes table
+#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_2PROTON 135 // only use in the situation, can't use in isotopes table
+#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_3PROTON 136 // only use in the situation, can't use in isotopes table
+#define DECAY_MODE_BETA_MINUS              141 
+#define DECAY_MODE_DOUBLE_BETA_MINUS       142 
+#define DECAY_MODE_BETA_MINUS_AND_ALPHA    143 
+#define DECAY_MODE_BETA_MINUS_AND_NEWTRON  144
+#define DECAY_MODE_BETA_MINUS_AND_2NEWTRON 145
+#define DECAY_MODE_BETA_MINUS_AND_3NEWTRON 146
+#define DECAY_MODE_BETA_MINUS_AND_4NEWTRON 147
+#define DECAY_MODE_PROTON_EMISSION  151
+#define DECAY_MODE_2PROTON_EMISSION 152
+#define DECAY_MODE_NEWTRON_EMISSION 161 
+#define DECAY_MODE_2NEWTRON_EMISSION 162 
+#define DECAY_MODE_3NEWTRON_EMISSION 163 
+#define DECAY_MODE_4NEWTRON_EMISSION 164 
+#define DECAY_MODE_CLUSTER_DECAY_14C         106014
+//#define DECAY_MODE_CLUSTER_DECAY_20O       108020
+//#define DECAY_MODE_CLUSTER_DECAY_23F       109023
+//#define DECAY_MODE_CLUSTER_DECAY_24Ne      110024
+//#define DECAY_MODE_CLUSTER_DECAY_25Ne_24Ne 110225
+//#define DECAY_MODE_CLUSTER_DECAY_26Ne_24Ne 110226
+//#define DECAY_MODE_CLUSTER_DECAY_28Mg      112028
+//#define DECAY_MODE_CLUSTER_DECAY_30Mg      112030
+//#define DECAY_MODE_CLUSTER_DECAY_30Mg_28Mg 112230
+//#define DECAY_MODE_CLUSTER_DECAY_32Si      114032
+//#define DECAY_MODE_CLUSTER_DECAY_34Si      114034
+#define DECAY_MODE_SELF_FISSION_80KR         136080 // 180Tl -> 100Ru +  80Kr
 
-#define DECAY_MODE_ALPHA 1
-#define DECAY_MODE_BETA_PLUS 2 
-#define DECAY_MODE_BETA_PLUS_PROTON 3
-#define DECAY_MODE_BETA_PLUS_ALPHA 4
-#define DECAY_MODE_ELECTRON_CAPTURE 5
-#define DECAY_MODE_ELECTRON_CAPTURE_PROTON 6
-#define DECAY_MODE_ELECTRON_CAPTURE_ALPHA 7
-#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE 8 // only use in the situation, can't use in isotopes table
-#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_PROTON 9 // only use in the situation, can't use in isotopes table
-#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_ALPHA 10 // only use in the situation, can't use in isotopes table
-#define DECAY_MODE_BETA_MINUS 11 
-#define DECAY_MODE_BETA_MINUS_AND_NEWTRON 12
-#define DECAY_MODE_PROTON_EMISSION 13
-#define DECAY_MODE_2PROTON_EMISSION 14
-#define DECAY_MODE_BETA_PLUS_2PROTON 15
-#define DECAY_MODE_BETA_PLUS_3PROTON 16
-#define DECAY_MODE_DOUBLE_BETA_MINUS 17 
-#define DECAY_MODE_BETA_MINUS_AND_2NEWTRON 18
-#define DECAY_MODE_BETA_MINUS_AND_3NEWTRON 19
-#define DECAY_MODE_BETA_MINUS_AND_4NEWTRON 20
-#define DECAY_MODE_BETA_MINUS_AND_ALPHA 21 
-#define DECAY_MODE_NEWTRON_EMISSION 22 
-#define DECAY_MODE_SELF_FISSION_80KR 23 // 180Tl -> 100Ru +  80Kr
-#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_2PROTON 24 // only use in the situation, can't use in isotopes table
-#define DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_3PROTON 25 // only use in the situation, can't use in isotopes table
-#define DECAY_MODE_DOUBLE_ELECTRON_CAPTURE 26
-#define DECAY_MODE_DOUBLE_BETA_PLUS 27
-#define DECAY_MODE_DOUBLE_ELECTRON_CAPTURE_DEGRADE 28
-#define DECAY_MODE_CLUSTER_DECAY_14C 29
-//#define DECAY_MODE_CLUSTER_DECAY_20O 30
-//#define DECAY_MODE_CLUSTER_DECAY_23F 31
-//#define DECAY_MODE_CLUSTER_DECAY_24Ne 32
-//#define DECAY_MODE_CLUSTER_DECAY_25Ne_24Ne 33
-//#define DECAY_MODE_CLUSTER_DECAY_26Ne_24Ne 34
-//#define DECAY_MODE_CLUSTER_DECAY_28Mg 35
-//#define DECAY_MODE_CLUSTER_DECAY_30Mg 36
-//#define DECAY_MODE_CLUSTER_DECAY_30Mg_28Mg 37
-//#define DECAY_MODE_CLUSTER_DECAY_32Si 38
-//#define DECAY_MODE_CLUSTER_DECAY_34Si 39
-#define MAX_DECAY_MODE DECAY_MODE_CLUSTER_DECAY_14C
 extern const char * getCollideName(int a_collideType);
 extern const char * getDecayModeText(int a_decayMode)
 {
@@ -627,36 +652,42 @@ extern const char * getDecayModeText(int a_decayMode)
 	switch(a_decayMode){
 		case DECAY_MODE_ALPHA: modeText = "ALPHA"; break;
 		case DECAY_MODE_BETA_PLUS: modeText = "BETA_PLUS"; break;
-		case DECAY_MODE_BETA_PLUS_PROTON: modeText = "BETA_PLUS_PROTON"; break;
+		case DECAY_MODE_DOUBLE_BETA_PLUS: modeText = "DOUBLE_BETA_PLUS"; break;
 		case DECAY_MODE_BETA_PLUS_ALPHA: modeText = "BETA_PLUS_ALPHA"; break;
-		case DECAY_MODE_ELECTRON_CAPTURE: modeText = "ELECTRON_CAPTURE"; break;
-		case DECAY_MODE_ELECTRON_CAPTURE_PROTON: modeText = "ELECTRON_CAPTURE_PROTON"; break;
-		case DECAY_MODE_ELECTRON_CAPTURE_ALPHA: modeText = "ELECTRON_CAPTURE_ALPHA"; break;
-		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE: modeText = "ELECTRON_CAPTURE_DEGRADE"; break;
-		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_PROTON: modeText = "ELECTRON_CAPTURE_DEGRADE_PROTON"; break;
-		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_ALPHA: modeText = "ELECTRON_CAPTURE_DEGRADE_ALPHA"; break;
-		case DECAY_MODE_BETA_MINUS: modeText = "BETA_MINUS"; break;
-		case DECAY_MODE_BETA_MINUS_AND_NEWTRON: modeText = "BETA_MINUS_AND_NEWTRON"; break;
-		case DECAY_MODE_PROTON_EMISSION: modeText = "PROTON_EMISSION"; break;
-		case DECAY_MODE_2PROTON_EMISSION: modeText = "2PROTON_EMISSION"; break;
+		case DECAY_MODE_BETA_PLUS_PROTON: modeText = "BETA_PLUS_PROTON"; break;
 		case DECAY_MODE_BETA_PLUS_2PROTON: modeText = "BETA_PLUS_2PROTON"; break;
 		case DECAY_MODE_BETA_PLUS_3PROTON: modeText = "BETA_PLUS_3PROTON"; break;
+		case DECAY_MODE_ELECTRON_CAPTURE: modeText = "ELECTRON_CAPTURE"; break;
+		case DECAY_MODE_DOUBLE_ELECTRON_CAPTURE: modeText = "DOUBLE_ELECTRON_CAPTURE"; break;
+		case DECAY_MODE_ELECTRON_CAPTURE_ALPHA: modeText = "ELECTRON_CAPTURE_ALPHA"; break;
+		case DECAY_MODE_ELECTRON_CAPTURE_PROTON: modeText = "ELECTRON_CAPTURE_PROTON"; break;
+		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE: modeText = "ELECTRON_CAPTURE_DEGRADE"; break;
+		case DECAY_MODE_DOUBLE_ELECTRON_CAPTURE_DEGRADE: modeText = "DOUBLE_ELECTRON_CAPTURE_DEGRADE"; break;
+		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_ALPHA: modeText = "ELECTRON_CAPTURE_DEGRADE_ALPHA"; break;
+		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_PROTON: modeText = "ELECTRON_CAPTURE_DEGRADE_PROTON"; break;
+		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_2PROTON: modeText = "ELECTRON_CAPTURE_DEGRADE_2PROTON"; break;
+		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_3PROTON: modeText = "ELECTRON_CAPTURE_DEGRADE_3PROTON"; break;
+		case DECAY_MODE_BETA_MINUS: modeText = "BETA_MINUS"; break;
 		case DECAY_MODE_DOUBLE_BETA_MINUS: modeText = "DOUBLE_BETA_MINUS"; break;
+		case DECAY_MODE_BETA_MINUS_AND_ALPHA: modeText = "BETA_MINUS_AND_ALPHA"; break;
+		case DECAY_MODE_BETA_MINUS_AND_NEWTRON: modeText = "BETA_MINUS_AND_NEWTRON"; break;
 		case DECAY_MODE_BETA_MINUS_AND_2NEWTRON: modeText = "BETA_MINUS_AND_2NEWTRON"; break;
 		case DECAY_MODE_BETA_MINUS_AND_3NEWTRON: modeText = "BETA_MINUS_AND_3NEWTRON"; break;
 		case DECAY_MODE_BETA_MINUS_AND_4NEWTRON: modeText = "BETA_MINUS_AND_4NEWTRON"; break;
-		case DECAY_MODE_BETA_MINUS_AND_ALPHA: modeText = "BETA_MINUS_AND_ALPHA"; break;
+		case DECAY_MODE_PROTON_EMISSION: modeText = "PROTON_EMISSION"; break;
+		case DECAY_MODE_2PROTON_EMISSION: modeText = "2PROTON_EMISSION"; break;
 		case DECAY_MODE_NEWTRON_EMISSION: modeText = "NEWTRON_EMISSION"; break;
-		case DECAY_MODE_SELF_FISSION_80KR: modeText = "SELF_FISSION_80KR"; break;
-		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_2PROTON: modeText = "ELECTRON_CAPTURE_DEGRADE_2PROTON"; break;
-		case DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_3PROTON: modeText = "ELECTRON_CAPTURE_DEGRADE_3PROTON"; break;
-		case DECAY_MODE_DOUBLE_ELECTRON_CAPTURE: modeText = "DOUBLE_ELECTRON_CAPTURE"; break;
-		case DECAY_MODE_DOUBLE_BETA_PLUS: modeText = "DOUBLE_BETA_PLUS"; break;
-		case DECAY_MODE_DOUBLE_ELECTRON_CAPTURE_DEGRADE: modeText = "DOUBLE_ELECTRON_CAPTURE_DEGRADE"; break;
+		case DECAY_MODE_2NEWTRON_EMISSION: modeText = "2NEWTRON_EMISSION"; break;
+		case DECAY_MODE_3NEWTRON_EMISSION: modeText = "3NEWTRON_EMISSION"; break;
+		case DECAY_MODE_4NEWTRON_EMISSION: modeText = "4NEWTRON_EMISSION"; break;
 		case DECAY_MODE_CLUSTER_DECAY_14C: modeText = "CLUSTER_DECAY_14C"; break;
+		case DECAY_MODE_SELF_FISSION_80KR: modeText = "SELF_FISSION_80KR"; break;
 		default:
-			if(a_decayMode > MAX_DECAY_MODE){
+			if(a_decayMode < MIN_DECAY_MODE){
 				modeText = getCollideName(a_decayMode);
+			}else{
+				fprintf(stderr, "FATAL:%s(%d):UNKNOWN DECAY %d\n", __FUNCTION__, __LINE__, a_decayMode);
+				exit(1);
 			}
 			break;
 	}
@@ -700,8 +731,7 @@ struct isotopeProperty {
 	int decayMode[SIZE_OF_DECAY_MODE];
 	double decayModeRate[SIZE_OF_DECAY_MODE];
 	double relativeIsotopicAbundance;//Natural abundance ratio by mole
-	double nucleusRadius;//
-	double relativeCollideCrossSection;//Relative collide-cross-sectional area, pow(massNumber, 2/3)
+	double relativeNucleusRadius;// pow(massNumber, 1.0/3.0)
     char * symbol;
     char * name;
     char * japaneseName;
@@ -978,19 +1008,18 @@ extern void initIsotopeProperty(int a_atomicNumber, int a_massNumber, double a_m
 		isotopePropertyPtr->halfLifeUnit = a_halfLifeUnit;
 		isotopePropertyPtr->relativeIsotopicAbundance = a_relativeIsotopicAbundance;
 		if(a_massNumber > 0){
-			isotopePropertyPtr->nucleusRadius = pow(a_massNumber, 1.0 / 3.0) * 1E-15;
-			isotopePropertyPtr->relativeCollideCrossSection = pow(a_massNumber, 2.0 / 3.0);
-			//pow(1, 2.0 / 3.0); = 1
-			//pow(2, 2.0 / 3.0); = 1.5874010519681994
-			//pow(3, 2.0 / 3.0); = 2.080083823051904
-			//pow(4, 2.0 / 3.0); = 2.5198420997897464
+			if(a_massNumber == 1){
+				isotopePropertyPtr->relativeNucleusRadius = e_radiusOfProtonByRmsCharge / e_r0;
+			}else if(a_massNumber < pow(e_radiusOfDeuteronByRmsCharge / e_r0, 3.0)){
+				//5.68 = pow(e_radiusOfDeuteronByRmsCharge / e_r0, 3.0)
+				isotopePropertyPtr->relativeNucleusRadius = e_radiusOfDeuteronByRmsCharge / e_r0;
+			}else{
+				isotopePropertyPtr->relativeNucleusRadius = pow(a_massNumber, 1.0 / 3.0);
+			}
 		}else if(a_massNumber == MASSNUMBER_ELECTRON && a_atomicNumber == ATOMICNUMBER_ELECTRON){
-			isotopePropertyPtr->nucleusRadius = 2.5e-18;
-			isotopePropertyPtr->relativeCollideCrossSection = pow(2.5e-18 / 0.8775E-15, 2.0);// = 0.00000811681723362635
-			// (2.5e-18 = electron radius by weak boson) / (0.8775E-15 = rms charge radius of proton)
+			isotopePropertyPtr->relativeNucleusRadius = e_radiusOfElectronByWeakBoson / e_r0;
 		}else{
-			isotopePropertyPtr->nucleusRadius = 0.0;
-			isotopePropertyPtr->relativeCollideCrossSection = 0;
+			isotopePropertyPtr->relativeNucleusRadius = 0.0;
 		}
 		n = strlen(getAtomPropertyPtr(a_atomicNumber)->symbol) + 4;
 		isotopePropertyPtr->symbol = clearAlloc(n, "symbol");
@@ -1140,26 +1169,40 @@ extern void initAtomProperties()
 		initIsotopePropertySymbols(0, 3, "3n", "trineutron", "仮想三重中性子", "3n");
 		initDecayMode(0, 1, DECAY_MODE_BETA_MINUS);
 		
-		initAtomProperty(1, "H", "hydrogen", "水素", 1, 3, 1, 3, 28.836);
+		initAtomProperty(1, "H", "hydrogen", "水素", 1, 7, 1, 3, 28.836);
 		initIsotopeProperty(1, 1, 1.00782503207, 0.0, HLU_STABLE, 0.999885);
 		initIsotopeProperty(1, 2, 2.0141017778, 0.0, HLU_STABLE, 0.000115); 
 		initIsotopeProperty(1, 3, 3.0160492777, 12.32, HLU_YEAR, 0.0);
+		initIsotopeProperty(1, 4, 4.02643, 1.39e-22, HLU_SECOND, 0.0);
+		initIsotopeProperty(1, 5, 5.03531, 9.1e-22, HLU_SECOND, 0.0);
+		initIsotopeProperty(1, 6, 6.04496, 2.9e-22, HLU_SECOND, 0.0);
+		initIsotopeProperty(1, 7, 7.05275, 2.3e-23, HLU_SECOND, 0.0);
 		initIsotopePropertySymbols(1, 1, "H", "hydrogen", "水素", "p");
 		initIsotopePropertySymbols(1, 2, "D", "deuterium", "重水素", "d");
 		initIsotopePropertySymbols(1, 3, "T", "tritium", "三重水素", "t");
 		initDecayMode(1, 3, DECAY_MODE_BETA_MINUS);
+		initDecayMode(1, 4, DECAY_MODE_NEWTRON_EMISSION);
+		initDecayMode(1, 5, DECAY_MODE_2NEWTRON_EMISSION);
+		initDecayMode2(1, 6, DECAY_MODE_3NEWTRON_EMISSION, 50.0, DECAY_MODE_4NEWTRON_EMISSION);
+		initDecayMode(1, 7, DECAY_MODE_4NEWTRON_EMISSION);
 		
-		initAtomProperty(2, "He", "helium", "ヘリウム", 3, 8, 3, 4, 20.786);
+		initAtomProperty(2, "He", "helium", "ヘリウム", 3, 10, 3, 4, 20.786);
+		initIsotopeProperty(2, 2, 2.015894, 1.0e-9, HLU_SECOND, 0.0);
 		initIsotopeProperty(2, 3, 3.0160293191, 0.0, HLU_STABLE, 0.00000134);
 		initIsotopeProperty(2, 4, 4.00260325415, 0.0, HLU_STABLE, 0.99999866);
 		initIsotopeProperty(2, 5, 5.01222, 700.0e-24, HLU_SECOND, 0.0);
 		initIsotopeProperty(2, 6, 6.0188891, 806.7e-3, HLU_SECOND, 0.0);
 		initIsotopeProperty(2, 7, 7.028021, 2.9e-21, HLU_SECOND, 0.0);
 		initIsotopeProperty(2, 8, 8.033922, 119.0e-3, HLU_SECOND, 0.0);
+		initIsotopeProperty(2, 9, 9.04395, 7.0e-21, HLU_SECOND, 0.0);
+		initIsotopeProperty(2, 10, 10.05240, 2.7e-21, HLU_SECOND, 0.0);
+		initDecayMode2(2, 2, DECAY_MODE_PROTON_EMISSION, 99.99, DECAY_MODE_BETA_PLUS);
 		initDecayMode(2, 5, DECAY_MODE_NEWTRON_EMISSION);
 		initDecayMode2(2, 6, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_ALPHA);
 		initDecayMode(2, 7, DECAY_MODE_NEWTRON_EMISSION);
 		initDecayMode2(2, 8, DECAY_MODE_BETA_MINUS, 84.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);//ignore "β-, fission (0.9%, 5He + 3H)"
+		initDecayMode(2, 9, DECAY_MODE_NEWTRON_EMISSION);
+		initDecayMode(2, 10, DECAY_MODE_2NEWTRON_EMISSION);
 
 		initAtomProperty(3, "Li", "lithium", "リチウム", 4, 11, 6, 7, 24.860);
 		initIsotopeProperty(3, 4, 4.02719, 91.0E-24, HLU_SECOND, 0.0);
@@ -6372,7 +6415,81 @@ extern void initAtomProperties()
 		}
 	}
 }
+extern void printAllElectronCapture(FILE * a_fp)
+{
+	int atomicNumber;
+	fputs("[Electron Capture Properties]\n", a_fp);
+	fputs("\n", a_fp);
+	fputs("AN : \"atomic number\"\n", a_fp);
+	fputs("MN : \"mass number\"\n", a_fp);
+	fputs("HLs : \"Half Lift time in second\"\n", a_fp);
+	fputs("dRt : \"decay Rate of Electron Capture\"\n", a_fp);
+	fputs("masU : \"mass [U]\"\n", a_fp);
+	fputs("mas : \"mass [MeV]\"\n", a_fp);
+	fputs("mDf : \"mass Defect in [MeV]\"\n", a_fp);
+	fputs("r1 : \"Electron orbit radius of k shell [m]\"\n", a_fp);
+	fputs("CP1 : \"Electrostatic potential energy of k shell [MeV]\"\n", a_fp);
+	fputs("E1 : \"Ionization Energy of k shell [MeV]\"\n", a_fp);
+	fputs("r0 : \"the radius of a nucleus [m]\"\n", a_fp);
+	fputs("CP0 : \"Electrostatic potential energy of the radius of a nucleus [MeV]\"\n", a_fp);
+	fputs("\n", a_fp);
+	fputs("AN symbol name MN HLs dRt masU mas mDf r1 CP1 E1 CP1-E1 r0 CP0\n", a_fp);
+	for(atomicNumber = MIN_ATOM_NUMBER; atomicNumber <= MAX_ATOM_NUMBER; ++atomicNumber){
+		struct atomProperty * atomPropertyPtr;
+		atomPropertyPtr = getAtomPropertyPtr(atomicNumber);
+		if(atomPropertyPtr){
+			if(atomPropertyPtr->atomicNumber != UNDEF_ATOMIC_NUMBER){
+				int massNumber;
+				for(massNumber = atomPropertyPtr->minMassNumber; massNumber <= atomPropertyPtr->maxMassNumber; ++massNumber){
+					struct isotopeProperty * isotopePropertyPtr
+					= getIsotopePropertyPtr(atomPropertyPtr->atomicNumber, massNumber);
+					if(atomPropertyPtr->atomicNumber == isotopePropertyPtr->atomicNumber){
+						if(isotopePropertyPtr->massU > 0.0){
+							if(isotopePropertyPtr->decayModeSize > 0){
+								int i;
+								for(i = 0; i < isotopePropertyPtr->decayModeSize; ++i){
+									if(isotopePropertyPtr->decayMode[i] == DECAY_MODE_ELECTRON_CAPTURE){
+										double massDefectMeV, r1, CP1, E1, r0, CP0;
+										int daughterAtomicNumber, daughterMassNumber;
+										struct isotopeProperty * daughterIsotopePropertyPtr;
+										daughterAtomicNumber = isotopePropertyPtr->atomicNumber - 1;
+										daughterMassNumber = isotopePropertyPtr->massNumber;
+										daughterIsotopePropertyPtr = getIsotopePropertyPtr(daughterAtomicNumber, daughterMassNumber);
+										massDefectMeV = isotopePropertyPtr->massMeV - daughterIsotopePropertyPtr->massMeV;
 
+										fprintf(a_fp, "%d", atomPropertyPtr->atomicNumber);
+										fprintf(a_fp, " \"%s\"", atomPropertyPtr->symbol);
+										fprintf(a_fp, " \"%s\"", atomPropertyPtr->name);
+										//fprintf(a_fp, " \"%s\"", atomPropertyPtr->japaneseName);
+										fprintf(a_fp, " %d", isotopePropertyPtr->massNumber);
+										//fprintf(a_fp, " \"%lg [%s]\"", isotopePropertyPtr->halfLife, getHalfLifeUnitString(isotopePropertyPtr->halfLifeUnit));
+										fprintf(a_fp, " %lg", calcHalfLifeSec(isotopePropertyPtr));
+									    //fprintf(a_fp, " %s", getDecayModeText(isotopePropertyPtr->decayMode[i]));
+									    fprintf(a_fp, " %lg", isotopePropertyPtr->decayModeRate[i]);
+										fprintf(a_fp, " %lg", isotopePropertyPtr->massU);
+										fprintf(a_fp, " %lg", isotopePropertyPtr->massMeV);
+									    fprintf(a_fp, " %lg", massDefectMeV);
+
+										r1 = 5.288e-11 / atomPropertyPtr->atomicNumber;
+										CP1 = (e_elementaryCharge * e_elementaryCharge * atomPropertyPtr->atomicNumber)/(4.0* M_PI *e_vacuumPermittivity * r1) / e_energyJouleOfeV / 1.0E6;
+										E1 = 13.6 * atomPropertyPtr->atomicNumber * atomPropertyPtr->atomicNumber * 1e-6;
+										r0 = isotopePropertyPtr->relativeNucleusRadius * e_r0;
+										CP0 = (e_elementaryCharge * e_elementaryCharge * atomPropertyPtr->atomicNumber)/(4.0* M_PI *e_vacuumPermittivity * r0) / e_energyJouleOfeV / 1.0E6;
+										fprintf(a_fp, " %lg %lg %lg %lg %lg %lg\n",  r1, CP1, E1, CP1 - E1, r0, CP0);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}else{
+		}
+	}
+	fputs("AN symbol name MN HLs dRt masU mas mDf r1 CP1 E1 CP1-E1 r0 CP0\n", a_fp);
+	fputs("\n", a_fp);
+	exit(0);
+}
 extern void printIsotopeProperty(FILE * a_fp, struct isotopeProperty * a_isotopePropertyPtr)
 {
 	if(a_isotopePropertyPtr->massU > 0.0){
@@ -6423,7 +6540,7 @@ extern void printIsotopeProperty(FILE * a_fp, struct isotopeProperty * a_isotope
 			}
 			fputs("\n", a_fp);
 		}
-		fprintf(a_fp, " nucleusRadius %lg RCCS %lg \n", a_isotopePropertyPtr->nucleusRadius, a_isotopePropertyPtr->relativeCollideCrossSection);
+		fprintf(a_fp, " NucleusRadius %lg\n", a_isotopePropertyPtr->relativeNucleusRadius * e_r0);
 	}
 }
 extern void printAtomProperty(FILE * a_fp, struct atomProperty * a_atomPropertyPtr)
@@ -7041,7 +7158,7 @@ extern void mergeSumMeVMol(struct sumMeVMol * a_merge, struct sumMeVMol * a_src1
 #define SCAT_SMALL_BY_COMPTON_E 5 // This Comton effect type is the enegy passed to an electron from a photon. But the amount of energy is less than "e_collideElectronMiniMeV". Therefore they can't cause the next neclear action anymore.
 
 
-#define SCAT_DEGRADE_IN_COMPTON_B 6 //The too many SCAT_BIG_MASS_DEFECT_NOW nodes in the hash table, "massDefectHashTable", they waste the memory and power of computer. So, we do degreade them by shopping the energy into 32 greades. The SCAT_DEGRADE_IN_COMPTON_B type contains shopped small remain part of BIG energy. The grading big energy is still in the "massDefectHashTable".
+#define SCAT_DEGRADE_IN_COMPTON_B 6 //The too many SCAT_BIG_MASS_DEFECT_NOW nodes in the hash table, "massDefectHashTable", they waste the memory and power of a computer. So, we do degreade them by shopping the energy into 32 greades. The SCAT_DEGRADE_IN_COMPTON_B type contains shopped small remain part of BIG energy. The grading big energy is still in the "massDefectHashTable".
 #define SCAT_DEGRADE_IN_COMPTON_S 7
 #define SIZE_OF_SCATTERD 8 //The array size of scatterd photon types. Those types of photon are reason of heat.
 
@@ -7655,25 +7772,29 @@ extern double printElectrode(FILE * a_fp, struct electrode * a_electrodePtr, str
 }
 //---------------------------------------------------------------------
 
-#define COLLIDE_ELECTRON  (MAX_DECAY_MODE + 1) //by high volatage
-#define COLLIDE_ELECTRON_C  (MAX_DECAY_MODE + 2) //by the compton Effect
-#define COLLIDE_PROTON (MAX_DECAY_MODE + 3)
-#define COLLIDE_DEUTERIUM (MAX_DECAY_MODE + 4)
-#define COLLIDE_TRITIUM (MAX_DECAY_MODE + 5)
-#define COLLIDE_NEUTRON (MAX_DECAY_MODE + 6)
+#define COLLIDE_PROTON     1 //by high volatage
+#define COLLIDE_DEUTERIUM  2 //by high volatage
+#define COLLIDE_TRITIUM    3 //by high volatage
+#define COLLIDE_ELECTRON   4 //by high volatage
+#define COLLIDE_NEUTRON    5
+#define COLLIDE_ELECTRON_C 6 //by the compton Effect
+
 extern const char * getCollideName(int a_collideType)
 {
 	const char * collideNamePtr = "unkown";
 	switch(a_collideType){
+	case COLLIDE_PROTON:     collideNamePtr = "COLLIDE_PROTON_BY_HIGH_VOLTAGE"; break;
+	case COLLIDE_DEUTERIUM:  collideNamePtr = "COLLIDE_DEUTERIUM_BY_HIGH_VOLTAGE"; break;
+	case COLLIDE_TRITIUM:    collideNamePtr = "COLLIDE_TRITIUM_BY_HIGH_VOLTAGE";  break;
 	case COLLIDE_ELECTRON:	 collideNamePtr = "COLLIDE_ELECTRON_BY_HIGH_VOLTAGE"; break;
+	case COLLIDE_NEUTRON:    collideNamePtr = "COLLIDE_NEUTRON";  break;
 	case COLLIDE_ELECTRON_C: collideNamePtr = "COLLIDE_ELECTRON_BY_COMPTON_EFFECT"; break;
-	case COLLIDE_PROTON:         collideNamePtr = "COLLIDE_PROTON_BY_HIGH_VOLTAGE"; break;
-	case COLLIDE_DEUTERIUM:      collideNamePtr = "COLLIDE_DEUTERIUM_BY_HIGH_VOLTAGE"; break;
-	case COLLIDE_TRITIUM:        collideNamePtr = "COLLIDE_TRITIUM_BY_HIGH_VOLTAGE";  break;
-	case COLLIDE_NEUTRON:        collideNamePtr = "COLLIDE_NEUTRON";  break;
 	default:
-		if(a_collideType <= MAX_DECAY_MODE){
+		if(a_collideType > MIN_DECAY_MODE){
 			collideNamePtr = getDecayModeText(a_collideType);
+		}else{
+			fprintf(stderr, "FATAL:%s(%d):UNKNOWN COLLIDE %d\n", __FUNCTION__, __LINE__, a_collideType);
+			exit(1);
 		}
 		break;
 	}
@@ -7713,15 +7834,21 @@ struct collide {
 	double electroPotentialMeV;//set by calcElectroPotentialMeVByCollide
 	
 	//{ set by getCollidedNewIsotopePropertyPtr
-	int newAtomicNumber;
-	int newMassNumber;
-	const struct isotopeProperty * newIsotopePropertyPtr;
-	double minAppliedVoltageMeV;
-	double massDefectMeV;
-	double minMassDefectMeV;
-	char * plusAlpha;
-	char nuclearReactionStr[REACTION_LEN + 1];
+#define MAX_NEWCOUNT 4
 	int isElectronCapture;
+	int newCount;
+	int newAtomicNumber[MAX_NEWCOUNT];
+	int newMassNumber[MAX_NEWCOUNT];
+	const struct isotopeProperty * newIsotopePropertyPtr[MAX_NEWCOUNT];
+	double minAppliedVoltageMeV[MAX_NEWCOUNT];
+	double massDefectMeV[MAX_NEWCOUNT];
+	double minMassDefectMeV[MAX_NEWCOUNT];
+	char * plusAlpha[MAX_NEWCOUNT];
+	char nuclearReactionStr[MAX_NEWCOUNT][REACTION_LEN + 1];
+	double rate[MAX_NEWCOUNT];
+	int subAtomicNumber[MAX_NEWCOUNT];
+	int subMassNumber[MAX_NEWCOUNT];
+	const struct isotopeProperty * subIsotopePropertyPtr[MAX_NEWCOUNT];
 	//}
 
 	double newIsotopeMol;// set by collideParticleAtom
@@ -7729,7 +7856,7 @@ struct collide {
 extern void useElectronOrNeutron(struct collide * a_pX)
 {
 	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_C){
-		a_pX->useElectron = 0;
+		a_pX->useElectron = 1;
 		a_pX->useNeutron = 0;
 	}else if(a_pX->collideType == COLLIDE_PROTON){
 		a_pX->useElectron = 1;
@@ -7832,7 +7959,7 @@ extern void freeCopyNuclearReactionKey(void * a_keyPtr)
 	free(ptr->formPtr);
 	free(a_keyPtr);
 }
-#define VERSION_OF_serializeNuclearReactionKey 1
+#define VERSION_OF_serializeNuclearReactionKey 2 //I changed the order of decayOrCollideType. (Oct 20, 2016)
 extern void * allocFreadNuclearReactionKey(FILE * a_fp)
 {
 	struct nuclearReactionKey * ret;
@@ -8100,7 +8227,7 @@ extern int iterateDebug(void * a_total, const void * a_keyPtr, void * a_valuePtr
 	return KEEP_NODE;
 }
 */
-extern void printAllNuclearReaction(FILE * a_fp)
+extern void printAllNuclearReaction(FILE * a_fp, const char * a_timeMessPtr)
 {
 	int needSortedTable = 1;
 	unsigned int size;
@@ -8139,7 +8266,7 @@ extern void printAllNuclearReaction(FILE * a_fp)
 			if(oldElectrodeType != keyPtr->electrodeType || oldReactionType != keyPtr->reactionType){
 				if(oldElectrodeType != -1 && oldReactionType != -1){
 					fprintf(a_fp, "%c%c Total %Lg [MeV mol] -> %Lg [MeV]\n", electrodeChar, reactionChar, totalMeV, totalMeV * NAvogadro);
-					fprintf(a_fp, "[ %s ReactionType %s ]>>>\n", electrodeTypeStr, reactionTypeStr);
+					fprintf(a_fp, "%s\n[ %s ReactionType %s ]>>>\n", a_timeMessPtr, electrodeTypeStr, reactionTypeStr);
 				}
 				oldElectrodeType = keyPtr->electrodeType;
 				oldReactionType = keyPtr->reactionType;
@@ -8147,7 +8274,7 @@ extern void printAllNuclearReaction(FILE * a_fp)
 				electrodeChar = getElectrodeChar(keyPtr->electrodeType);
 				reactionTypeStr = getNuclearReactionName(keyPtr->reactionType);
 				reactionChar = getNuclearReactionChar(keyPtr->reactionType);
-				fprintf(a_fp, "\n[ %s ReactionType %s ]<<<\n", electrodeTypeStr, reactionTypeStr);
+				fprintf(a_fp, "\n[ %s ReactionType %s ]<<<\n%s\n", electrodeTypeStr, reactionTypeStr, a_timeMessPtr);
 				j = 1;
 				totalMeV = 0.0;
 			}
@@ -8206,7 +8333,7 @@ extern void printAllNuclearReaction(FILE * a_fp)
 		}
 		if(size > 0){
 			fprintf(a_fp, "%c%c Total %Lg [MeV mol] -> %Lg [MeV]\n", electrodeChar, reactionChar, totalMeV, totalMeV * NAvogadro);
-			fprintf(a_fp, "[ %s ReactionType %s ]>>>\n", electrodeTypeStr, reactionTypeStr);
+			fprintf(a_fp, "%s\n[ %s ReactionType %s ]>>>\n", a_timeMessPtr, electrodeTypeStr, reactionTypeStr);
 		}
 		free(nodePtrs);
 	}
@@ -8214,36 +8341,36 @@ extern void printAllNuclearReaction(FILE * a_fp)
 
 
 //---------------------------------------------------------------------
-extern void sprintNoDataOfAtom(struct collide * a_pX, struct atomProperty * a_atomPropertyPtr)
+extern void sprintNoDataOfAtom(struct collide * a_pX, struct atomProperty * a_atomPropertyPtr, int a_index)
 {
 	if(a_pX->printNuclearReaction){
 		if(a_atomPropertyPtr){
-			snprintf(a_pX->nuclearReactionStr, REACTION_LEN,
+			snprintf(a_pX->nuclearReactionStr[a_index], REACTION_LEN,
 				"There is no data of atom, %s: %s + %s -> %d%s\n", 
 				getCollideName(a_pX->collideType), 
 				a_pX->targetIsotopePropertyPtr->symbol, a_pX->bulletPropertyPtr->nucleusName,
-				a_pX->newMassNumber, a_atomPropertyPtr->symbol);
+				a_pX->newMassNumber[a_index], a_atomPropertyPtr->symbol);
 		}else{
-			snprintf(a_pX->nuclearReactionStr, REACTION_LEN,
+			snprintf(a_pX->nuclearReactionStr[a_index], REACTION_LEN,
 				"There is no data of atom, %s: %s + %s -> %d~%d(mass~atom)\n", 
 				getCollideName(a_pX->collideType), 
 				a_pX->targetIsotopePropertyPtr->symbol, a_pX->bulletPropertyPtr->nucleusName,
-				a_pX->newMassNumber, a_pX->newAtomicNumber);		
+				a_pX->newMassNumber[a_index], a_pX->newAtomicNumber[a_index]);		
 		}
 	}
 }
-extern void checkNoDataOfAtom(struct collide * a_pX)
+extern void checkNoDataOfAtom(struct collide * a_pX, int a_index)
 {
-	struct atomProperty * atomPropertyPtr = getAtomPropertyPtr(a_pX->newAtomicNumber);
+	struct atomProperty * atomPropertyPtr = getAtomPropertyPtr(a_pX->newAtomicNumber[a_index]);
 	if(atomPropertyPtr){
-		if(atomPropertyPtr->min1secMassNumber <= a_pX->newMassNumber 
-		&& a_pX->newMassNumber <= atomPropertyPtr->max1secMassNumber){
-			sprintNoDataOfAtom(a_pX, atomPropertyPtr);
+		if(atomPropertyPtr->min1secMassNumber <= a_pX->newMassNumber[a_index] 
+		&& a_pX->newMassNumber[a_index] <= atomPropertyPtr->max1secMassNumber){
+			sprintNoDataOfAtom(a_pX, atomPropertyPtr, a_index);
 		}else{
 			;//The new isotope has very short half-time. So, we ignore them.
 		}
 	}else{
-		sprintNoDataOfAtom(a_pX, atomPropertyPtr);
+		sprintNoDataOfAtom(a_pX, atomPropertyPtr, a_index);
 	}
 }
 extern void calcElectroPotentialMeVByCollide(struct collide * a_pX)
@@ -8252,7 +8379,10 @@ extern void calcElectroPotentialMeVByCollide(struct collide * a_pX)
 	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_C){
 		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
-			sign = 1;
+			sign = 1;//The coulomb barrier between an electron and an electron
+			a_pX->electroPotentialMeV = a_pX->appliedVoltageMeV;//Coulomb potential to allow a moving electron and a static electron to approach
+			
+			//a_pX->electroPotentialMeV = e_coefElectroPotentialMeV / (e_radiusOfElectronByWeakBoson + e_radiusOfElectronByWeakBoson);//287.9[MeV]
 		}else if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_NEUTRON 
 		&& (a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_NEUTRON
 			|| a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_DINEUTRON
@@ -8277,77 +8407,103 @@ extern void calcElectroPotentialMeVByCollide(struct collide * a_pX)
 		){
 			sign = 0;
 		}else{
-			sign = 1;
+			sign = 1;//The coulomb barrier between a proton/deuterium/tritium and a nucleus
+			a_pX->electroPotentialMeV = e_coefElectroPotentialMeV * (a_pX->targetIsotopePropertyPtr->atomicNumber) / ((a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius) * e_r0);
 		}
 	}else{//COLLIDE_NEUTRON
 		sign = 0;
 	}
-	if(sign == 0){
+	if(sign == 0){// collide neutron
 		a_pX->electroPotentialMeV = 0.0;
-	}else{
-		a_pX->electroPotentialMeV = sign * e_coefElectroPotentialMeV * (a_pX->targetIsotopePropertyPtr->atomicNumber) / (a_pX->targetIsotopePropertyPtr->nucleusRadius + a_pX->bulletPropertyPtr->nucleusRadius);
+	}else if(sign == -1){// collide an electron to a nucleus
+		a_pX->electroPotentialMeV = -1.0 * e_coefElectroPotentialMeV * (a_pX->targetIsotopePropertyPtr->atomicNumber) / ((a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius) * e_r0);
 	}
 	//fprintf(stderr, "DEBUG:%s:%s target:%s electroPotentialMeV=%lg\n", __FUNCTION__, getCollideName(a_pX->collideType), a_pX->targetIsotopePropertyPtr->symbol, a_pX->electroPotentialMeV);
 }
-extern void set_minMassDefectMeV_plusAlpha(struct collide * a_pX)
+extern void set_minMassDefectMeV_plusAlpha(struct collide * a_pX, int a_index)
 {
-			
-	if(a_pX->minAppliedVoltageMeV >= 0.0){
-		a_pX->minMassDefectMeV = 0.0;
+	//fprintf(stderr, "DEBUG:%s:BEGIN{a_pX %p\n", __FUNCTION__, a_pX);	
+	if(a_pX->minAppliedVoltageMeV[a_index] >= 0.0){
+		a_pX->minMassDefectMeV[a_index] = 0.0;
 	}else{
-		a_pX->minMassDefectMeV = - a_pX->minAppliedVoltageMeV;
-		a_pX->minAppliedVoltageMeV = 0.0;
+		a_pX->minMassDefectMeV[a_index] = - a_pX->minAppliedVoltageMeV[a_index];
+		a_pX->minAppliedVoltageMeV[a_index] = 0.0;
 	}
-	if(a_pX->massDefectMeV >= 0.0){
-		a_pX->plusAlpha = " + x";
+	if(a_pX->massDefectMeV[a_index] >= 0.0){
+		a_pX->plusAlpha[a_index] = " + x";
 	}else{
-		a_pX->plusAlpha = " - x";
+		a_pX->plusAlpha[a_index] = " - x";
 	}
+	//fprintf(stderr, "DEBUG:%s:END}\n", __FUNCTION__);
 }
 extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 {
-	//fprintf(stderr, "DEBUG:%s:BEGIN{%lp\n", __FUNCTION__, a_pX);
+	//fprintf(stderr, "DEBUG:%s:BEGIN{a_pX %p\n", __FUNCTION__, a_pX);
 	calcElectroPotentialMeVByCollide(a_pX);
-	a_pX->newAtomicNumber = UNDEF_ATOMIC_NUMBER;//for safety
-	a_pX->newMassNumber = UNDEF_MASS_NUMBER;//for safety
-	a_pX->newIsotopePropertyPtr = NULL;//for safety
-	a_pX->minAppliedVoltageMeV = 0.0;//for safety
-	a_pX->massDefectMeV = 0.0;//for safety
-	a_pX->minMassDefectMeV = 0.0;//for safety
-	a_pX->plusAlpha = "";//for safety
-	a_pX->nuclearReactionStr[0] = 0;//for safety
+	a_pX->newCount = 1;
+	a_pX->newAtomicNumber[0] = UNDEF_ATOMIC_NUMBER;//for safety
+	a_pX->newMassNumber[0] = UNDEF_MASS_NUMBER;//for safety
+	a_pX->newIsotopePropertyPtr[0] = NULL;//for safety
+	a_pX->minAppliedVoltageMeV[0] = 0.0;//for safety
+	a_pX->massDefectMeV[0] = 0.0;//for safety
+	a_pX->minMassDefectMeV[0] = 0.0;//for safety
+	a_pX->plusAlpha[0] = "";//for safety
+	a_pX->nuclearReactionStr[0][0] = 0;//for safety
+	a_pX->rate[0] = 1.0;
 	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_C){
-		a_pX->isElectronCapture = 1;
-		a_pX->newAtomicNumber = a_pX->targetIsotopePropertyPtr->atomicNumber - 1;
-		a_pX->newMassNumber = a_pX->targetIsotopePropertyPtr->massNumber;
-		if(a_pX->newAtomicNumber != ATOMICNUMBER_ELECTRON || a_pX->newMassNumber != MASSNUMBER_ELECTRON){
-			a_pX->newIsotopePropertyPtr = getIsotopePropertyPtr(a_pX->newAtomicNumber, a_pX->newMassNumber);
-			if(a_pX->newIsotopePropertyPtr){
-				a_pX->minAppliedVoltageMeV = a_pX->newIsotopePropertyPtr->massMeV - a_pX->targetIsotopePropertyPtr->massMeV;
-				a_pX->massDefectMeV = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV;
-				set_minMassDefectMeV_plusAlpha(a_pX);
+		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
+		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
+			a_pX->isElectronCapture = 2;
+			a_pX->newAtomicNumber[0] = a_pX->targetIsotopePropertyPtr->atomicNumber;
+			a_pX->newMassNumber[0] = a_pX->targetIsotopePropertyPtr->massNumber;
+			a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
+			if(a_pX->newIsotopePropertyPtr[0]){
+				a_pX->minAppliedVoltageMeV[0] = 0.0;
+				a_pX->massDefectMeV[0] = a_pX->appliedVoltageMeV;
+				set_minMassDefectMeV_plusAlpha(a_pX, 0);
 				if(a_pX->printNuclearReaction){
-					double targetIonMassMeV = a_pX->targetIsotopePropertyPtr->massMeV - e_massElectronMeV;
-					char * targetSymbolPtr;
-					if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_HYDROGEN){
-						targetSymbolPtr = a_pX->targetIsotopePropertyPtr->nucleusName;
-					}else{
-						targetSymbolPtr = a_pX->targetIsotopePropertyPtr->symbol;
-					}
-					snprintf(a_pX->nuclearReactionStr, REACTION_LEN,
-						"%s+(%lg) + e-(%lg) + (%lg%s)[MeV] -> %s(%lg) + νe + (%lg%s)[MeV]", 
-						targetSymbolPtr, targetIonMassMeV,
-						e_massElectronMeV,
-						a_pX->minAppliedVoltageMeV, a_pX->plusAlpha,
-						a_pX->newIsotopePropertyPtr->symbol, a_pX->newIsotopePropertyPtr->massMeV,
-						a_pX->minMassDefectMeV, a_pX->plusAlpha);
+					snprintf(a_pX->nuclearReactionStr[0], REACTION_LEN,
+						"e-(%lg) + e-(%lg) + (X+0)[MeV] -> e-(%lg) + (Y)[MeV] + e-(%lg) + (Z)[MeV]", 
+						e_massElectronMeV, e_massElectronMeV, 
+						e_massElectronMeV, e_massElectronMeV);
 					//fprintf(stderr, "DEBUG:%s:snprintf %s\n", __FUNCTION__, a_pX->nuclearReactionStr);
 				}
 			}else{
-				checkNoDataOfAtom(a_pX);
+				checkNoDataOfAtom(a_pX, 0);
 			}
 		}else{
-			fprintf(stderr, "ERROR:%s(%d):COLLIDE_ELECTRON:%d with ELECTRON\n", __FUNCTION__, __LINE__, a_pX->collideType);
+			a_pX->isElectronCapture = 1;
+			a_pX->newAtomicNumber[0] = a_pX->targetIsotopePropertyPtr->atomicNumber - 1;
+			a_pX->newMassNumber[0] = a_pX->targetIsotopePropertyPtr->massNumber;
+			if(a_pX->newAtomicNumber[0] != ATOMICNUMBER_ELECTRON || a_pX->newMassNumber[0] != MASSNUMBER_ELECTRON){
+				a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
+				if(a_pX->newIsotopePropertyPtr[0]){
+					a_pX->minAppliedVoltageMeV[0] = a_pX->newIsotopePropertyPtr[0]->massMeV - a_pX->targetIsotopePropertyPtr->massMeV;
+					a_pX->massDefectMeV[0] = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV[0];
+					set_minMassDefectMeV_plusAlpha(a_pX, 0);
+					if(a_pX->printNuclearReaction){
+						double targetIonMassMeV = a_pX->targetIsotopePropertyPtr->massMeV - e_massElectronMeV;
+						char * targetSymbolPtr;
+						if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_HYDROGEN){
+							targetSymbolPtr = a_pX->targetIsotopePropertyPtr->nucleusName;
+						}else{
+							targetSymbolPtr = a_pX->targetIsotopePropertyPtr->symbol;
+						}
+						snprintf(a_pX->nuclearReactionStr[0], REACTION_LEN,
+							"%s+(%lg) + e-(%lg) + (%lg%s)[MeV] -> %s(%lg) + νe + (%lg%s)[MeV]", 
+							targetSymbolPtr, targetIonMassMeV,
+							e_massElectronMeV,
+							a_pX->minAppliedVoltageMeV[0], a_pX->plusAlpha[0],
+							a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopePropertyPtr[0]->massMeV,
+							a_pX->minMassDefectMeV[0], a_pX->plusAlpha[0]);
+						//fprintf(stderr, "DEBUG:%s:snprintf %s\n", __FUNCTION__, a_pX->nuclearReactionStr[0]);
+					}
+				}else{
+					checkNoDataOfAtom(a_pX, 0);
+				}
+			}else{
+				fprintf(stderr, "FATAL:%s(%d):COLLIDE_ELECTRON:%d\n", __FUNCTION__, __LINE__, a_pX->collideType);
+			}
 		}
 	}else if(a_pX->collideType == COLLIDE_PROTON 
 	|| a_pX->collideType == COLLIDE_DEUTERIUM 
@@ -8356,99 +8512,177 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
 			//fprintf(stderr, "DEBUG:%s:COLLIDE_PROTON... ATOMICNUMBER_ELECTRON\n", __FUNCTION__);
 			a_pX->isElectronCapture = 1;
-			a_pX->newAtomicNumber = ATOMICNUMBER_NEUTRON;
+			a_pX->newAtomicNumber[0] = ATOMICNUMBER_NEUTRON;
 			switch(a_pX->collideType){
-				case COLLIDE_PROTON:    a_pX->newMassNumber = MASSNUMBER_NEUTRON;    break;
-				case COLLIDE_DEUTERIUM: a_pX->newMassNumber = MASSNUMBER_DINEUTRON;  break;
-				case COLLIDE_TRITIUM:   a_pX->newMassNumber = MASSNUMBER_TRINEUTRON; break;
+				case COLLIDE_PROTON:    a_pX->newMassNumber[0] = MASSNUMBER_NEUTRON;    break;
+				case COLLIDE_DEUTERIUM: a_pX->newMassNumber[0] = MASSNUMBER_DINEUTRON;  break;
+				case COLLIDE_TRITIUM:   a_pX->newMassNumber[0] = MASSNUMBER_TRINEUTRON; break;
 			}
-			a_pX->newIsotopePropertyPtr = getIsotopePropertyPtr(a_pX->newAtomicNumber, a_pX->newMassNumber);
-			if(a_pX->newIsotopePropertyPtr){
-				a_pX->minAppliedVoltageMeV = a_pX->newIsotopePropertyPtr->massMeV - a_pX->bulletPropertyPtr->massMeV;
-				a_pX->massDefectMeV = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV;
-				set_minMassDefectMeV_plusAlpha(a_pX);
+			a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
+			if(a_pX->newIsotopePropertyPtr[0]){
+				a_pX->minAppliedVoltageMeV[0] = a_pX->newIsotopePropertyPtr[0]->massMeV - a_pX->bulletPropertyPtr->massMeV;
+				a_pX->massDefectMeV[0] = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV[0];
+				set_minMassDefectMeV_plusAlpha(a_pX, 0);
 				if(a_pX->printNuclearReaction){
 					double bulletIonMassMeV = a_pX->bulletPropertyPtr->massMeV - e_massElectronMeV;
 					//fprintf(stderr, "DEBUG:%s:snprintf COLLIDE_PROTON\n", __FUNCTION__);
-					snprintf(a_pX->nuclearReactionStr, REACTION_LEN,
+					snprintf(a_pX->nuclearReactionStr[0], REACTION_LEN,
 						"e-(%lg) + %s+(%lg) + (%lg%s)[MeV] -> %s(%lg) + νe + (%lg%s)[MeV]", 
 						e_massElectronMeV,
 						a_pX->bulletPropertyPtr->nucleusName, bulletIonMassMeV,
-						a_pX->minAppliedVoltageMeV, a_pX->plusAlpha,
-						a_pX->newIsotopePropertyPtr->symbol, a_pX->newIsotopePropertyPtr->massMeV,
-						a_pX->minMassDefectMeV, a_pX->plusAlpha);
+						a_pX->minAppliedVoltageMeV[0], a_pX->plusAlpha[0],
+						a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopePropertyPtr[0]->massMeV,
+						a_pX->minMassDefectMeV[0], a_pX->plusAlpha[0]);
 					//fprintf(stderr, "DEBUG:%s:snprintf COLLIDE_PROTON %s\n", __FUNCTION__, a_pX->nuclearReactionStr);
 				}
 			}else{
-				checkNoDataOfAtom(a_pX);
+				checkNoDataOfAtom(a_pX, 0);
 			}
 		}else{
 			//fprintf(stderr, "DEBUG:%s:COLLIDE_PROTON... other\n", __FUNCTION__);
 			a_pX->isElectronCapture = 0;
-			a_pX->newAtomicNumber = a_pX->targetIsotopePropertyPtr->atomicNumber + a_pX->bulletPropertyPtr->atomicNumber;
-			a_pX->newMassNumber = a_pX->targetIsotopePropertyPtr->massNumber + a_pX->bulletPropertyPtr->massNumber;
-			a_pX->newIsotopePropertyPtr = getIsotopePropertyPtr(a_pX->newAtomicNumber, a_pX->newMassNumber);
-			if(a_pX->newIsotopePropertyPtr){
-				a_pX->minAppliedVoltageMeV = a_pX->newIsotopePropertyPtr->massMeV - (a_pX->targetIsotopePropertyPtr->massMeV + a_pX->bulletPropertyPtr->massMeV);
-				a_pX->massDefectMeV = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV;
-				set_minMassDefectMeV_plusAlpha(a_pX);
+			if(a_pX->collideType == COLLIDE_DEUTERIUM
+			&& a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_DEUTERIUM 
+			&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_DEUTERIUM){
+				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+				a_pX->newCount = 3;
+				a_pX->newAtomicNumber[0] = ATOMICNUMBER_TRITIUM;
+				a_pX->newMassNumber[0] = MASSNUMBER_TRITIUM;
+				a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
+				a_pX->rate[0] = 0.5 - 0.5e-6;
+				a_pX->subAtomicNumber[0] = ATOMICNUMBER_HYDROGEN;
+				a_pX->subMassNumber[0] = MASSNUMBER_HYDROGEN;
+				a_pX->subIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->subAtomicNumber[0], a_pX->subMassNumber[0]);
+				a_pX->minAppliedVoltageMeV[0] = (a_pX->newIsotopePropertyPtr[0]->massMeV + a_pX->subIsotopePropertyPtr[0]->massMeV) - (a_pX->targetIsotopePropertyPtr->massMeV + a_pX->bulletPropertyPtr->massMeV);
+				a_pX->massDefectMeV[0] = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV[0];
+				set_minMassDefectMeV_plusAlpha(a_pX, 0);
 				if(a_pX->printNuclearReaction){
-					char * targetSymbol;
-					char * targetIonSign;
-					char * newSymbol;
-					char * newIonSign;
-					double targetIonMassMeV, bulletIonMassMeV, newAtomMassMeV;
-					if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_NEUTRON
-					&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_NEUTRON){
-						targetSymbol = a_pX->targetIsotopePropertyPtr->symbol;
-						targetIonSign = "";
-						targetIonMassMeV = a_pX->targetIsotopePropertyPtr->massMeV;
-						bulletIonMassMeV = a_pX->bulletPropertyPtr->massMeV - e_massElectronMeV;
-						newAtomMassMeV = a_pX->newIsotopePropertyPtr->massMeV - e_massElectronMeV;
-						newSymbol = a_pX->newIsotopePropertyPtr->nucleusName;
-						newIonSign = "+";
-					}else{
-						targetSymbol = a_pX->targetIsotopePropertyPtr->symbol;
-						targetIonSign = "-";
-						targetIonMassMeV = a_pX->targetIsotopePropertyPtr->massMeV + e_massElectronMeV;
-						bulletIonMassMeV = a_pX->bulletPropertyPtr->massMeV - e_massElectronMeV;
-						newAtomMassMeV = a_pX->newIsotopePropertyPtr->massMeV;
-						newSymbol = a_pX->newIsotopePropertyPtr->symbol;
-						newIonSign = "";
-					}
-					//fprintf(stderr, "DEBUG:%s:snprintf other\n", __FUNCTION__);
-					snprintf(a_pX->nuclearReactionStr, REACTION_LEN,
-						"%s%s(%lg) + %s+(%lg) + (%lg%s)[MeV] -> %s%s(%lg) + (%lg%s)[MeV]", 
-						targetSymbol, targetIonSign, targetIonMassMeV,
-						a_pX->bulletPropertyPtr->nucleusName, bulletIonMassMeV,
-						a_pX->minAppliedVoltageMeV, a_pX->plusAlpha,
-						newSymbol, newIonSign, newAtomMassMeV,
-						a_pX->minMassDefectMeV, a_pX->plusAlpha);
-					//fprintf(stderr, "DEBUG:%s:snprintf other %s\n", __FUNCTION__, a_pX->nuclearReactionStr);
+					//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+					snprintf(a_pX->nuclearReactionStr[0], REACTION_LEN,
+						"D(%lg) + D(%lg) + (%lg%s)[MeV] -> T(%lg) + H(%lg) + (%lg%s)[MeV] (rate:%lg)", 
+						a_pX->targetIsotopePropertyPtr->massMeV,
+						a_pX->bulletPropertyPtr->massMeV,
+						a_pX->minAppliedVoltageMeV[0], a_pX->plusAlpha[0],
+						a_pX->newIsotopePropertyPtr[0]->massMeV,
+						a_pX->subIsotopePropertyPtr[0]->massMeV,
+						a_pX->minMassDefectMeV[0], a_pX->plusAlpha[0], a_pX->rate[0]);
+					//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, a_pX->nuclearReactionStr[0]);
 				}
+
+				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+				a_pX->newAtomicNumber[1] = ATOMICNUMBER_HELIUM;
+				a_pX->newMassNumber[1] = MASSNUMBER_HELIUM3;
+				a_pX->newIsotopePropertyPtr[1] = getIsotopePropertyPtr(a_pX->newAtomicNumber[1], a_pX->newMassNumber[1]);
+				a_pX->rate[1] = 0.5 - 0.5e-6;
+				a_pX->subAtomicNumber[1] = ATOMICNUMBER_NEUTRON;
+				a_pX->subMassNumber[1] = MASSNUMBER_NEUTRON;
+				a_pX->subIsotopePropertyPtr[1] = getIsotopePropertyPtr(a_pX->subAtomicNumber[1], a_pX->subMassNumber[1]);
+				a_pX->minAppliedVoltageMeV[1] = (a_pX->newIsotopePropertyPtr[1]->massMeV + a_pX->subIsotopePropertyPtr[1]->massMeV) - (a_pX->targetIsotopePropertyPtr->massMeV + a_pX->bulletPropertyPtr->massMeV);
+				a_pX->massDefectMeV[1] = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV[1];
+				set_minMassDefectMeV_plusAlpha(a_pX, 1);
+				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+				if(a_pX->printNuclearReaction){
+					//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+					snprintf(a_pX->nuclearReactionStr[1], REACTION_LEN,
+						"D(%lg) + D(%lg) + (%lg%s)[MeV] -> 3He(%lg) + n(%lg) + (%lg%s)[MeV] (rate:%lg)", 
+						a_pX->targetIsotopePropertyPtr->massMeV,
+						a_pX->bulletPropertyPtr->massMeV,
+						a_pX->minAppliedVoltageMeV[1], a_pX->plusAlpha[1],
+						a_pX->newIsotopePropertyPtr[1]->massMeV,
+						a_pX->subIsotopePropertyPtr[1]->massMeV,
+						a_pX->minMassDefectMeV[1], a_pX->plusAlpha[1], a_pX->rate[1]);
+					//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, a_pX->nuclearReactionStr[1]);
+				}
+
+				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+				a_pX->newAtomicNumber[2] = ATOMICNUMBER_HELIUM;
+				a_pX->newMassNumber[2] = MASSNUMBER_HELIUM;
+				a_pX->newIsotopePropertyPtr[2] = getIsotopePropertyPtr(a_pX->newAtomicNumber[2], a_pX->newMassNumber[2]);
+				a_pX->rate[2] = 1.0 - a_pX->rate[0] - a_pX->rate[1];
+				a_pX->subAtomicNumber[2] = UNDEF_ATOMIC_NUMBER;
+				a_pX->subMassNumber[2] = UNDEF_MASS_NUMBER;
+				a_pX->subIsotopePropertyPtr[2] = NULL;
+				a_pX->minAppliedVoltageMeV[2] = a_pX->newIsotopePropertyPtr[2]->massMeV - (a_pX->targetIsotopePropertyPtr->massMeV + a_pX->bulletPropertyPtr->massMeV);
+				a_pX->massDefectMeV[2] = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV[2];
+				set_minMassDefectMeV_plusAlpha(a_pX, 2);
+				if(a_pX->printNuclearReaction){
+					//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+					snprintf(a_pX->nuclearReactionStr[2], REACTION_LEN,
+						"D(%lg) + D(%lg) + (%lg%s)[MeV] -> 4He(%lg) + (%lg%s)[MeV] (rate:%lg)", 
+						a_pX->targetIsotopePropertyPtr->massMeV,
+						a_pX->bulletPropertyPtr->massMeV,
+						a_pX->minAppliedVoltageMeV[2], a_pX->plusAlpha[2],
+						a_pX->newIsotopePropertyPtr[2]->massMeV,
+						a_pX->minMassDefectMeV[2], a_pX->plusAlpha[2], a_pX->rate[2]);
+					//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, a_pX->nuclearReactionStr[2]);
+				}
+				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
 			}else{
-				checkNoDataOfAtom(a_pX);
+				a_pX->newAtomicNumber[0] = a_pX->targetIsotopePropertyPtr->atomicNumber + a_pX->bulletPropertyPtr->atomicNumber;
+				a_pX->newMassNumber[0] = a_pX->targetIsotopePropertyPtr->massNumber + a_pX->bulletPropertyPtr->massNumber;
+				a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
+				if(a_pX->newIsotopePropertyPtr[0]){
+					a_pX->minAppliedVoltageMeV[0] = a_pX->newIsotopePropertyPtr[0]->massMeV - (a_pX->targetIsotopePropertyPtr->massMeV + a_pX->bulletPropertyPtr->massMeV);
+					a_pX->massDefectMeV[0] = a_pX->appliedVoltageMeV - a_pX->minAppliedVoltageMeV[0];
+					set_minMassDefectMeV_plusAlpha(a_pX, 0);
+					if(a_pX->printNuclearReaction){
+						char * targetSymbol;
+						char * targetIonSign;
+						char * newSymbol;
+						char * newIonSign;
+						double targetIonMassMeV, bulletIonMassMeV, newAtomMassMeV;
+						if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_NEUTRON
+						&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_NEUTRON){
+							targetSymbol = a_pX->targetIsotopePropertyPtr->symbol;
+							targetIonSign = "";
+							targetIonMassMeV = a_pX->targetIsotopePropertyPtr->massMeV;
+							bulletIonMassMeV = a_pX->bulletPropertyPtr->massMeV - e_massElectronMeV;
+							newAtomMassMeV = a_pX->newIsotopePropertyPtr[0]->massMeV - e_massElectronMeV;
+							newSymbol = a_pX->newIsotopePropertyPtr[0]->nucleusName;
+							newIonSign = "+";
+						}else{
+							targetSymbol = a_pX->targetIsotopePropertyPtr->symbol;
+							targetIonSign = "-";
+							targetIonMassMeV = a_pX->targetIsotopePropertyPtr->massMeV + e_massElectronMeV;
+							bulletIonMassMeV = a_pX->bulletPropertyPtr->massMeV - e_massElectronMeV;
+							newAtomMassMeV = a_pX->newIsotopePropertyPtr[0]->massMeV;
+							newSymbol = a_pX->newIsotopePropertyPtr[0]->symbol;
+							newIonSign = "";
+						}
+						//fprintf(stderr, "DEBUG:%s:snprintf other\n", __FUNCTION__);
+						snprintf(a_pX->nuclearReactionStr[0], REACTION_LEN,
+							"%s%s(%lg) + %s+(%lg) + (%lg%s)[MeV] -> %s%s(%lg) + (%lg%s)[MeV]", 
+							targetSymbol, targetIonSign, targetIonMassMeV,
+							a_pX->bulletPropertyPtr->nucleusName, bulletIonMassMeV,
+							a_pX->minAppliedVoltageMeV[0], a_pX->plusAlpha[0],
+							newSymbol, newIonSign, newAtomMassMeV,
+							a_pX->minMassDefectMeV[0], a_pX->plusAlpha[0]);
+						//fprintf(stderr, "DEBUG:%s:snprintf other %s\n", __FUNCTION__, a_pX->nuclearReactionStr);
+					}
+				}else{
+					checkNoDataOfAtom(a_pX, 0);
+				}
 			}
 		}
 	}else if(a_pX->collideType == COLLIDE_NEUTRON){ 
 		a_pX->isElectronCapture = 0;
-		a_pX->newAtomicNumber = a_pX->targetIsotopePropertyPtr->atomicNumber + a_pX->bulletPropertyPtr->atomicNumber;
-		a_pX->newMassNumber = a_pX->targetIsotopePropertyPtr->massNumber + a_pX->bulletPropertyPtr->massNumber;
-		a_pX->newIsotopePropertyPtr = getIsotopePropertyPtr(a_pX->newAtomicNumber, a_pX->newMassNumber);
-		if(a_pX->newIsotopePropertyPtr){
-			a_pX->massDefectMeV = (a_pX->targetIsotopePropertyPtr->massMeV + a_pX->bulletPropertyPtr->massMeV) - a_pX->newIsotopePropertyPtr->massMeV;
+		a_pX->newAtomicNumber[0] = a_pX->targetIsotopePropertyPtr->atomicNumber + a_pX->bulletPropertyPtr->atomicNumber;
+		a_pX->newMassNumber[0] = a_pX->targetIsotopePropertyPtr->massNumber + a_pX->bulletPropertyPtr->massNumber;
+		a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
+		if(a_pX->newIsotopePropertyPtr[0]){
+			a_pX->massDefectMeV[0] = (a_pX->targetIsotopePropertyPtr->massMeV + a_pX->bulletPropertyPtr->massMeV) - a_pX->newIsotopePropertyPtr[0]->massMeV;
 			if(a_pX->printNuclearReaction){
 				//fprintf(stderr, "DEBUG:%s:snprintf other\n", __FUNCTION__);
-				snprintf(a_pX->nuclearReactionStr, REACTION_LEN,
+				snprintf(a_pX->nuclearReactionStr[0], REACTION_LEN,
 					"%s(%lg) + %s(%lg) -> %s(%lg) + %lg[MeV]", 
 					a_pX->targetIsotopePropertyPtr->symbol, a_pX->targetIsotopePropertyPtr->massMeV,
 					a_pX->bulletPropertyPtr->nucleusName, a_pX->bulletPropertyPtr->massMeV,
-					a_pX->newIsotopePropertyPtr->symbol, a_pX->newIsotopePropertyPtr->massMeV,
-					a_pX->massDefectMeV);
+					a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopePropertyPtr[0]->massMeV,
+					a_pX->massDefectMeV[0]);
 				//fprintf(stderr, "DEBUG:%s:snprintf other %s\n", __FUNCTION__, a_pX->nuclearReactionStr);
 			}
 		}else{
-			checkNoDataOfAtom(a_pX);
+			checkNoDataOfAtom(a_pX, 0);
 		}
 	}
 	//fprintf(stderr, "DEBUG:%s:END}\n", __FUNCTION__);
@@ -8473,37 +8707,98 @@ extern int checkCollidingUsage(struct collide * a_pX)
 }
 extern double getCrossSection(struct collide * a_pX)
 {
+	double relativeR;
 	double CrossSection;
-	if(e_usebulletCrossSection){
-		CrossSection = (a_pX->targetIsotopePropertyPtr->relativeCollideCrossSection + a_pX->bulletPropertyPtr->relativeCollideCrossSection) * a_pX->targetAtomMol;
-	}else{
-		CrossSection = a_pX->targetIsotopePropertyPtr->relativeCollideCrossSection * a_pX->targetAtomMol;
+	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_C){
+		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
+		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
+			// U = - (Z * e^2) / (4 * π * ε0 * r)
+			// r = - (Z * e^2) / (4 * π * ε0 * U)
+			// Z = 1, U [J] = U' [MeV] * 1.0e6 * 1.60217662E-19 [J/eV]
+			
+			//I think that the radius of electrons is treated larger up to the Coulomb Barrier in the case of collision between an electron and an electron.
+			relativeR = e_coefElectroPotentialMeV / (a_pX->appliedVoltageMeV * e_r0);
+			CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
+		}else{
+			//I think that the radius of nucleus is treated smaller down to the Weak Boson in the case of collision between an electron and a nucleus.
+			//The electron will collide two up-quark only in protons of a nucleus, not any up-quark in a nutron.
+			if(e_usebulletCrossSection){
+				relativeR = e_relativeRadiusOfElectronByWeakBoson + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+			}else{
+				relativeR = e_relativeRadiusOfElectronByWeakBoson;
+			}
+			CrossSection = relativeR * relativeR * a_pX->targetIsotopePropertyPtr->atomicNumber * 2 * a_pX->targetAtomMol;
+		}
+	}else if(a_pX->collideType == COLLIDE_PROTON 
+	|| a_pX->collideType == COLLIDE_DEUTERIUM 
+	|| a_pX->collideType == COLLIDE_TRITIUM){
+		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
+		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
+			if(e_usebulletCrossSection){
+				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + e_relativeRadiusOfElectronByWeakBoson;
+			}else{
+				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+			}
+			CrossSection = relativeR * relativeR * a_pX->bulletPropertyPtr->atomicNumber * 2 * a_pX->targetAtomMol;
+		}else{
+			if(e_usebulletCrossSection){
+				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+			}else{
+				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+			}
+			CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
+		}
+	}else{//COLLIDE_NEUTRON
+		if(e_usebulletCrossSection){
+			relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+		}else{
+			relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+		}
+		CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
 	}
 	return CrossSection;
+}
+extern void sumTotalCollideCrossSection(struct collide * a_pX)
+{
+	a_pX->targetAtomMol = getMol(a_pX->targetAtomValuePtr);
+	if(a_pX->targetAtomMol >= a_pX->electrodePtr->detectLimitMolForIsotope){
+		a_pX->totalCollideCrossSection += getCrossSection(a_pX);
+		a_pX->totalTargetMol += a_pX->targetAtomMol;
+		//fprintf(stderr, "DEBUG:%s:totalCollideCrossSection:%lg\n", __FUNCTION__, a_pX->totalCollideCrossSection);
+	}
 }
 extern int iterateCrossSection(void * a_total, struct objectNodeConst * a_nodePtr)
 {
 	struct collide * pX = (struct collide *)a_total;
-	//fprintf(stderr, "DEBUG:%s:{BEGIN:%lp %lp %lp\n", __FUNCTION__, a_total, a_keyPtr, a_valuePtr);
 	pX->targetIsotopePropertyPtr = ((struct atomKey *)a_nodePtr->keyPtr)->isotopePropertyPtr;
 	pX->targetAtomValuePtr = (struct atomValue *)a_nodePtr->valuePtr;
-
+	//if(pX->collideType == COLLIDE_ELECTRON){
+	//	fprintf(stderr, "DEBUG:%s:{BEGIN:%p %s\n", __FUNCTION__, pX, pX->targetIsotopePropertyPtr->symbol);
+	//}
 	if(checkCollidingUsage(pX)){
 		getCollidedNewIsotopePropertyPtr(pX);
-		if(pX->newIsotopePropertyPtr){
-			if(pX->massDefectMeV > 0.0){
-				if(pX->appliedVoltageMeV >= pX->electroPotentialMeV){
-					pX->targetAtomMol = getMol(pX->targetAtomValuePtr);
-					if(pX->targetAtomMol >= pX->electrodePtr->detectLimitMolForIsotope){
-						pX->totalCollideCrossSection += getCrossSection(pX);
-						pX->totalTargetMol += pX->targetAtomMol;
-						//fprintf(stderr, "DEBUG:%s:totalCollideCrossSection:%lg\n", __FUNCTION__, pX->totalCollideCrossSection);
-					}
+		if(pX->newIsotopePropertyPtr[0]){
+			if(pX->collideType == COLLIDE_ELECTRON || pX->collideType == COLLIDE_ELECTRON_C){
+				if(pX->massDefectMeV[0] > 0.0){
+					sumTotalCollideCrossSection(pX);
+				}
+				//if(pX->collideType == COLLIDE_ELECTRON){
+				//	fprintf(stderr, "DEBUG:%s(%d):%p ELECTRON+target:%s new:%s massDefectMeV[0]:%lg totalCollideCrossSection:%lg\n", __FUNCTION__, __LINE__, pX, pX->targetIsotopePropertyPtr->symbol, pX->newIsotopePropertyPtr[0]->symbol, pX->massDefectMeV[0], pX->totalCollideCrossSection);
+				//}
+			}else if(pX->collideType == COLLIDE_PROTON 
+			|| pX->collideType == COLLIDE_DEUTERIUM 
+			|| pX->collideType == COLLIDE_TRITIUM){
+				sumTotalCollideCrossSection(pX);
+			}else{//COLLIDE_NEUTRON
+				if(pX->massDefectMeV[0] > 0.0){
+					sumTotalCollideCrossSection(pX);
 				}
 			}
 		}
 	}
-	//fprintf(stderr, "DEBUG:%s:{END:totalCollideCrossSection:%lg\n", __FUNCTION__, pX->totalCollideCrossSection);
+	//if(pX->collideType == COLLIDE_ELECTRON){
+	//	fprintf(stderr, "DEBUG:%s:}END:totalCollideCrossSection:%lg\n", __FUNCTION__, pX->totalCollideCrossSection);
+	//}
 	return KEEP_NODE;
 }
 
@@ -8521,14 +8816,16 @@ extern double calcCollideCrossSectionRate(struct collide * a_pX)
 extern double collideParticleAtom(struct collide * a_pX)
 {
 	//The collision of a particle like an electron, a proton, a deterium or a tritium, it may have kinetic energy,  it will be absorbed by neuclaus.
-	
+	int i;
 	double collidedMol = 0.0, collideCrossSectionRate;
-	//fprintf(stderr, "DEBUG:%s:{BEGIN%lp\n", __FUNCTION__, a_pX);
+	//if(a_pX->collideType == COLLIDE_ELECTRON){
+	//	fprintf(stderr, "DEBUG:%s:{BEGIN %s\n", __FUNCTION__, a_pX->targetIsotopePropertyPtr->symbol);
+	//}
 	if(checkCollidingUsage(a_pX)){
 		getCollidedNewIsotopePropertyPtr(a_pX);
-		if(a_pX->newIsotopePropertyPtr){
-			if(a_pX->massDefectMeV > 0.0){
-				if(a_pX->appliedVoltageMeV >= a_pX->electroPotentialMeV){
+		if(a_pX->newIsotopePropertyPtr[0]){
+			if(a_pX->appliedVoltageMeV >= a_pX->electroPotentialMeV){
+				if(a_pX->massDefectMeV[0] > 0.0){
 					a_pX->targetAtomMol = getMol(a_pX->targetAtomValuePtr);
 					if(a_pX->targetAtomMol >= a_pX->electrodePtr->detectLimitMolForIsotope){
 						collideCrossSectionRate = calcCollideCrossSectionRate(a_pX);
@@ -8537,64 +8834,78 @@ extern double collideParticleAtom(struct collide * a_pX)
 							a_pX->newIsotopeMol = 0.0;//collect tolelance.
 						}
 						if(a_pX->newIsotopeMol > a_pX->targetAtomMol){
-							if(a_pX->newIsotopeMol > a_pX->targetAtomMol * 4.0){
-								fprintf(stderr, "WARN:%s(%d):%s newIsotope %s Mol:%lg > targetAtom %s mol:%lg\n",
-									__FUNCTION__, __LINE__, getCollideName(a_pX->collideType), 
-									a_pX->newIsotopePropertyPtr->symbol, a_pX->newIsotopeMol, 
-									a_pX->targetIsotopePropertyPtr->symbol, a_pX->targetAtomMol);
-							}
 							if(a_pX->newIsotopeMol > a_pX->targetAtomMol * 8.0){
 								fprintf(e_logFp, "WARN:%s(%d):%s newIsotope %s Mol:%lg > targetAtom %s mol:%lg\n",
 									__FUNCTION__, __LINE__, getCollideName(a_pX->collideType), 
-									a_pX->newIsotopePropertyPtr->symbol, a_pX->newIsotopeMol, 
+									a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopeMol, 
+									a_pX->targetIsotopePropertyPtr->symbol, a_pX->targetAtomMol);
+							}
+							if(a_pX->newIsotopeMol > a_pX->targetAtomMol * 4.0){
+								fprintf(stderr, "WARN:%s(%d):%s newIsotope %s Mol:%lg > targetAtom %s mol:%lg\n",
+									__FUNCTION__, __LINE__, getCollideName(a_pX->collideType), 
+									a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopeMol, 
 									a_pX->targetIsotopePropertyPtr->symbol, a_pX->targetAtomMol);
 							}
 							a_pX->newIsotopeMol = a_pX->targetAtomMol;
 						}
-						//fprintf(stderr, "DEBUG:%s:%s a_pX->newIsotopeMol:%lg\n", __FUNCTION__, a_pX->newIsotopePropertyPtr->symbol, a_pX->newIsotopeMol);
-						if(a_pX->newIsotopeMol >= a_pX->electrodePtr->detectLimitMolForIsotope){
-							registNuclearReaction(a_pX->electrodePtr, REACTION_DETECT, a_pX->collideType, a_pX->nuclearReactionStr, a_pX->massDefectMeV, a_pX->newIsotopeMol, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
-							if(a_pX->isElectronCapture){
-								registOutputOfElectronCapture(a_pX->electrodePtr, a_pX->massDefectMeV, a_pX->newIsotopeMol);
-							}else{
-								registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, a_pX->massDefectMeV, a_pX->newIsotopeMol);
+						for(i = 0; i < a_pX->newCount; ++i){
+							double newIsotopeMolRate = a_pX->newIsotopeMol * a_pX->rate[i];
+							//if(a_pX->collideType == COLLIDE_ELECTRON){
+								//fprintf(stderr, "DEBUG:%s(%d):%s collideCrossSectionRate:%lg (i:%d/newCount:%d) newIsotopeMol:%lg, rate:%lg, newIsotopeMolRate:%lg detectLimitMolForIsotope:%lg\n", __FUNCTION__, __LINE__, a_pX->newIsotopePropertyPtr[0]->symbol, collideCrossSectionRate, i, a_pX->newCount, a_pX->newIsotopeMol, a_pX->rate[i], newIsotopeMolRate, a_pX->electrodePtr->detectLimitMolForIsotope);
+							//}
+							if(newIsotopeMolRate >= a_pX->electrodePtr->detectLimitMolForIsotope){
+								if(a_pX->isElectronCapture == 2){//collision between two electrons
+									registOutput(a_pX->electrodePtr, SCAT_IMPERFECT, a_pX->massDefectMeV[i], newIsotopeMolRate);
+								}else{
+									registNuclearReaction(a_pX->electrodePtr, REACTION_DETECT, a_pX->collideType, a_pX->nuclearReactionStr[i], a_pX->massDefectMeV[i], newIsotopeMolRate, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
+									if(a_pX->isElectronCapture == 1){
+										registOutputOfElectronCapture(a_pX->electrodePtr, a_pX->massDefectMeV[i], newIsotopeMolRate);
+									}else{
+										registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, a_pX->massDefectMeV[i], newIsotopeMolRate);
+									}
+									collidedMol += newIsotopeMolRate;
+									setMolSub(a_pX->targetAtomValuePtr, newIsotopeMolRate);
+									if(a_pX->newAtomicNumber[i] == ATOMICNUMBER_NEUTRON 
+									&& (a_pX->newMassNumber[i] == MASSNUMBER_DINEUTRON 
+									|| a_pX->newMassNumber[i] == MASSNUMBER_TRINEUTRON)){
+										// The dineutron and trineutron will imediately separate into neutrons.
+										newIsotopeMolRate *= a_pX->newMassNumber[i];
+										a_pX->newMassNumber[i] = MASSNUMBER_NEUTRON;
+										a_pX->newIsotopePropertyPtr[i] = getIsotopePropertyPtr(ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON);
+									}
+									increaseAtom(a_pX->electrodePtr, a_pX->newAtomicNumber[i], a_pX->newMassNumber[i], newIsotopeMolRate);
+									if(a_pX->subIsotopePropertyPtr[i]){
+										increaseAtom(a_pX->electrodePtr, a_pX->subAtomicNumber[i], a_pX->subMassNumber[i], newIsotopeMolRate);
+									}
+								}
+							}else if(newIsotopeMolRate > 0.0){
+								registNuclearReaction(a_pX->electrodePtr, REACTION_CANT_DETECT, a_pX->collideType, a_pX->nuclearReactionStr[i], a_pX->massDefectMeV[i], newIsotopeMolRate, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
+								//fprintf(stderr, "DEBUG:%s:%s newIsotopeMolRate:%lg < detectLimitMolForIsotope:%lg\n %s\n",
+								//__FUNCTION__, a_pX->newIsotopePropertyPtr->symbol, 
+								//newIsotopeMolRate, a_pX->electrodePtr->detectLimitMolForIsotope, a_pX->nuclearReactionStr);
+							}else{ //newIsotopeMolRate <= 0.0
+								;//Do nothing!
 							}
-							collidedMol = a_pX->newIsotopeMol;
-							setMolSub(a_pX->targetAtomValuePtr, a_pX->newIsotopeMol);
-							if(a_pX->newAtomicNumber == ATOMICNUMBER_NEUTRON 
-							&& (a_pX->newMassNumber == MASSNUMBER_DINEUTRON 
-							|| a_pX->newMassNumber == MASSNUMBER_TRINEUTRON)){
-								// The dineutron and trineutron will imediately separate into neutrons.
-								a_pX->newIsotopeMol *= a_pX->newMassNumber;
-								a_pX->newMassNumber = MASSNUMBER_NEUTRON;
-								a_pX->newIsotopePropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON);
-							}
-							increaseAtom(a_pX->electrodePtr, a_pX->newAtomicNumber, a_pX->newMassNumber, a_pX->newIsotopeMol);
-						}else if(a_pX->newIsotopeMol > 0.0){
-							registNuclearReaction(a_pX->electrodePtr, REACTION_CANT_DETECT, a_pX->collideType, a_pX->nuclearReactionStr, a_pX->massDefectMeV, a_pX->newIsotopeMol, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
-							//fprintf(stderr, "DEBUG:%s:%s a_pX->newIsotopeMol:%lg < detectLimitMolForIsotope:%lg\n %s\n",
-							//__FUNCTION__, a_pX->newIsotopePropertyPtr->symbol, 
-							//a_pX->newIsotopeMol, a_pX->electrodePtr->detectLimitMolForIsotope, a_pX->nuclearReactionStr);
-						}else{ //a_pX->newIsotopeMol <= 0.0
-							;//Do nothing!
 						}
 					}else{
-						registNuclearReaction(a_pX->electrodePtr, REACTION_CANT_DETECT, a_pX->collideType, a_pX->nuclearReactionStr, a_pX->massDefectMeV, a_pX->targetAtomMol, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
+						registNuclearReaction(a_pX->electrodePtr, REACTION_CANT_DETECT, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], a_pX->targetAtomMol, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
 					}
 				}else{
-					registNuclearReaction(a_pX->electrodePtr, REACTION_COULOMB_BARRIER, a_pX->collideType, a_pX->nuclearReactionStr, a_pX->massDefectMeV, 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);					
+					registNuclearReaction(a_pX->electrodePtr, REACTION_ENDOTHERMIC, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
 				}
 			}else{
-				registNuclearReaction(a_pX->electrodePtr, REACTION_ENDOTHERMIC, a_pX->collideType, a_pX->nuclearReactionStr, a_pX->massDefectMeV, 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
+				registNuclearReaction(a_pX->electrodePtr, REACTION_COULOMB_BARRIER, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
 			}
 		}else{
-			if(a_pX->nuclearReactionStr[0]){
-				registNuclearReaction(a_pX->electrodePtr, REACTION_ERROR, a_pX->collideType, a_pX->nuclearReactionStr, a_pX->massDefectMeV, 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
+			if(a_pX->nuclearReactionStr[0][0]){
+				registNuclearReaction(a_pX->electrodePtr, REACTION_ERROR, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
 				//fprintf(stderr, "%s\n", a_pX->nuclearReactionStr);
 			}
 		}
 	}
-	//fprintf(stderr, "DEBUG:%s:}END:collidedMol:%lp\n", __FUNCTION__, collidedMol);
+	//if(a_pX->collideType == COLLIDE_ELECTRON){
+	//	fprintf(stderr, "DEBUG:%s:}END:collidedMol:%lg\n", __FUNCTION__, collidedMol);
+	//}
 	return collidedMol;
 }
 
@@ -8613,7 +8924,7 @@ extern int iterateCollide(void * a_total, struct objectNodeConst * a_nodePtr)
 extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_collideType, double a_appliedVoltageMeV, double a_arriveBulletMol, double a_collideBulletRate, struct atomNodeConst * a_decreaseBulletPtr)
 {
 	struct collide col;
-	//fprintf(stderr, "DEBUG:%s:{BEGIN a_collideType:%d a_appliedVoltageMeV:%lg a_arriveBulletMol:%lg a_collideBulletRate:%lg\n", __FUNCTION__, a_collideType, a_appliedVoltageMeV, a_arriveBulletMol, a_collideBulletRate);
+	//fprintf(stderr, "DEBUG:%s:{BEGIN a_collideType:%s a_appliedVoltageMeV:%lg a_arriveBulletMol:%lg a_collideBulletRate:%lg\n", __FUNCTION__, getCollideName(a_collideType), a_appliedVoltageMeV, a_arriveBulletMol, a_collideBulletRate);
 	//e_cntCollideBulletToElectrode++;//DEBUG
 	memset(&col, 0, sizeof(struct collide));
 	//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
@@ -8656,7 +8967,7 @@ extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_co
 			if(oPtr){
 				//fprintf(stderr, "DEBUG:%s:iterateCrossSection usedCnt:%d\n", __FUNCTION__, col.electrodePtr->atomHashTable.usedCnt);
 				for(i = 0; i < size; ++i){
-					//fprintf(stderr, "DEBUG:%s:call iterateCrossSection i:%d\n", __FUNCTION__, i);
+					//fprintf(stderr, "DEBUG:%s:call iterateCrossSection i/size:%d/%d\n", __FUNCTION__, i, size);
 					iterateCrossSection(&col, oPtr[i]);
 				}
 				//fprintf(stderr, "DEBUG:%s:inCompton:%d\n", __FUNCTION__, e_inComptonEffect);
@@ -8664,7 +8975,7 @@ extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_co
 				col.printNuclearReaction = 1;
 				//fprintf(stderr, "DEBUG:%s:iterateCrossSection usedCnt:%d\n", __FUNCTION__, col.electrodePtr->atomHashTable.usedCnt);
 				for(i = 0; i < size; ++i){
-					//fprintf(stderr, "DEBUG:%s:call iterateCollide i:%d\n", __FUNCTION__, i);
+					//fprintf(stderr, "DEBUG:%s:call iterateCollide i/size:%d/%d\n", __FUNCTION__, i, size);
 					iterateCollide(&col, oPtr[i]);
 				}
 				free(oPtr);
@@ -9336,6 +9647,39 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 						}else{
 							showErrorOfUndefinedDaughter = 1;
 						}
+					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_2NEWTRON_EMISSION
+					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_3NEWTRON_EMISSION
+					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_4NEWTRON_EMISSION){
+						int ncnt = 2;
+						switch(a_isotopePropertyPtr->decayMode[i]){
+						case DECAY_MODE_2NEWTRON_EMISSION: ncnt = 2; break;
+						case DECAY_MODE_3NEWTRON_EMISSION: ncnt = 3; break;
+						case DECAY_MODE_4NEWTRON_EMISSION: ncnt = 4; break;
+						}
+						daughterAtomicNumber = a_isotopePropertyPtr->atomicNumber;
+						daughterMassNumber = a_isotopePropertyPtr->massNumber - ncnt;
+						daughterIsotopePropertyPtr = getIsotopePropertyPtr(daughterAtomicNumber, daughterMassNumber);
+						if(daughterIsotopePropertyPtr){
+							massDefectMeV = a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * ncnt);
+							if(massDefectMeV > 0.0){
+								snprintf(nuclearReactionStr, REACTION_LEN,
+									"%s(%lg) -> %s(%lg) + %d n(%d * %lg) + %lg[MeV/c^2]", 
+										a_isotopePropertyPtr->symbol, a_isotopePropertyPtr->massMeV,
+										daughterIsotopePropertyPtr->symbol, daughterIsotopePropertyPtr->massMeV,
+										ncnt, ncnt,
+										e_massNeutronMeV, massDefectMeV);
+								checkMassInNuclearReaction(a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * ncnt), massDefectMeV, nuclearReactionStr);
+								registNuclearReaction(a_electrodePtr, REACTION_DETECT, a_isotopePropertyPtr->decayMode[i], nuclearReactionStr, massDefectMeV, partialMol, 0.0, 0.0);
+								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
+								increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, partialMol * ncnt);
+								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+							}else{
+								showErrorNegativeMassDefect = 1;
+							}
+						}else{
+							showErrorOfUndefinedDaughter = 1;
+						}
 					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_CLUSTER_DECAY_14C){
 						daughterAtomicNumber = a_isotopePropertyPtr->atomicNumber - ATOMICNUMBER_CARBON;
 						daughterMassNumber = a_isotopePropertyPtr->massNumber - MASSNUMBER_CARBON14;
@@ -9708,24 +10052,33 @@ extern void moveFromClenup(struct cleanUp * a_cleanUpPtr)
 		}
 	}
 }
-extern void initMaxMinOfClenup(struct cleanUp * a_cleanUpPtr)
+extern int initMaxMinOfClenup(struct cleanUp * a_cleanUpPtr)
 {
+	int ret = 0;
 	int j, k;
 
 	a_cleanUpPtr->step[0] = (a_cleanUpPtr->maxMeV[0] - a_cleanUpPtr->minMeV[2]) / DEGRADE_DIV;
-	a_cleanUpPtr->minMeV[0] = a_cleanUpPtr->minMeV[2] + a_cleanUpPtr->step[0];
-	a_cleanUpPtr->step[1] = (a_cleanUpPtr->minMeV[0] - a_cleanUpPtr->minMeV[2]) / (DEGRADE_DIV + 1);
-	a_cleanUpPtr->maxMeV[1] = a_cleanUpPtr->minMeV[0] - a_cleanUpPtr->step[1];
-	a_cleanUpPtr->minMeV[1] = a_cleanUpPtr->minMeV[2] + a_cleanUpPtr->step[1];
-	a_cleanUpPtr->step[2] = (a_cleanUpPtr->minMeV[1] - a_cleanUpPtr->minMeV[2]) / DEGRADE_DIV;
-	a_cleanUpPtr->maxMeV[2] = a_cleanUpPtr->minMeV[1] - a_cleanUpPtr->step[2];
-	
-	for(j = 0; j < DEGRADE_MAG; ++j){
-		for(k = 0; k < DEGRADE_DIV; ++k){
-			a_cleanUpPtr->md[j][k].MeV = (a_cleanUpPtr->maxMeV[j] * k + a_cleanUpPtr->minMeV[j] * (DEGRADE_DIV - 1 - k)) / (DEGRADE_DIV - 1);
-			a_cleanUpPtr->md[j][k].mol = 0.0;
+	if(a_cleanUpPtr->step[0] > 0.0){
+		a_cleanUpPtr->minMeV[0] = a_cleanUpPtr->minMeV[2] + a_cleanUpPtr->step[0];
+		a_cleanUpPtr->step[1] = (a_cleanUpPtr->minMeV[0] - a_cleanUpPtr->minMeV[2]) / (DEGRADE_DIV + 1);
+		if(a_cleanUpPtr->step[1] > 0.0){
+			a_cleanUpPtr->maxMeV[1] = a_cleanUpPtr->minMeV[0] - a_cleanUpPtr->step[1];
+			a_cleanUpPtr->minMeV[1] = a_cleanUpPtr->minMeV[2] + a_cleanUpPtr->step[1];
+			a_cleanUpPtr->step[2] = (a_cleanUpPtr->minMeV[1] - a_cleanUpPtr->minMeV[2]) / DEGRADE_DIV;
+			if(a_cleanUpPtr->step[2] > 0.0){
+				a_cleanUpPtr->maxMeV[2] = a_cleanUpPtr->minMeV[1] - a_cleanUpPtr->step[2];
+				ret = 1;
+				
+				for(j = 0; j < DEGRADE_MAG; ++j){
+					for(k = 0; k < DEGRADE_DIV; ++k){
+						a_cleanUpPtr->md[j][k].MeV = (a_cleanUpPtr->maxMeV[j] * k + a_cleanUpPtr->minMeV[j] * (DEGRADE_DIV - 1 - k)) / (DEGRADE_DIV - 1);
+						a_cleanUpPtr->md[j][k].mol = 0.0;
+					}
+				}
+			}
 		}
 	}
+	return ret;
 }
 extern int iterateClenupMassDefect(void * a_total, struct objectNodeConst * a_nodePtr)
 {
@@ -9831,17 +10184,18 @@ extern void comptonEffect(struct electrode * a_electrodePtr)
 			cUp.totalMeVMol = 0.0;
 			cUp.degradeMeVMol = 0.0;
 			iterateInHashTable(&a_electrodePtr->massDefectHashTable, &cUp, iterateClenupMassDefect);
-			initMaxMinOfClenup(&cUp);
-			//I recommend the degrading process of SCAT_BIG_MASS_DEFECT_NOW with using the aproximatic calculation for faster calculation.
-			//fprintf(stderr, "DEBUG:%s:doProcess:%d cUp.cntOfBigMolNode:%d cUp.maxChangeMeVOfBigMol:%lg cUp.minChangeMeVOfBigMol:%lg\n", __FUNCTION__, doProcess, cUp.cntOfBigMolNode, cUp.maxChangeMeVOfBigMol, cUp.minChangeMeVOfBigMol);
-			//fprintf(stderr, "DEBUG:%s:doProcess:%d cUp.cntOfSmallMolNode:%d\n", __FUNCTION__, doProcess, cUp.cntOfSmallMolNode);
-			if(cUp.cntOfBigMolNode > DEGRADE_MAG * DEGRADE_DIV || cUp.cntOfSmallMolNode > DEGRADE_MAG * DEGRADE_DIV * 8){
-				iterateInHashTable(&a_electrodePtr->massDefectHashTable, &cUp, iterateDegreadeMassDefect);
-				if(abs((int)(10000 * (cUp.degradeMeVMol - cUp.totalMeVMol) / cUp.totalMeVMol)) > 1){
-					fprintf(stderr, "ERROR:%s(%d):cUp.degradeMeVMol:%lf != cUp.totalMeVMol:%lf\n", __FUNCTION__, __LINE__, cUp.degradeMeVMol, cUp.totalMeVMol);
-					exit(1);
+			if(initMaxMinOfClenup(&cUp)){
+				//I recommend the degrading process of SCAT_BIG_MASS_DEFECT_NOW with using the aproximatic calculation for faster calculation.
+				//fprintf(stderr, "DEBUG:%s:doProcess:%d cUp.cntOfBigMolNode:%d cUp.maxChangeMeVOfBigMol:%lg cUp.minChangeMeVOfBigMol:%lg\n", __FUNCTION__, doProcess, cUp.cntOfBigMolNode, cUp.maxChangeMeVOfBigMol, cUp.minChangeMeVOfBigMol);
+				//fprintf(stderr, "DEBUG:%s:doProcess:%d cUp.cntOfSmallMolNode:%d\n", __FUNCTION__, doProcess, cUp.cntOfSmallMolNode);
+				if(cUp.cntOfBigMolNode > DEGRADE_MAG * DEGRADE_DIV || cUp.cntOfSmallMolNode > DEGRADE_MAG * DEGRADE_DIV * 8){
+					iterateInHashTable(&a_electrodePtr->massDefectHashTable, &cUp, iterateDegreadeMassDefect);
+					if(abs((int)(10000 * (cUp.degradeMeVMol - cUp.totalMeVMol) / cUp.totalMeVMol)) > 1){
+						fprintf(stderr, "ERROR:%s(%d):cUp.degradeMeVMol:%lf != cUp.totalMeVMol:%lf\n", __FUNCTION__, __LINE__, cUp.degradeMeVMol, cUp.totalMeVMol);
+						exit(1);
+					}
+					moveFromClenup(&cUp);
 				}
-				moveFromClenup(&cUp);
 			}
 		}
 		//fprintf(stderr, "DEBUG:%s:massDefectHashTable.usedCnt:%u j:%d\n", __FUNCTION__, a_electrodePtr->massDefectHashTable.usedCnt, j);
@@ -10234,14 +10588,15 @@ extern void printSumup(FILE * a_fp, char * a_Titile, int a_loop, char * a_Tail, 
 	oldCOP = COP;
 	fputs(totalText, a_fp);
 	fputs(totalText, stderr);
-	fprintf(a_fp, "%s >>>>>\n\n", timeMess);
 
 	if(a_BeginOrEnd == END_PRINT || e_rc.logNecleusReactions){
+		fprintf(a_fp, "%s -----\n\n", timeMess);
 		//fprintf(stderr, "DEBUG:%s:e_nuclearReaction.usedCnt=%d\n", __FUNCTION__, e_nuclearReaction.usedCnt);
-		printAllNuclearReaction(a_fp);
+		printAllNuclearReaction(a_fp, timeMess);
 		printUnregistedAtomNumbers(a_fp);
 		printUnregistedIsotopeNumbers(a_fp);
 	}
+	fprintf(a_fp, "%s >>>>>\n\n", timeMess);
 	fflush(a_fp);
 	fsync(fileno(a_fp));
 }
@@ -10373,6 +10728,8 @@ extern void checkArgs(int argc, char * argv[], time_t * a_timeBeginPtr)
 			strncpy(rc.paramFname, argv[i] + 3, FNAME_LEN);
 		}else if(strcmp(argv[i], "-H-") == 0){
 			adjustHydrogenHelium = -6;
+		}else if(strcmp(argv[i], "-EC") == 0){
+			printAllElectronCapture(stdout);
 		}else if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0){
 			printf(
 "[help of usage]\n\
@@ -10510,6 +10867,7 @@ extern void checkArgs(int argc, char * argv[], time_t * a_timeBeginPtr)
 		int e_useComptonEffect = %d;\n\
 -H- : It specifies to reduce the amount of hydrogen and helium in the positive electrode\n\
     into one-1,000,000th before running the simulation.\n\
+-EC : Print the property of Electron Capture in decay modes. Not simulate.\n\
 ./simulate -h\n\
  (Show this help with '-h' or '-help'.)\n", 
 			DEFAULT_TERMTIMESEC, DEFAULT_INTERVALSEC, DEFAULT_LOGSTEP, DEFAULT_DATASTEP,

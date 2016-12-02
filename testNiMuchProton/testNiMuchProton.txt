@@ -1,0 +1,2 @@
+double e_emittedElectronMol = 4e-11;
+double e_emittedProtonMol = 4e-12;

@@ -1,0 +1,4 @@
+char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = "H=0.3, Al=1.0";
+char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = "H=0.3, Al=1.0";
+double e_emittedElectronMol = 4e-11;
+double e_emittedProtonMol = 4e-12;

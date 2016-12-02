@@ -32,6 +32,7 @@
 
 //-----------------------------------------------------------------
 #define MAX_ISOTOPES 200
+#define MAX_RECATION 300 
 struct isotopeHistoryTable {
 	int arySize;
 	int usedSize;
@@ -42,6 +43,14 @@ struct isotopeHistoryTable {
 	char * halfLifeAry[MAX_ISOTOPES];
 	double halfLifeSecAry[MAX_ISOTOPES];
 	double * molHistory[MAX_ISOTOPES];
+
+	int countOfReactions;
+	struct tag_reaction {
+		int rnum;
+		char * typePtr;//index 1
+		char * reactionPtr;//index 2
+		double * MeVAry;
+	} reaction[MAX_RECATION];
 } e_isotopeHistoryTableP, e_isotopeHistoryTableN;
 
 struct tag_sorted{
@@ -62,6 +71,7 @@ int compare_sorted(const void *a, const void *b)
 	}
     return ret;
 }
+int e_analyReaction = 0;
 
 void printIsotopeHistory(const char * a_nodeName, const struct isotopeHistoryTable * a_isotopeHistoryTable, int a_secStep, const char * a_stepName)
 {
@@ -80,9 +90,9 @@ void printIsotopeHistory(const char * a_nodeName, const struct isotopeHistoryTab
 	}
 	
 	//print the header line
-	fprintf(stdout, "%s SORTED-BY-ATOMIC-ORDER", a_nodeName);
+	fprintf(stdout, "\"%s SORTED-BY-ATOMIC-ORDER", a_nodeName);
 	if(a_isotopeHistoryTable->usedSize > 0){
-		fprintf(stdout, " (sec from %d to %d step %d)\n", a_isotopeHistoryTable->secAry[0], a_isotopeHistoryTable->secAry[a_isotopeHistoryTable->usedSize - 1], a_secStep);
+		fprintf(stdout, " (sec from %d to %d step %d)\"\n", a_isotopeHistoryTable->secAry[0], a_isotopeHistoryTable->secAry[a_isotopeHistoryTable->usedSize - 1], a_secStep);
 	}else{
 		fprintf(stderr, "ERROR:%s:a_isotopeHistoryTable->usedSize %d <= 0\n", __FUNCTION__, a_isotopeHistoryTable->usedSize);
 		exit(1);
@@ -138,9 +148,9 @@ void printIsotopeHistory(const char * a_nodeName, const struct isotopeHistoryTab
 	
 	qsort(sorted, a_isotopeHistoryTable->countOfIsotopes, sizeof(struct tag_sorted), compare_sorted);
 	
-	fprintf(stdout, "%s SORTED-BY-MOL", a_nodeName);
+	fprintf(stdout, "\"%s SORTED-BY-MOL", a_nodeName);
 	if(a_isotopeHistoryTable->usedSize > 0){
-		fprintf(stdout, " (sec from %d to %d step %d)\n", a_isotopeHistoryTable->secAry[0], a_isotopeHistoryTable->secAry[a_isotopeHistoryTable->usedSize - 1], a_secStep);
+		fprintf(stdout, " (sec from %d to %d step %d)\"\n", a_isotopeHistoryTable->secAry[0], a_isotopeHistoryTable->secAry[a_isotopeHistoryTable->usedSize - 1], a_secStep);
 	}else{
 		fprintf(stderr, "ERROR:%s:a_isotopeHistoryTable->usedSize %d <= 0\n", __FUNCTION__, a_isotopeHistoryTable->usedSize);
 		exit(1);
@@ -187,7 +197,46 @@ void printIsotopeHistory(const char * a_nodeName, const struct isotopeHistoryTab
 		}
 	}
 	fprintf(stdout, "\n");
-	
+	if(e_analyReaction){
+		fprintf(stdout, "\"[ %s ReactionType DETECT exothermic ]\"\n", a_nodeName);
+		fprintf(stdout, "final[MeV] R-Num type reaction\n");
+		for(i = 0; i < a_isotopeHistoryTable->countOfReactions; ++i){
+			fprintf(stdout, "%lg %d %s \"%s\"\n", a_isotopeHistoryTable->reaction[i].MeVAry[a_isotopeHistoryTable->usedSize - 1], a_isotopeHistoryTable->reaction[i].rnum, a_isotopeHistoryTable->reaction[i].typePtr, a_isotopeHistoryTable->reaction[i].reactionPtr);
+		}
+		fprintf(stdout, "\n");
+		fprintf(stdout, "\"[ %s [MeV]Ary (Colum is R-Num)]\"\n", a_nodeName);
+		fprintf(stdout, "%s sec", a_stepName);
+		for(i = 0; i < a_isotopeHistoryTable->countOfReactions; ++i){
+			fprintf(stdout, " %d", a_isotopeHistoryTable->reaction[i].rnum);
+		}
+		fprintf(stdout, "\n");
+		for(j = k = 0; j < a_isotopeHistoryTable->usedSize - 1; ++j){
+			if(a_isotopeHistoryTable->secAry[j] % a_secStep == 0){
+				fprintf(stdout, "%d %d", k + 1, a_isotopeHistoryTable->secAry[j + 1]);
+				++k;
+				for(i = 0; i < a_isotopeHistoryTable->countOfReactions; ++i){
+					fprintf(stdout, " %lg", a_isotopeHistoryTable->reaction[i].MeVAry[j + 1] - a_isotopeHistoryTable->reaction[i].MeVAry[j]);
+				}
+				fprintf(stdout, "\n");
+			}
+		}
+		fprintf(stdout, "\"[ %s add-up[MeV]Ary (Colum is R-Num)]\"\n", a_nodeName);
+		fprintf(stdout, "%s sec", a_stepName);
+		for(i = 0; i < a_isotopeHistoryTable->countOfReactions; ++i){
+			fprintf(stdout, " %d", a_isotopeHistoryTable->reaction[i].rnum);
+		}
+		fprintf(stdout, "\n");
+		for(j = k = 0; j < a_isotopeHistoryTable->usedSize; ++j){
+			if(a_isotopeHistoryTable->secAry[j] % a_secStep == 0){
+				fprintf(stdout, "%d %d", k, a_isotopeHistoryTable->secAry[j]);
+				++k;
+				for(i = 0; i < a_isotopeHistoryTable->countOfReactions; ++i){
+					fprintf(stdout, " %lg", a_isotopeHistoryTable->reaction[i].MeVAry[j]);
+				}
+				fprintf(stdout, "\n");
+			}
+		}
+	}
 }
 int getMassNumber(const char * a_isotpeName)
 {
@@ -237,35 +286,98 @@ void debug_getMassNumber()
 	CHK_getMassNumber("66Zn", 66);
 }
 
+int CheckAtomicName(const char * a_isotpeName, const char * a_atomicName)
+{
+	int ret = 0;
+	int isotpeNameLen = strlen(a_isotpeName);
+	int atomicNameLen = strlen(a_atomicName);
+	if(isotpeNameLen >= atomicNameLen){
+		if(strcmp(a_isotpeName + isotpeNameLen - atomicNameLen, a_atomicName) == 0){
+			if(isotpeNameLen > atomicNameLen){
+				if('0' <= a_isotpeName[isotpeNameLen - atomicNameLen - 1]
+				&& a_isotpeName[isotpeNameLen - atomicNameLen - 1] <= '9'){
+					ret = 1;
+				}
+			}else{
+				ret = 1;
+			}
+		}
+	}
+	return ret;
+}
 int getAtomicNumber(const char * a_isotpeName)
 {
 	int ret = 0;
-	if(strcmp(a_isotpeName, "e") == 0){
+	if(CheckAtomicName(a_isotpeName, "e")){
 		ret = 0;
-	}else if(strcmp(a_isotpeName, "n") == 0){
+	}else if(CheckAtomicName(a_isotpeName, "n")){
 		ret = 0;
-	}else if(strcmp(a_isotpeName, "H") == 0){
+	}else if(CheckAtomicName(a_isotpeName, "H")){
 		ret = 1;
-	}else if(strcmp(a_isotpeName, "D") == 0){
+	}else if(CheckAtomicName(a_isotpeName, "D")){
 		ret = 1;
-	}else if(strcmp(a_isotpeName, "T") == 0){
+	}else if(CheckAtomicName(a_isotpeName, "T")){
 		ret = 1;
-	}else if(strstr(a_isotpeName, "He")){
+	}else if(CheckAtomicName(a_isotpeName, "He")){
 		ret = 2;
-	}else if(strstr(a_isotpeName, "Mn")){
+	}else if(CheckAtomicName(a_isotpeName, "Li")){
+		ret = 3;
+	}else if(CheckAtomicName(a_isotpeName, "Be")){
+		ret = 4;
+	}else if(CheckAtomicName(a_isotpeName, "B")){
+		ret = 5;
+	}else if(CheckAtomicName(a_isotpeName, "C")){
+		ret = 6;
+	}else if(CheckAtomicName(a_isotpeName, "N")){
+		ret = 7;
+	}else if(CheckAtomicName(a_isotpeName, "O")){
+		ret = 8;
+	}else if(CheckAtomicName(a_isotpeName, "F")){
+		ret = 9;
+	}else if(CheckAtomicName(a_isotpeName, "Ne")){
+		ret = 10;
+	}else if(CheckAtomicName(a_isotpeName, "Na")){
+		ret = 11;
+	}else if(CheckAtomicName(a_isotpeName, "Mg")){
+		ret = 12;
+	}else if(CheckAtomicName(a_isotpeName, "Al")){
+		ret = 13;
+	}else if(CheckAtomicName(a_isotpeName, "Si")){
+		ret = 14;
+	}else if(CheckAtomicName(a_isotpeName, "P")){
+		ret = 15;
+	}else if(CheckAtomicName(a_isotpeName, "S")){
+		ret = 16;
+	}else if(CheckAtomicName(a_isotpeName, "Cl")){
+		ret = 17;
+	}else if(CheckAtomicName(a_isotpeName, "Ar")){
+		ret = 18;
+	}else if(CheckAtomicName(a_isotpeName, "K")){
+		ret = 19;
+	}else if(CheckAtomicName(a_isotpeName, "Ca")){
+		ret = 20;
+	}else if(CheckAtomicName(a_isotpeName, "Sc")){
+		ret = 21;
+	}else if(CheckAtomicName(a_isotpeName, "Ti")){
+		ret = 22;
+	}else if(CheckAtomicName(a_isotpeName, "V")){
+		ret = 23;
+	}else if(CheckAtomicName(a_isotpeName, "Cr")){
+		ret = 24;
+	}else if(CheckAtomicName(a_isotpeName, "Mn")){
 		ret = 25;
-	}else if(strstr(a_isotpeName, "Fe")){
+	}else if(CheckAtomicName(a_isotpeName, "Fe")){
 		ret = 26;
-	}else if(strstr(a_isotpeName, "Co")){
+	}else if(CheckAtomicName(a_isotpeName, "Co")){
 		ret = 27;
-	}else if(strstr(a_isotpeName, "Ni")){
+	}else if(CheckAtomicName(a_isotpeName, "Ni")){
 		ret = 28;
-	}else if(strstr(a_isotpeName, "Cu")){
+	}else if(CheckAtomicName(a_isotpeName, "Cu")){
 		ret = 29;
-	}else if(strstr(a_isotpeName, "Zn")){
+	}else if(CheckAtomicName(a_isotpeName, "Zn")){
 		ret = 30;
 	}else {
-		fprintf(stderr, "ERROR:%s:unknown atomic number= %s", __FUNCTION__, a_isotpeName);
+		fprintf(stderr, "ERROR:%s:unknown atomic number= %s\n", __FUNCTION__, a_isotpeName);
 		exit(1);
 	}
 	return ret;
@@ -363,7 +475,64 @@ void registIsotope(struct isotopeHistoryTable * a_isotopeHistoryTable, int a_sec
 		a_isotopeHistoryTable->countOfIsotopes++;
 	}
 }
-
+int comparReaction(const void * p1, const void * p2)
+{
+	int ret = 0;
+	const struct tag_reaction * q1 = (const struct tag_reaction *)p1;
+	const struct tag_reaction * q2 = (const struct tag_reaction *)p2;
+	if(q1->rnum < q2->rnum){
+		ret = -1;
+	}else if(q1->rnum > q2->rnum){
+		ret = 1;
+	}
+	return ret;
+}
+void sortReactionByRnum(struct isotopeHistoryTable * a_isotopeHistoryTable)
+{
+	qsort(&a_isotopeHistoryTable->reaction, a_isotopeHistoryTable->countOfReactions, sizeof(struct tag_reaction), comparReaction);
+}
+void appendRecation(struct isotopeHistoryTable * a_isotopeHistoryTable, int a_secIndex, int a_rnum, const char * a_typePtr, const char * a_reactionPtr, double a_MeV)
+{
+	int i, j = -1;
+	//fprintf(stderr, "DEBUG:%s(%d):%p secI:%d rnum:%d type:%s MeV:%lg\n %s\n", __FUNCTION__, __LINE__, a_isotopeHistoryTable, a_secIndex, a_rnum, a_typePtr, a_MeV, a_reactionPtr);
+	for(i = 0; i < a_isotopeHistoryTable->countOfReactions; ++i){
+		j = a_rnum + i;
+		if(j >= a_isotopeHistoryTable->countOfReactions){
+			j %= a_isotopeHistoryTable->countOfReactions;
+		}
+		if(strcmp(a_typePtr, a_isotopeHistoryTable->reaction[j].typePtr) == 0
+		&& strcmp(a_reactionPtr, a_isotopeHistoryTable->reaction[j].reactionPtr) == 0){
+			//found
+			a_isotopeHistoryTable->reaction[j].rnum = a_rnum;
+			if(a_secIndex < a_isotopeHistoryTable->arySize){
+				a_isotopeHistoryTable->reaction[j].MeVAry[a_secIndex] = a_MeV;
+			}else{
+				fprintf(stderr, "ERROR:%s(%d): a_secIndex:%d >= a_isotopeHistoryTable->arySize:%d\n", __FUNCTION__, __LINE__, a_secIndex, a_isotopeHistoryTable->arySize);
+				exit(1);
+			}
+			break;
+		}
+		j = -1;
+	}
+	if(j == -1){
+		if(a_isotopeHistoryTable->countOfReactions < MAX_RECATION){
+			a_isotopeHistoryTable->reaction[a_isotopeHistoryTable->countOfReactions].rnum = a_rnum;
+			a_isotopeHistoryTable->reaction[a_isotopeHistoryTable->countOfReactions].typePtr = allocStrcpy(a_typePtr);
+			a_isotopeHistoryTable->reaction[a_isotopeHistoryTable->countOfReactions].reactionPtr = allocStrcpy(a_reactionPtr);
+			a_isotopeHistoryTable->reaction[a_isotopeHistoryTable->countOfReactions].MeVAry = clearAlloc(sizeof(double) * a_isotopeHistoryTable->arySize, "MeVAry");
+			if(a_secIndex < a_isotopeHistoryTable->arySize){
+				a_isotopeHistoryTable->reaction[a_isotopeHistoryTable->countOfReactions].MeVAry[a_secIndex] = a_MeV;
+			}else{
+				fprintf(stderr, "ERROR:%s(%d): a_secIndex:%d >= a_isotopeHistoryTable->arySize:%d\n", __FUNCTION__, __LINE__, a_secIndex, a_isotopeHistoryTable->arySize);
+				exit(1);
+			}
+			a_isotopeHistoryTable->countOfReactions++;
+		}else{
+			fprintf(stderr, "ERROR:%s(%d): a_isotopeHistoryTable->countOfReactions:%d >= MAX_RECATION:%d\n", __FUNCTION__, __LINE__, a_isotopeHistoryTable->countOfReactions, MAX_RECATION);
+			exit(1);
+		}
+	}
+}
 int foundSecIndex(struct isotopeHistoryTable * a_isotopeHistoryTable, int a_TimeSecond)
 {
 	int ret;
@@ -401,6 +570,13 @@ void initIsotopeHistoryTable(struct isotopeHistoryTable * a_isotopeHistoryTable,
 		a_isotopeHistoryTable->halfLifeAry[i] = NULL;
 		a_isotopeHistoryTable->halfLifeSecAry[i] = 1.0;
 		a_isotopeHistoryTable->molHistory[i] = NULL;
+	}
+	a_isotopeHistoryTable->countOfReactions = 0;
+	for(i = 0; i < MAX_RECATION; ++i){
+		a_isotopeHistoryTable->reaction[i].rnum = 0;
+		a_isotopeHistoryTable->reaction[i].typePtr = NULL;
+		a_isotopeHistoryTable->reaction[i].reactionPtr = NULL;
+		a_isotopeHistoryTable->reaction[i].MeVAry = NULL;
 	}
 }
 //-----------------------------------------------------------------
@@ -551,6 +727,11 @@ void analyze(const char * a_Fname)
 		char buff[LINE_MAX];
 		int inFlag = 0, negativeElectrodeFlag = 0, positiveElectrodeFlag = 0;
 		int allsec, secIndexP, secIndexN;
+		int inNegativeElectrodeReaction = 0, inPositiveElectrodeReaction = 0, reactionLine = 0;
+		char head[61], rnumStr[61], type[131], reaction[401];
+		int rnum;
+		char eq[11], x[31], u1[11], u2[11], ar[11], u3[11];
+		double MeV;
 		while(fgets(buff, LINE_MAX, fp)){
 			char * nlPtr;
 			nlPtr = strstr(buff, "\n");
@@ -558,7 +739,16 @@ void analyze(const char * a_Fname)
 				*nlPtr = 0;
 			}
 			++lineNum;
-			if(memcmp(buff, "[TIME] ", 7) == 0){
+			if(memcmp(buff, "R1 command", 10) == 0){
+				if(strstr(buff, " -n1")){
+					e_analyReaction = 1;
+				}else{
+					if(e_analyReaction == 1){
+						e_analyReaction = 0;
+						fprintf(stderr, "WARN:%s(%d):reset e_analyReaction = 0;\n", __FUNCTION__, __LINE__);
+					}
+				}
+			}else if(memcmp(buff, "[TIME] ", 7) == 0){
 				int len;
 				len = strlen(buff);
 				if(memcmp(buff + len - 5, "<<<<<", 5) == 0){
@@ -611,11 +801,71 @@ void analyze(const char * a_Fname)
 				if(strstr(buff, "TOTAL ENERGY @") == buff){
 					scanTotalEnergy(secIndexN, buff);
 				}
+				if(e_analyReaction 
+				&& strcmp(buff, "[ NEGATIVE ELECTRODE ReactionType DETECT exothermic ]<<<") == 0){
+					inNegativeElectrodeReaction = 1;
+					//fprintf(stderr, "DEBUG:%s(%d):found [ NEGATIVE ELECTRODE ReactionType DETECT exothermic ]<<<\n", __FUNCTION__, __LINE__);
+				}
+				if(e_analyReaction 
+				&& strcmp(buff, "[ NEGATIVE ELECTRODE ReactionType DETECT exothermic ]>>>") == 0){
+					sortReactionByRnum(&e_isotopeHistoryTableN);
+					inNegativeElectrodeReaction = 0;
+					//fprintf(stderr, "DEBUG:%s(%d):found [ NEGATIVE ELECTRODE ReactionType DETECT exothermic ]>>>\n", __FUNCTION__, __LINE__);
+				}
+				if(e_analyReaction 
+				&& strcmp(buff, "[ POSITIVE ELECTRODE ReactionType DETECT exothermic ]<<<") == 0){
+					inPositiveElectrodeReaction = 1;
+					//fprintf(stderr, "DEBUG:%s(%d):found [ POSITIVE ELECTRODE ReactionType DETECT exothermic ]<<<\n", __FUNCTION__, __LINE__);
+				}
+				if(e_analyReaction 
+				&& strcmp(buff, "[ POSITIVE ELECTRODE ReactionType DETECT exothermic ]>>>") == 0){
+					sortReactionByRnum(&e_isotopeHistoryTableP);
+					inPositiveElectrodeReaction = 0;
+					//fprintf(stderr, "DEBUG:%s(%d):found [ POSITIVE ELECTRODE ReactionType DETECT exothermic ]>>>\n", __FUNCTION__, __LINE__);
+				}
+				if(inNegativeElectrodeReaction || inPositiveElectrodeReaction){
+					if(reactionLine == 0){
+						//"P+ 14 BETA_MINUS_AND_ALPHA"
+						//"P+ Total 2.91628e-09 [MeV mol] -> 1.75622e+15 [MeV]"
+						sscanf(buff, "%60s %60s %130s", head, rnumStr, type);
+						if(strcmp(head, "N+") == 0 || strcmp(head, "P+") == 0){
+							if(strcmp(rnumStr, "Total") == 0){
+								sscanf(buff, "%60s %60s %130s %10s %10s %10s %lg %10s", head, rnumStr, type, u1, u2, ar, &MeV, u3);
+								if(strcmp(u1, "[MeV") == 0 && strcmp(u2, "mol]") == 0 
+								&& strcmp(ar, "->") == 0 && strcmp(u3, "[MeV]") == 0){
+									rnum = 0;
+									appendRecation((strcmp(head, "N+") == 0) ? &e_isotopeHistoryTableN : &e_isotopeHistoryTableP, (strcmp(head, "N+") == 0) ? secIndexN : secIndexP, rnum, "Total", "Total", MeV);
+								}
+							}else if('0' <= rnumStr[0] && rnumStr[0] <= '9'){
+								rnum = atoi(rnumStr);
+								if(rnum > 0){
+									reactionLine = 1;
+								}
+							}
+						}
+					}else if(reactionLine == 1){
+						//" 6He(5606.56) -> D+(1875.61) + e-(0.510999) + ~νe(0) + He(3728.4) + 2.03445[MeV/c^2]"
+						strncpy(reaction, buff + 1, 400);
+						reactionLine = 2;
+					}else if(reactionLine == 2){
+						//" MassDefect 2.03445 [MeV] * [ 2.76753e-15 , 4.48091e-13 ] [mol] * 9 [cnt]"
+						reactionLine = 3;
+					}else if(reactionLine == 3){
+						//" = 1.91824e-12 [MeV mol] -> 1.15519e+12 [MeV]"
+						sscanf(buff, " %10s %30s %10s %10s %10s %lg %10s", eq, x, u1, u2, ar, &MeV, u3);
+						if(strcmp(eq, "=") == 0 && strcmp(u1, "[MeV") == 0 && strcmp(u2, "mol]") == 0 
+						&& strcmp(ar, "->") == 0 && strcmp(u3, "[MeV]") == 0){
+							appendRecation((strcmp(head, "N+") == 0) ? &e_isotopeHistoryTableN : &e_isotopeHistoryTableP, (strcmp(head, "N+") == 0) ? secIndexN : secIndexP, rnum, type, reaction, MeV);
+						}
+						reactionLine = 0;
+					}
+				}
 			}
 		}
 		fclose(fp);
 	}
 }
+
 void printHelp()
 {
 	fprintf(stdout, "[help of usage]\n\
@@ -629,6 +879,7 @@ void printHelp()
 -Phour : print the history by an hour (default).\n\
 -Pday  : print the history by a day.\n\
 -Pweek : print the history by a week.\n\
+-Psec  : print the history by a second.\n\
 -D=dd : The analyzing period by days, 'dd' is the number of days, default = 2.\n\
  If 'dd' is longer than the period of simulation in log file, \n\
  the analyzation will stop at the end of log file.\n\
@@ -659,6 +910,9 @@ int main(int argc, char * argv[])
 		}else if(strcmp(argv[beg_i], "-Pweek") == 0){
 			secStep = 3600 * 24 * 7;
 			stepName = "week";
+		}else if(strcmp(argv[beg_i], "-Psec") == 0){
+			secStep = 1;
+			stepName = "second";
 		}else if(memcmp(argv[beg_i], "-D=", 3) == 0){
 			daysOfTotalPeriod = atoi(argv[beg_i] + 3);
 			if(daysOfTotalPeriod <= 0){

@@ -16,17 +16,200 @@ clean:
 rmlog:
 	rm -f data.dat s00*.log m*.log h*.log
 
+RUN_SIMULATE = ../../neutron_generator/simulate
+RUN_ANALYZELOG = ../../neutron_generator/analyzelog
+
+help:
+	./simulate -h
+
+ElectronCaptureList:
+	mkdir -p ElectronCaptureList
+	cd ElectronCaptureList ; \
+	rm -f data.dat s00*.log m*.log h*.log ; \
+	$(RUN_SIMULATE) -EC >ElectronCaptureList.txt
+
 # testNi is :
 # (1) run 'sumulate' while 1 minute + many hour with default contitions.
-testNi:
-	mkdir -p testNi
-	cd testNi ; \
+testNiPoorProton:
+	mkdir -p testNiPoorProton
+	cd testNiPoorProton ; \
 	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
-	../simulate ; \
-	../simulate -t=1h ; \
-	../simulate -t=1d ; \
-	../simulate -t=1d
+	$(RUN_SIMULATE) ; \
+	$(RUN_SIMULATE) -t=1h ; \
+	$(RUN_SIMULATE) -t=1d ; \
+	$(RUN_SIMULATE) -t=1d
 
+testNiMuchProton:
+	mkdir -p testNiMuchProton
+	cd testNiMuchProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "double e_emittedElectronMol = 4e-11;" >testNiMuchProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testNiMuchProton.txt ; \
+	$(RUN_SIMULATE) -P=testNiMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testNiMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testNiMuchProton.txt
+
+testAlMuchProton:
+	mkdir -p testAlMuchProton
+	cd testAlMuchProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.3, Al=1.0\";" > testAlMuchProton.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.3, Al=1.0\";" >> testAlMuchProton.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testAlMuchProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testAlMuchProton.txt ; \
+	$(RUN_SIMULATE) -P=testAlMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlMuchProton.txt
+
+testFeMuchProton:
+	mkdir -p testFeMuchProton
+	cd testFeMuchProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, Fe=1.0\";" > testFeMuchProton.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, Fe=1.0\";" >> testFeMuchProton.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testFeMuchProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testFeMuchProton.txt ; \
+	$(RUN_SIMULATE) -P=testFeMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testFeMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testFeMuchProton.txt
+
+testMnMuchProton:
+	mkdir -p testMnMuchProton
+	cd testMnMuchProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Mn=1.0\";" > testMnMuchProton.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Mn=1.0\";" >> testMnMuchProton.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testMnMuchProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testMnMuchProton.txt ; \
+	$(RUN_SIMULATE) -P=testMnMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testMnMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testMnMuchProton.txt
+
+testLiMuchProton:
+	mkdir -p testLiMuchProton
+	cd testLiMuchProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=1.0\";" > testLiMuchProton.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=1.0\";" >> testLiMuchProton.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testLiMuchProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testLiMuchProton.txt ; \
+	$(RUN_SIMULATE) -P=testLiMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLiMuchProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLiMuchProton.txt
+
+
+testAlPoorProton:
+	mkdir -p testAlPoorProton
+	cd testAlPoorProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.3, Al=1.0\";" > testAlPoorProton.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.3, Al=1.0\";" >> testAlPoorProton.txt ; \
+	echo "double e_emittedElectronMol = 4e-12;" >>testAlPoorProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-11;" >>testAlPoorProton.txt ; \
+	$(RUN_SIMULATE) -P=testAlPoorProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlPoorProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlPoorProton.txt
+
+testFePoorProton:
+	mkdir -p testFePoorProton
+	cd testFePoorProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, Fe=1.0\";" > testFePoorProton.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, Fe=1.0\";" >> testFePoorProton.txt ; \
+	echo "double e_emittedElectronMol = 4e-12;" >>testFePoorProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-11;" >>testFePoorProton.txt ; \
+	$(RUN_SIMULATE) -P=testFePoorProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testFePoorProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testFePoorProton.txt
+
+testMnPoorProton:
+	mkdir -p testMnPoorProton
+	cd testMnPoorProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Mn=1.0\";" > testMnPoorProton.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Mn=1.0\";" >> testMnPoorProton.txt ; \
+	echo "double e_emittedElectronMol = 4e-12;" >>testMnPoorProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-11;" >>testMnPoorProton.txt ; \
+	$(RUN_SIMULATE) -P=testMnPoorProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testMnPoorProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testMnPoorProton.txt
+
+testLiPoorProton:
+	mkdir -p testLiPoorProton
+	cd testLiPoorProton ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=1.0\";" > testLiPoorProton.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=1.0\";" >> testLiPoorProton.txt ; \
+	echo "double e_emittedElectronMol = 4e-12;" >>testLiPoorProton.txt ; \
+	echo "double e_emittedProtonMol = 4e-11;" >>testLiPoorProton.txt ; \
+	$(RUN_SIMULATE) -P=testLiPoorProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLiPoorProton.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLiPoorProton.txt
+
+
+testNiMuchD:
+	mkdir -p testNiMuchD
+	cd testNiMuchD ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.6, Ni=1.0\";" > testNiMuchD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.6, Ni=1.0\";" >> testNiMuchD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testNiMuchD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testNiMuchD.txt ; \
+	$(RUN_SIMULATE) -P=testNiMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testNiMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testNiMuchD.txt
+
+testAlMuchD:
+	mkdir -p testAlMuchD
+	cd testAlMuchD ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.3, Al=1.0\";" > testAlMuchD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.3, Al=1.0\";" >> testAlMuchD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testAlMuchD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testAlMuchD.txt ; \
+	$(RUN_SIMULATE) -P=testAlMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlMuchD.txt
+
+testFeMuchD:
+	mkdir -p testFeMuchD
+	cd testFeMuchD ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.4, Fe=1.0\";" > testFeMuchD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.4, Fe=1.0\";" >> testFeMuchD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testFeMuchD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testFeMuchD.txt ; \
+	$(RUN_SIMULATE) -P=testFeMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testFeMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testFeMuchD.txt
+
+testMnMuchD:
+	mkdir -p testMnMuchD
+	cd testMnMuchD ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.2, Mn=1.0\";" > testMnMuchD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.2, Mn=1.0\";" >> testMnMuchD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testMnMuchD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testMnMuchD.txt ; \
+	$(RUN_SIMULATE) -P=testMnMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testMnMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testMnMuchD.txt
+
+testLiMuchD:
+	mkdir -p testLiMuchD
+	cd testLiMuchD ; \
+	rm -f data.dat s00*.log m*.log h*.log param1.dat ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.2, Li=1.0\";" > testLiMuchD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.2, Li=1.0\";" >> testLiMuchD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testLiMuchD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testLiMuchD.txt ; \
+	$(RUN_SIMULATE) -P=testLiMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLiMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLiMuchD.txt
+
+testMMM: testAlPoorProton testFePoorProton testMnPoorProton testLiPoorProton testNiMuchD testAlMuchD testFeMuchD testMnMuchD testLiMuchD
+
+# ---------------- old targets ----------------
 # testNistopcur is :
 # (1) run 'sumulate' with stopping the high voltage charge and with reducing hydrogen in the new directry 'testNistopcur' after helitaging 'testNi'.
 testNistopcur:
@@ -36,10 +219,10 @@ testNistopcur:
 	cp -f ../testNi/*.log . ; \
 	echo "double e_emittedElectronMol = 0.0;" >testNistopcur.txt ; \
 	echo "double e_emittedProtonMol = 0.0;" >>testNistopcur.txt ; \
-	../simulate -t=24h -P=testNistopcur.txt ; \
-	../simulate -t=24h -P=testNistopcur.txt ; \
-	../simulate -t=24h -P=testNistopcur.txt ; \
-	../simulate -t=24h -P=testNistopcur.txt 
+	$(RUN_SIMULATE) -t=24h -P=testNistopcur.txt ; \
+	$(RUN_SIMULATE) -t=24h -P=testNistopcur.txt ; \
+	$(RUN_SIMULATE) -t=24h -P=testNistopcur.txt ; \
+	$(RUN_SIMULATE) -t=24h -P=testNistopcur.txt 
 
 # testNistopcurH is :
 # (1) run 'sumulate' with stopping the high voltage charge and with reducing hydrogen in the new directry 'testNistopcurH' after helitaging 'testNi'.
@@ -50,10 +233,10 @@ testNistopcurH:
 	cp -f ../testNi/*.log . ; \
 	echo "double e_emittedElectronMol = 0.0;" >testNistopcurH.txt ; \
 	echo "double e_emittedProtonMol = 0.0;" >>testNistopcurH.txt ; \
-	../simulate -t=24h -P=testNistopcurH.txt -H- ; \
-	../simulate -t=24h -P=testNistopcurH.txt -H- ; \
-	../simulate -t=24h -P=testNistopcurH.txt ; \
-	../simulate -t=24h -P=testNistopcurH.txt 
+	$(RUN_SIMULATE) -t=24h -P=testNistopcurH.txt -H- ; \
+	$(RUN_SIMULATE) -t=24h -P=testNistopcurH.txt -H- ; \
+	$(RUN_SIMULATE) -t=24h -P=testNistopcurH.txt ; \
+	$(RUN_SIMULATE) -t=24h -P=testNistopcurH.txt 
 
 # testNi_10days is :
 # (1) run 'sumulate' during 31 days in the new directry 'testNi_10days' after helitaging 'testNi'.
@@ -62,10 +245,10 @@ testNi_10days:
 	cd testNi_10days ; \
 	cp -f ../testNi/data.dat . ; \
 	cp -f ../testNi/*.log . ; \
-	../simulate -t=2d ; \
-	../simulate -t=2d ; \
-	../simulate -t=2d ; \
-	../simulate -t=2d 
+	$(RUN_SIMULATE) -t=2d ; \
+	$(RUN_SIMULATE) -t=2d ; \
+	$(RUN_SIMULATE) -t=2d ; \
+	$(RUN_SIMULATE) -t=2d 
 
 # testNi_woCE is :
 # (1) run 'sumulate' while 1 minute + some hours without ComptonEffect.
@@ -74,9 +257,9 @@ testNi_woCE:
 	cd testNi_woCE ; \
 	rm -f data.dat s00*.log m*.log h*.log param2.dat ; \
 	echo "int e_useComptonEffect = 0;" >param2.dat ; \
-	../simulate -P=param2.dat ; \
-	../simulate -t=1h -P=param2.dat ; \
-	../simulate -t=1d -P=param2.dat
+	$(RUN_SIMULATE) -P=param2.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=param2.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=param2.dat
 
 # test_woH is :
 # (1) run 'sumulate' while (1 minute + some hours) without hydrogen.
@@ -87,9 +270,9 @@ test_woH:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > param3.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" >> param3.dat ; \
 	echo "double e_emittedProtonMol = 0.0;" >> param3.dat ; \
-	../simulate -P=param3.dat ; \
-	../simulate -t=1h -P=param3.dat ; \
-	../simulate -t=1d -P=param3.dat 
+	$(RUN_SIMULATE) -P=param3.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=param3.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=param3.dat 
 
 
 # testNi_cur100 is :
@@ -99,9 +282,9 @@ testNi_cur100:
 	cd testNi_cur100 ; \
 	echo "double e_emittedElectronMol = 1.0E-8;" >param4.dat ; \
 	echo "double e_emittedProtonMol = 0.4E-8;" >>param4.dat ; \
-	../simulate -P=param4.dat ; \
-	../simulate -t=1h -P=param4.dat ; \
-	../simulate -t=1d -P=param4.dat 
+	$(RUN_SIMULATE) -P=param4.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=param4.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=param4.dat 
 
 
 # testNi_rate4 is :
@@ -115,9 +298,9 @@ testNi_rate4:
 	echo "double e_neutronGenInSpaceProtonRate = 0.04;" >>param5.dat ; \
 	echo "double e_hydrogenGenInSpaceProtonRate = 0.04;" >>param5.dat ; \
 	echo "double e_collideProtonRateOnElectrode = 0.8;" >>param5.dat ; \
-	../simulate -P=param5.dat ; \
-	../simulate -t=1h -P=param5.dat ; \
-	../simulate -t=1d -P=param5.dat 
+	$(RUN_SIMULATE) -P=param5.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=param5.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=param5.dat 
 
 
 # testNi_rate025 is :
@@ -131,9 +314,9 @@ testNi_rate025:
 	echo "double e_neutronGenInSpaceProtonRate = 0.0025;" >>param8.dat ; \
 	echo "double e_hydrogenGenInSpaceProtonRate = 0.0025;" >>param8.dat ; \
 	echo "double e_collideProtonRateOnElectrode = 0.05;" >>param8.dat ; \
-	../simulate -P=param8.dat ; \
-	../simulate -t=1h -P=param8.dat ; \
-	../simulate -t=1d -P=param8.dat
+	$(RUN_SIMULATE) -P=param8.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=param8.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=param8.dat
 
 testNi_rateNeutron:
 	mkdir -p testNi_rateNeutron
@@ -144,9 +327,9 @@ testNi_rateNeutron:
 	echo "double e_neutronGenInSpaceProtonRate = 0.1;" >>param_rateNeutron.dat ; \
 	echo "double e_hydrogenGenInSpaceProtonRate = 0.1;" >>param_rateNeutron.dat ; \
 	echo "double e_collideProtonRateOnElectrode = 0.2;" >>param_rateNeutron.dat ; \
-	../simulate -P=param_rateNeutron.dat ; \
-	../simulate -t=1h -P=param_rateNeutron.dat ; \
-	../simulate -t=1d -P=param_rateNeutron.dat 
+	$(RUN_SIMULATE) -P=param_rateNeutron.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=param_rateNeutron.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=param_rateNeutron.dat 
 
 # Deuterium(D, heavy hydrogen) #1
 testD:
@@ -155,9 +338,9 @@ testD:
 	rm -f data.dat s00*.log m*.log h*.log D*.log paramD.dat ; \
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > paramD.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.6, Ni=1.0\";" >> paramD.dat ; \
-	../simulate -P=paramD.dat ; \
-	../simulate -t=1h -P=paramD.dat ; \
-	../simulate -t=1d -P=paramD.dat 
+	$(RUN_SIMULATE) -P=paramD.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramD.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramD.dat 
 
 
 testDH:
@@ -166,9 +349,9 @@ testDH:
 	rm -f data.dat s00*.log m*.log h*.log D*.log testDH.dat ; \
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testDH.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.3, D=0.3, Ni=1.0\";" >> testDH.dat ; \
-	../simulate -P=testDH.dat ; \
-	../simulate -t=1h -P=testDH.dat ; \
-	../simulate -t=1d -P=testDH.dat 
+	$(RUN_SIMULATE) -P=testDH.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testDH.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testDH.dat 
 
 testDH3M:
 	mkdir -p testDH3M
@@ -177,9 +360,9 @@ testDH3M:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testDH3M.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.3, D=0.3, Ni=1.0\";" >> testDH3M.dat ; \
 	echo "double e_appliedVoltageScale = 3.9;" >> testDH3M.dat ; \
-	../simulate -P=testDH3M.dat ; \
-	../simulate -t=1h -P=testDH3M.dat ; \
-	../simulate -t=1d -P=testDH3M.dat 
+	$(RUN_SIMULATE) -P=testDH3M.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testDH3M.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testDH3M.dat 
 
 testD2:
 	mkdir -p testD2
@@ -187,9 +370,9 @@ testD2:
 	rm -f data.dat s00*.log m*.log h*.log D*.log paramD2.dat ; \
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.3, Ni=1.0\";" > paramD2.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.6, Ni=1.0\";" >> paramD2.dat ; \
-	../simulate -P=paramD2.dat ; \
-	../simulate -t=1h -P=paramD2.dat ; \
-	../simulate -t=1d -P=paramD2.dat 
+	$(RUN_SIMULATE) -P=paramD2.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramD2.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramD2.dat 
 
 testDH2:
 	mkdir -p testDH2
@@ -197,9 +380,9 @@ testDH2:
 	rm -f data.dat s00*.log m*.log h*.log D*.log testDH2.dat ; \
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.15, D=0.15, Ni=1.0\";" > testDH2.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.3, D=0.3, Ni=1.0\";" >> testDH2.dat ; \
-	../simulate -P=testDH2.dat ; \
-	../simulate -t=1h -P=testDH2.dat ; \
-	../simulate -t=1d -P=testDH2.dat 
+	$(RUN_SIMULATE) -P=testDH2.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testDH2.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testDH2.dat 
 
 testDH23M:
 	mkdir -p testDH23M
@@ -208,9 +391,9 @@ testDH23M:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.15, D=0.15, Ni=1.0\";" > testDH23M.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.3, D=0.3, Ni=1.0\";" >> testDH23M.dat ; \
 	echo "double e_appliedVoltageScale = 3.9;" >> testDH23M.dat ; \
-	../simulate -P=testDH23M.dat ; \
-	../simulate -t=1h -P=testDH23M.dat ; \
-	../simulate -t=1d -P=testDH23M.dat 
+	$(RUN_SIMULATE) -P=testDH23M.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testDH23M.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testDH23M.dat 
 
 # Deuterium(D, heavy hydrogen) 1%
 testD1_Ni:
@@ -219,9 +402,9 @@ testD1_Ni:
 	rm -f data.dat s00*.log m*.log h*.log D*.log testD1_Ni.txt ; \
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testD1_Ni.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.6, D=0.006, Ni=1.0\";" >> testD1_Ni.txt ; \
-	../simulate -P=testD1_Ni.txt ; \
-	../simulate -t=1h -P=testD1_Ni.txt ; \
-	../simulate -t=1d -P=testD1_Ni.txt 
+	$(RUN_SIMULATE) -P=testD1_Ni.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testD1_Ni.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testD1_Ni.txt 
 
 testD1_Fe:
 	mkdir -p testD1_Fe
@@ -230,9 +413,9 @@ testD1_Fe:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Fe=1.0\";" > testD1_Fe.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.4, D=0.004, Fe=1.0\";" >> testD1_Fe.txt ; \
 	echo "double e_emittedProtonMol = 0.26666E-10;" >> testD1_Fe.txt ; \
-	../simulate -P=testD1_Fe.txt ; \
-	../simulate -t=1h -P=testD1_Fe.txt ; \
-	../simulate -t=1d -P=testD1_Fe.txt 
+	$(RUN_SIMULATE) -P=testD1_Fe.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testD1_Fe.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testD1_Fe.txt 
 
 testD1_Al:
 	mkdir -p testD1_Al
@@ -241,9 +424,9 @@ testD1_Al:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testD1_Al.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.2, D=0.002, Al=1.0\";" >> testD1_Al.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testD1_Al.dat ; \
-	../simulate -P=testD1_Al.dat ; \
-	../simulate -t=1h -P=testD1_Al.dat ; \
-	../simulate -t=1d -P=testD1_Al.dat 
+	$(RUN_SIMULATE) -P=testD1_Al.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testD1_Al.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testD1_Al.dat 
 
 # Li 1%
 testLi1_Ni:
@@ -252,9 +435,9 @@ testLi1_Ni:
 	rm -f data.dat s00*.log m*.log h*.log D*.log testLi1_Ni.txt ; \
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testLi1_Ni.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.6, Li=0.006, Ni=1.0\";" >> testLi1_Ni.txt ; \
-	../simulate -P=testLi1_Ni.txt ; \
-	../simulate -t=1h -P=testLi1_Ni.txt ; \
-	../simulate -t=1d -P=testLi1_Ni.txt 
+	$(RUN_SIMULATE) -P=testLi1_Ni.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLi1_Ni.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLi1_Ni.txt 
 
 testLi1_Fe:
 	mkdir -p testLi1_Fe
@@ -263,9 +446,9 @@ testLi1_Fe:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Fe=1.0\";" > testLi1_Fe.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, Li=0.004, Fe=1.0\";" >> testLi1_Fe.txt ; \
 	echo "double e_emittedProtonMol = 0.26666E-10;" >> testLi1_Fe.txt ; \
-	../simulate -P=testLi1_Fe.txt ; \
-	../simulate -t=1h -P=testLi1_Fe.txt ; \
-	../simulate -t=1d -P=testLi1_Fe.txt 
+	$(RUN_SIMULATE) -P=testLi1_Fe.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLi1_Fe.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLi1_Fe.txt 
 
 testLi1_Al:
 	mkdir -p testLi1_Al
@@ -274,9 +457,9 @@ testLi1_Al:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testLi1_Al.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=0.002, Al=1.0\";" >> testLi1_Al.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testLi1_Al.dat ; \
-	../simulate -P=testLi1_Al.dat ; \
-	../simulate -t=1h -P=testLi1_Al.dat ; \
-	../simulate -t=1d -P=testLi1_Al.dat 
+	$(RUN_SIMULATE) -P=testLi1_Al.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testLi1_Al.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testLi1_Al.dat 
 
 # Na 1%
 testNa1_Ni:
@@ -285,9 +468,9 @@ testNa1_Ni:
 	rm -f data.dat s00*.log m*.log h*.log D*.log testNa1_Ni.txt ; \
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testNa1_Ni.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.6, Na=0.006, Ni=1.0\";" >> testNa1_Ni.txt ; \
-	../simulate -P=testNa1_Ni.txt ; \
-	../simulate -t=1h -P=testNa1_Ni.txt ; \
-	../simulate -t=1d -P=testNa1_Ni.txt 
+	$(RUN_SIMULATE) -P=testNa1_Ni.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testNa1_Ni.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testNa1_Ni.txt 
 
 testNa1_Fe:
 	mkdir -p testNa1_Fe
@@ -296,9 +479,9 @@ testNa1_Fe:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Fe=1.0\";" > testNa1_Fe.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, Na=0.004, Fe=1.0\";" >> testNa1_Fe.txt ; \
 	echo "double e_emittedProtonMol = 0.26666E-10;" >> testNa1_Fe.txt ; \
-	../simulate -P=testNa1_Fe.txt ; \
-	../simulate -t=1h -P=testNa1_Fe.txt ; \
-	../simulate -t=1d -P=testNa1_Fe.txt 
+	$(RUN_SIMULATE) -P=testNa1_Fe.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testNa1_Fe.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testNa1_Fe.txt 
 
 testNa1_Al:
 	mkdir -p testNa1_Al
@@ -307,9 +490,9 @@ testNa1_Al:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testNa1_Al.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Na=0.002, Al=1.0\";" >> testNa1_Al.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testNa1_Al.dat ; \
-	../simulate -P=testNa1_Al.dat ; \
-	../simulate -t=1h -P=testNa1_Al.dat ; \
-	../simulate -t=1d -P=testNa1_Al.dat 
+	$(RUN_SIMULATE) -P=testNa1_Al.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testNa1_Al.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testNa1_Al.dat 
 
 # Mercury(Hg) #80
 # testHg is :(1) run 'sumulate' while 1 minute + some hours with mercury(Hg).
@@ -319,9 +502,9 @@ testHg196:
 	rm -f data.dat s00*.log m*.log h*.log D*.log testHg196.txt ; \
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testHg196.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.6, 196Hg=0.015, 198Hg=0.997\";" >> testHg196.txt ; \
-	../simulate -P=testHg196.txt ; \
-	../simulate -t=1h -P=testHg196.txt ; \
-	../simulate -t=1d -P=testHg196.txt 
+	$(RUN_SIMULATE) -P=testHg196.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testHg196.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testHg196.txt 
 
 testHgDAlcur100:
 	mkdir -p testHgDAlcur100
@@ -331,9 +514,9 @@ testHgDAlcur100:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.3, D=0.3, 196Hg=0.015, 198Hg=0.997\";" >> testHgDAlcur100.dat ; \
 	echo "double e_emittedElectronMol = 1.0E-8;" >>testHgDAlcur100.dat ; \
 	echo "double e_emittedProtonMol = 0.4E-8;" >>testHgDAlcur100.dat ; \
-	../simulate -P=testHgDAlcur100.dat ; \
-	../simulate -t=1h -P=testHgDAlcur100.dat ; \
-	../simulate -t=1d -P=testHgDAlcur100.dat 
+	$(RUN_SIMULATE) -P=testHgDAlcur100.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testHgDAlcur100.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testHgDAlcur100.dat 
 
 testHgDAl3Mcur100:
 	mkdir -p testHgDAl3Mcur100
@@ -344,9 +527,9 @@ testHgDAl3Mcur100:
 	echo "double e_appliedVoltageScale = 3.9;" >> testHgDAl3Mcur100.dat ; \
 	echo "double e_emittedElectronMol = 1.0E-8;" >>testHgDAl3Mcur100.dat ; \
 	echo "double e_emittedProtonMol = 0.4E-8;" >>testHgDAl3Mcur100.dat ; \
-	../simulate -P=testHgDAl3Mcur100.dat ; \
-	../simulate -t=1h -P=testHgDAl3Mcur100.dat ; \
-	../simulate -t=1d -P=testHgDAl3Mcur100.dat 
+	$(RUN_SIMULATE) -P=testHgDAl3Mcur100.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testHgDAl3Mcur100.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testHgDAl3Mcur100.dat 
 
 testHgDAl23Mcur100:
 	mkdir -p testHgDAl23Mcur100
@@ -357,9 +540,9 @@ testHgDAl23Mcur100:
 	echo "double e_appliedVoltageScale = 3.9;" >> testHgDAl23Mcur100.dat ; \
 	echo "double e_emittedElectronMol = 1.0E-8;" >>testHgDAl23Mcur100.dat ; \
 	echo "double e_emittedProtonMol = 0.4E-8;" >>testHgDAl23Mcur100.dat ; \
-	../simulate -P=testHgDAl23Mcur100.dat ; \
-	../simulate -t=1h -P=testHgDAl23Mcur100.dat ; \
-	../simulate -t=1d -P=testHgDAl23Mcur100.dat 
+	$(RUN_SIMULATE) -P=testHgDAl23Mcur100.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testHgDAl23Mcur100.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testHgDAl23Mcur100.dat 
 
 
 # Iron(Fe) #26 
@@ -370,9 +553,9 @@ testFe:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Fe=1.0\";" > paramFe.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, Fe=1.0\";" >> paramFe.dat ; \
 	echo "double e_emittedProtonMol = 0.26666E-10;" >> paramFe.dat ; \
-	../simulate -P=paramFe.dat ; \
-	../simulate -t=1h -P=paramFe.dat ; \
-	../simulate -t=1d -P=paramFe.dat 
+	$(RUN_SIMULATE) -P=paramFe.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramFe.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramFe.dat 
 
 # Aluminum(Al) #13 has a largest COP = 3.51 after 1 day.
 testAl:
@@ -382,9 +565,9 @@ testAl:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testAl.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Al=1.0\";" >> testAl.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testAl.dat ; \
-	../simulate -P=testAl.dat ; \
-	../simulate -t=1h -P=testAl.dat ; \
-	../simulate -t=1d -P=testAl.dat 
+	$(RUN_SIMULATE) -P=testAl.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testAl.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testAl.dat 
 
 testAl_cur100_10days:
 	mkdir -p testAl_cur100_10days
@@ -394,13 +577,13 @@ testAl_cur100_10days:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Al=1.0\";" >> testAl_cur100_10days.txt ; \
 	echo "double e_emittedElectronMol = 1.0E-8;" >>testAl_cur100_10days.txt ; \
 	echo "double e_emittedProtonMol = 0.13333E-8;" >> testAl_cur100_10days.txt ; \
-	../simulate -P=testAl_cur100_10days.txt ; \
-	../simulate -t=1d -P=testAl_cur100_10days.txt ; \
-	../simulate -t=1d -P=testAl_cur100_10days.txt  ; \
-	../simulate -t=2d -P=testAl_cur100_10days.txt ; \
-	../simulate -t=2d -P=testAl_cur100_10days.txt ; \
-	../simulate -t=2d -P=testAl_cur100_10days.txt ; \
-	../simulate -t=2d -P=testAl_cur100_10days.txt
+	$(RUN_SIMULATE) -P=testAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testAl_cur100_10days.txt  ; \
+	$(RUN_SIMULATE) -t=2d -P=testAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=2d -P=testAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=2d -P=testAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=2d -P=testAl_cur100_10days.txt
 
 testAlD:
 	mkdir -p testAlD
@@ -409,9 +592,9 @@ testAlD:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testAlD.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.2, Al=1.0\";" >> testAlD.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testAlD.dat ; \
-	../simulate -P=testAlD.dat ; \
-	../simulate -t=1h -P=testAlD.dat ; \
-	../simulate -t=1d -P=testAlD.dat 
+	$(RUN_SIMULATE) -P=testAlD.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlD.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlD.dat 
 
 testAlD2:
 	mkdir -p testAlD2
@@ -420,9 +603,9 @@ testAlD2:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Al=1.0\";" > testAlD2.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.2, Al=1.0\";" >> testAlD2.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testAlD2.dat ; \
-	../simulate -P=testAlD2.dat ; \
-	../simulate -t=1h -P=testAlD2.dat ; \
-	../simulate -t=1d -P=testAlD2.dat 
+	$(RUN_SIMULATE) -P=testAlD2.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlD2.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlD2.dat 
 
 testAlHD:
 	mkdir -p testAlHD
@@ -431,9 +614,9 @@ testAlHD:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testAlHD.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.1, D=0.1, Al=1.0\";" >> testAlHD.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testAlHD.dat ; \
-	../simulate -P=testAlHD.dat ; \
-	../simulate -t=1h -P=testAlHD.dat ; \
-	../simulate -t=1d -P=testAlHD.dat 
+	$(RUN_SIMULATE) -P=testAlHD.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlHD.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlHD.dat 
 
 testAlHD2:
 	mkdir -p testAlHD2
@@ -442,9 +625,9 @@ testAlHD2:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.05, D=0.05, Al=1.0\";" > testAlHD2.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.1, D=0.1, Al=1.0\";" >> testAlHD2.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testAlHD2.dat ; \
-	../simulate -P=testAlHD2.dat ; \
-	../simulate -t=1h -P=testAlHD2.dat ; \
-	../simulate -t=1d -P=testAlHD2.dat 
+	$(RUN_SIMULATE) -P=testAlHD2.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlHD2.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlHD2.dat 
 
 testAlHD3M:
 	mkdir -p testAlHD3M
@@ -454,9 +637,9 @@ testAlHD3M:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.1, D=0.1, Al=1.0\";" >> testAlHD3M.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testAlHD3M.dat ; \
 	echo "double e_appliedVoltageScale = 3.9;" >> testAlHD3M.dat ; \
-	../simulate -P=testAlHD3M.dat ; \
-	../simulate -t=1h -P=testAlHD3M.dat ; \
-	../simulate -t=1d -P=testAlHD3M.dat 
+	$(RUN_SIMULATE) -P=testAlHD3M.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlHD3M.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlHD3M.dat 
 
 testAlHD23M:
 	mkdir -p testAlHD23M
@@ -466,9 +649,9 @@ testAlHD23M:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.1, D=0.1, Al=1.0\";" >> testAlHD23M.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testAlHD23M.dat ; \
 	echo "double e_appliedVoltageScale = 3.9;" >> paramAlD.dat ; \
-	../simulate -P=testAlHD23M.dat ; \
-	../simulate -t=1h -P=testAlHD23M.dat ; \
-	../simulate -t=1d -P=testAlHD23M.dat 
+	$(RUN_SIMULATE) -P=testAlHD23M.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlHD23M.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testAlHD23M.dat 
 
 #----------------------------------------------------------
 testLi:
@@ -478,9 +661,9 @@ testLi:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > paramLi.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=1.0\";" >> paramLi.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> paramLi.dat ; \
-	../simulate -P=paramLi.dat ; \
-	../simulate -t=1h -P=paramLi.dat ; \
-	../simulate -t=1d -P=paramLi.dat 
+	$(RUN_SIMULATE) -P=paramLi.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramLi.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramLi.dat 
 
 testLiAl:
 	mkdir -p testLiAl
@@ -489,9 +672,9 @@ testLiAl:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testLiAl.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=1.0\";" >> testLiAl.txt ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testLiAl.txt ; \
-	../simulate -P=testLiAl.txt ; \
-	../simulate -t=1h -P=testLiAl.txt ; \
-	../simulate -t=1d -P=testLiAl.txt 
+	$(RUN_SIMULATE) -P=testLiAl.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLiAl.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLiAl.txt 
 
 testLiAl6:
 	mkdir -p testLiAl6
@@ -500,9 +683,9 @@ testLiAl6:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testLiAl6.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, 6Li=1.0\";" >> testLiAl6.txt ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testLiAl6.txt ; \
-	../simulate -P=testLiAl6.txt ; \
-	../simulate -t=1h -P=testLiAl6.txt ; \
-	../simulate -t=1d -P=testLiAl6.txt 
+	$(RUN_SIMULATE) -P=testLiAl6.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLiAl6.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLiAl6.txt 
 
 testLiAl7:
 	mkdir -p testLiAl7
@@ -511,9 +694,20 @@ testLiAl7:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Al=1.0\";" > testLiAl7.txt ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, 7Li=1.0\";" >> testLiAl7.txt ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testLiAl7.txt ; \
-	../simulate -P=testLiAl7.txt ; \
-	../simulate -t=1h -P=testLiAl7.txt ; \
-	../simulate -t=1d -P=testLiAl7.txt 
+	$(RUN_SIMULATE) -P=testLiAl7.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLiAl7.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLiAl7.txt 
+
+testLi_Short:
+	mkdir -p testLi_Short
+	cd testLi_Short ; \
+	rm -f data.dat s00*.log m*.log h*.log D*.log testLi_Short.txt ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testLi_Short.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=1.0\";" >> testLi_Short.txt ; \
+	echo "double e_emittedProtonMol = 0.13333E-10;" >> testLi_Short.txt ; \
+	$(RUN_SIMULATE) -t=120s -i=1s -s=1 -n1 -P=testLi_Short.txt; \
+	$(RUN_ANALYZELOG) -Psec -D=1 -M=1 s00_m02s00_1_1_60.log >ana.log
+
 
 testLiAl_cur100_10days:
 	mkdir -p testLiAl_cur100_10days
@@ -523,13 +717,13 @@ testLiAl_cur100_10days:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Li=1.0\";" >> testLiAl_cur100_10days.txt ; \
 	echo "double e_emittedElectronMol = 1.0E-8;" >>testLiAl_cur100_10days.txt ; \
 	echo "double e_emittedProtonMol = 0.13333E-8;" >> testLiAl_cur100_10days.txt ; \
-	../simulate -P=testLiAl_cur100_10days.txt ; \
-	../simulate -t=1d -P=testLiAl_cur100_10days.txt ; \
-	../simulate -t=1d -P=testLiAl_cur100_10days.txt  ; \
-	../simulate -t=2d -P=testLiAl_cur100_10days.txt ; \
-	../simulate -t=2d -P=testLiAl_cur100_10days.txt ; \
-	../simulate -t=2d -P=testLiAl_cur100_10days.txt ; \
-	../simulate -t=2d -P=testLiAl_cur100_10days.txt
+	$(RUN_SIMULATE) -P=testLiAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLiAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testLiAl_cur100_10days.txt  ; \
+	$(RUN_SIMULATE) -t=2d -P=testLiAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=2d -P=testLiAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=2d -P=testLiAl_cur100_10days.txt ; \
+	$(RUN_SIMULATE) -t=2d -P=testLiAl_cur100_10days.txt
 
 testCa:
 	mkdir -p testCa
@@ -538,9 +732,9 @@ testCa:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > paramCa.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Ca=1.0\";" >> paramCa.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> paramCa.dat ; \
-	../simulate -P=paramCa.dat ; \
-	../simulate -t=1h -P=paramCa.dat ; \
-	../simulate -t=1d -P=paramCa.dat 
+	$(RUN_SIMULATE) -P=paramCa.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramCa.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramCa.dat 
 
 testNa:
 	mkdir -p testNa
@@ -549,9 +743,9 @@ testNa:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > paramNa.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Na=1.0\";" >> paramNa.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> paramNa.dat ; \
-	../simulate -P=paramNa.dat ; \
-	../simulate -t=1h -P=paramNa.dat ; \
-	../simulate -t=1d -P=paramNa.dat 
+	$(RUN_SIMULATE) -P=paramNa.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramNa.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramNa.dat 
 
 testK:
 	mkdir -p testK
@@ -560,9 +754,9 @@ testK:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > paramK.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, K=1.0\";" >> paramK.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> paramK.dat ; \
-	../simulate -P=paramK.dat ; \
-	../simulate -t=1h -P=paramK.dat ; \
-	../simulate -t=1d -P=paramK.dat 
+	$(RUN_SIMULATE) -P=paramK.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramK.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramK.dat 
 
 testMg:
 	mkdir -p testMg
@@ -571,9 +765,9 @@ testMg:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > paramMg.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Mg=1.0\";" >> paramMg.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> paramMg.dat ; \
-	../simulate -P=paramMg.dat ; \
-	../simulate -t=1h -P=paramMg.dat ; \
-	../simulate -t=1d -P=paramMg.dat 
+	$(RUN_SIMULATE) -P=paramMg.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramMg.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramMg.dat 
 
 testTi:
 	mkdir -p testTi
@@ -582,9 +776,9 @@ testTi:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ti=1.0\";" > paramTi.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Ti=1.0\";" >> paramTi.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> paramTi.dat ; \
-	../simulate -P=paramTi.dat ; \
-	../simulate -t=1h -P=paramTi.dat ; \
-	../simulate -t=1d -P=paramTi.dat 
+	$(RUN_SIMULATE) -P=paramTi.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=paramTi.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=paramTi.dat 
 
 #----------------------------------------------------------
 testBe:
@@ -594,9 +788,9 @@ testBe:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Be=1.0\";" > testBe.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Be=1.0\";" >> testBe.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testBe.dat ; \
-	../simulate -P=testBe.dat ; \
-	../simulate -t=1h -P=testBe.dat ; \
-	../simulate -t=1d -P=testBe.dat 
+	$(RUN_SIMULATE) -P=testBe.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testBe.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testBe.dat 
 
 testSc:
 	mkdir -p testSc
@@ -605,9 +799,9 @@ testSc:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Sc=1.0\";" > testSc.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Sc=1.0\";" >> testSc.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testSc.dat ; \
-	../simulate -P=testSc.dat ; \
-	../simulate -t=1h -P=testSc.dat ; \
-	../simulate -t=1d -P=testSc.dat 
+	$(RUN_SIMULATE) -P=testSc.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testSc.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testSc.dat 
 
 testV:
 	mkdir -p testV
@@ -616,9 +810,9 @@ testV:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"V=1.0\";" > testV.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, V=1.0\";" >> testV.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testV.dat ; \
-	../simulate -P=testV.dat ; \
-	../simulate -t=1h -P=testV.dat ; \
-	../simulate -t=1d -P=testV.dat 
+	$(RUN_SIMULATE) -P=testV.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testV.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testV.dat 
 
 testCr:
 	mkdir -p testCr
@@ -627,9 +821,9 @@ testCr:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Cr=1.0\";" > testCr.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Cr=1.0\";" >> testCr.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testCr.dat ; \
-	../simulate -P=testCr.dat ; \
-	../simulate -t=1h -P=testCr.dat ; \
-	../simulate -t=1d -P=testCr.dat 
+	$(RUN_SIMULATE) -P=testCr.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testCr.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testCr.dat 
 
 testMn:
 	mkdir -p testMn
@@ -638,9 +832,9 @@ testMn:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Mn=1.0\";" > testMn.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Mn=1.0\";" >> testMn.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testMn.dat ; \
-	../simulate -P=testMn.dat ; \
-	../simulate -t=1h -P=testMn.dat ; \
-	../simulate -t=1d -P=testMn.dat 
+	$(RUN_SIMULATE) -P=testMn.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testMn.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testMn.dat 
 
 testCo:
 	mkdir -p testCo
@@ -649,9 +843,9 @@ testCo:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Co=1.0\";" > testCo.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Co=1.0\";" >> testCo.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testCo.dat ; \
-	../simulate -P=testCo.dat ; \
-	../simulate -t=1h -P=testCo.dat ; \
-	../simulate -t=1d -P=testCo.dat 
+	$(RUN_SIMULATE) -P=testCo.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testCo.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testCo.dat 
 
 testCu:
 	mkdir -p testCu
@@ -660,9 +854,9 @@ testCu:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Cu=1.0\";" > testCu.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Cu=1.0\";" >> testCu.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testCu.dat ; \
-	../simulate -P=testCu.dat ; \
-	../simulate -t=1h -P=testCu.dat ; \
-	../simulate -t=1d -P=testCu.dat 
+	$(RUN_SIMULATE) -P=testCu.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testCu.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testCu.dat 
 
 testZn:
 	mkdir -p testZn
@@ -671,9 +865,9 @@ testZn:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testZn.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Zn=1.0\";" >> testZn.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testZn.dat ; \
-	../simulate -P=testZn.dat ; \
-	../simulate -t=1h -P=testZn.dat ; \
-	../simulate -t=1d -P=testZn.dat 
+	$(RUN_SIMULATE) -P=testZn.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testZn.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testZn.dat 
 
 testGa:
 	mkdir -p testGa
@@ -682,9 +876,9 @@ testGa:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ni=1.0\";" > testGa.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Ga=1.0\";" >> testGa.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testGa.dat ; \
-	../simulate -P=testGa.dat ; \
-	../simulate -t=1h -P=testGa.dat ; \
-	../simulate -t=1d -P=testGa.dat 
+	$(RUN_SIMULATE) -P=testGa.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testGa.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testGa.dat 
 
 testGe:
 	mkdir -p testGe
@@ -693,9 +887,9 @@ testGe:
 	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"Ge=1.0\";" > testGe.dat ; \
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Ge=1.0\";" >> testGe.dat ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testGe.dat ; \
-	../simulate -P=testGe.dat ; \
-	../simulate -t=1h -P=testGe.dat ; \
-	../simulate -t=1d -P=testGe.dat 
+	$(RUN_SIMULATE) -P=testGe.dat ; \
+	$(RUN_SIMULATE) -t=1h -P=testGe.dat ; \
+	$(RUN_SIMULATE) -t=1d -P=testGe.dat 
 
 #----------------------------------------------------------
 #super high voltage for AL, Fe, Ni
@@ -707,9 +901,9 @@ testSHV_AlH:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.2, Al=1.0\";" >> testSHV_AlH.txt ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testSHV_AlH.txt ; \
 	echo "double e_appliedVoltageScale = 5.97;" >> testSHV_AlH.txt ; \
-	../simulate -P=testSHV_AlH.txt ; \
-	../simulate -t=1h -P=testSHV_AlH.txt ; \
-	../simulate -t=1d -P=testSHV_AlH.txt
+	$(RUN_SIMULATE) -P=testSHV_AlH.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_AlH.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_AlH.txt
 
 testSHV_AlHD:
 	mkdir -p testSHV_AlHD
@@ -719,9 +913,9 @@ testSHV_AlHD:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.1, D=0.1, Al=1.0\";" >> testSHV_AlHD.txt ; \
 	echo "double e_emittedProtonMol = 0.13333E-10;" >> testSHV_AlHD.txt ; \
 	echo "double e_appliedVoltageScale = 5.97;" >> testSHV_AlHD.txt ; \
-	../simulate -P=testSHV_AlHD.txt ; \
-	../simulate -t=1h -P=testSHV_AlHD.txt ; \
-	../simulate -t=1d -P=testSHV_AlHD.txt
+	$(RUN_SIMULATE) -P=testSHV_AlHD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_AlHD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_AlHD.txt
 
 testSHV_FeH:
 	mkdir -p testSHV_FeH
@@ -731,9 +925,9 @@ testSHV_FeH:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, Fe=1.0\";" >> testSHV_FeH.txt ; \
 	echo "double e_emittedProtonMol = 0.26666E-10;" >> testSHV_FeH.txt ; \
 	echo "double e_appliedVoltageScale = 10.01;" >> testSHV_FeH.txt ; \
-	../simulate -P=testSHV_FeH.txt ; \
-	../simulate -t=1h -P=testSHV_FeH.txt ; \
-	../simulate -t=1d -P=testSHV_FeH.txt
+	$(RUN_SIMULATE) -P=testSHV_FeH.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_FeH.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_FeH.txt
 
 testSHV_FeHD:
 	mkdir -p testSHV_FeHD
@@ -743,9 +937,9 @@ testSHV_FeHD:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.2, D=0.2, Fe=1.0\";" >> testSHV_FeHD.txt ; \
 	echo "double e_emittedProtonMol = 0.26666E-10;" >> testSHV_FeHD.txt ; \
 	echo "double e_appliedVoltageScale = 10.01;" >> testSHV_FeHD.txt ; \
-	../simulate -P=testSHV_FeHD.txt ; \
-	../simulate -t=1h -P=testSHV_FeHD.txt ; \
-	../simulate -t=1d -P=testSHV_FeHD.txt
+	$(RUN_SIMULATE) -P=testSHV_FeHD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_FeHD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_FeHD.txt
 
 testSHV_56FeH:
 	mkdir -p testSHV_56FeH
@@ -755,9 +949,9 @@ testSHV_56FeH:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.4, 56Fe=1.0\";" >> testSHV_56FeH.txt ; \
 	echo "double e_emittedProtonMol = 0.26666E-10;" >> testSHV_56FeH.txt ; \
 	echo "double e_appliedVoltageScale = 10.01;" >> testSHV_56FeH.txt ; \
-	../simulate -P=testSHV_56FeH.txt ; \
-	../simulate -t=1h -P=testSHV_56FeH.txt ; \
-	../simulate -t=1d -P=testSHV_56FeH.txt
+	$(RUN_SIMULATE) -P=testSHV_56FeH.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_56FeH.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_56FeH.txt
 
 testSHV_56FeHD:
 	mkdir -p testSHV_56FeHD
@@ -767,9 +961,9 @@ testSHV_56FeHD:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.2, D=0.2, 56Fe=1.0\";" >> testSHV_56FeHD.txt ; \
 	echo "double e_emittedProtonMol = 0.26666E-10;" >> testSHV_56FeHD.txt ; \
 	echo "double e_appliedVoltageScale = 10.01;" >> testSHV_56FeHD.txt ; \
-	../simulate -P=testSHV_56FeHD.txt ; \
-	../simulate -t=1h -P=testSHV_56FeHD.txt ; \
-	../simulate -t=1d -P=testSHV_56FeHD.txt
+	$(RUN_SIMULATE) -P=testSHV_56FeHD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_56FeHD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_56FeHD.txt
 
 testSHV_NiH:
 	mkdir -p testSHV_NiH
@@ -779,9 +973,9 @@ testSHV_NiH:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.6, Ni=1.0\";" >> testSHV_NiH.txt ; \
 	echo "double e_emittedProtonMol = 0.4e-10;" >> testSHV_NiH.txt ; \
 	echo "double e_appliedVoltageScale = 10.58;" >> testSHV_NiH.txt ; \
-	../simulate -P=testSHV_NiH.txt ; \
-	../simulate -t=1h -P=testSHV_NiH.txt ; \
-	../simulate -t=1d -P=testSHV_NiH.txt
+	$(RUN_SIMULATE) -P=testSHV_NiH.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_NiH.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_NiH.txt
 
 testSHV_NiHD:
 	mkdir -p testSHV_NiHD
@@ -791,9 +985,9 @@ testSHV_NiHD:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.3, D=0.3, Ni=1.0\";" >> testSHV_NiHD.txt ; \
 	echo "double e_emittedProtonMol = 0.4e-10;" >> testSHV_NiHD.txt ; \
 	echo "double e_appliedVoltageScale = 10.58;" >> testSHV_NiHD.txt ; \
-	../simulate -P=testSHV_NiHD.txt ; \
-	../simulate -t=1h -P=testSHV_NiHD.txt ; \
-	../simulate -t=1d -P=testSHV_NiHD.txt
+	$(RUN_SIMULATE) -P=testSHV_NiHD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_NiHD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_NiHD.txt
 
 testSHV_62NiH:
 	mkdir -p testSHV_62NiH
@@ -803,9 +997,9 @@ testSHV_62NiH:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.6, 62Ni=1.0\";" >> testSHV_62NiH.txt ; \
 	echo "double e_emittedProtonMol = 0.4e-10;" >> testSHV_62NiH.txt ; \
 	echo "double e_appliedVoltageScale = 10.58;" >> testSHV_62NiH.txt ; \
-	../simulate -P=testSHV_62NiH.txt ; \
-	../simulate -t=1h -P=testSHV_62NiH.txt ; \
-	../simulate -t=1d -P=testSHV_62NiH.txt
+	$(RUN_SIMULATE) -P=testSHV_62NiH.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_62NiH.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_62NiH.txt
 
 testSHV_62NiHD:
 	mkdir -p testSHV_62NiHD
@@ -815,9 +1009,9 @@ testSHV_62NiHD:
 	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"1H=0.3, D=0.3, 62Ni=1.0\";" >> testSHV_62NiHD.txt ; \
 	echo "double e_emittedProtonMol = 0.4e-10;" >> testSHV_62NiHD.txt ; \
 	echo "double e_appliedVoltageScale = 10.58;" >> testSHV_62NiHD.txt ; \
-	../simulate -P=testSHV_62NiHD.txt ; \
-	../simulate -t=1h -P=testSHV_62NiHD.txt ; \
-	../simulate -t=1d -P=testSHV_62NiHD.txt
+	$(RUN_SIMULATE) -P=testSHV_62NiHD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testSHV_62NiHD.txt ; \
+	$(RUN_SIMULATE) -t=1d -P=testSHV_62NiHD.txt
 
 #----------------------------------------------------------
 alltestA:testNi testNi_woCE test_woH testNi_cur100 testNi_10days
