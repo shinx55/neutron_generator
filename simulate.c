@@ -80,24 +80,42 @@ double e_appliedVoltageScale;
 double e_emittedElectronMol;//The number of moles of electrons emitted per one(1) second from the negative electrode by high-voltage pulse like the Cockcroft-Walton voltage multiplier circuit.
 
 double e_collideElectronRateOnElectrode;//Probability to collide between (the electron emitted from the negative electrode) and (the particles in the positive electrode), the electron has large kinetic energy than the energy of beta decay, the electron emitted from the negative electrode, that reaches on the positive electrode
-double e_collideElectronRateForMidiMeV;//This is paired with 'e_collideElectronMidiMeV'
-double e_collideElectronRateForMiniMeV;//This is paired with 'e_collideElectronMiniMeV'
+double e_collideElectronRateForMidiMeV;//This is paired with 'e_collideMidiMeV'
+double e_collideElectronRateForMiniMeV;//This is paired with 'e_collideMiniMeV'
 double e_emittedProtonMol;//The number of moles of protons emitted per one(1) second from the by positive electrode by high-voltage pulse like the Cockcroft-Walton voltage multiplier circuit.
 double e_neutronGenInSpaceProtonRate;//The probability applied for the proton that is emitted from the positive electrode and will collide with the electron emitted from the negative electrode in the intermediate space of electrodes and will transform into a neutron with enough kinetic energy greater than the energy of beta decay.
 double e_neutronGenInSpaceFallRate;//Almost all of the neutrons generated in the intermediate space fall on the positive electrode. The neutrons have smaller energy(= e_appliedDefectMeV).
 double e_hydrogenGenInSpaceProtonRate;//The probability applied for the proton that is emitted from the positive electrode and will collide with the electron emitted from the negative electrode in the intermediate space of electrodes and will transform into a hydrogen with small kinetic energy less than the energy of beta decay.
 double e_collideProtonRateOnElectrode;//Probability to collide between the proton and ((the nucleus or the electron) in the negative electrode), the proton has large kinetic energy than the energy of beta decay, the proton emitted from the positive electrode reach the negative electrode
-double e_collideElectronMidiMeV;//This is almost half of e_betaEnergyMeV = 0.78 [MeV]
-double e_collideElectronMiniMeV; //10[keV] is 1.16e+8 [K]. It is almost as same as D-T fusion reactor. It is about 100 times of the heat of the corona of the Sun, 1.0e+6 [K]. It is about 1,000 times of the energy to ionize a hydrogen, 13.6 [eV].
+double e_collideMidiMeV;//This is almost half of e_betaEnergyMeV = 0.78 [MeV]
+double e_collideMiniMeV; //10[keV] is 1.16e+8 [K]. It is almost as same as D-T fusion reactor. It is about 100 times of the heat of the corona of the Sun, 1.0e+6 [K]. It is about 1,000 times of the energy to ionize a hydrogen, 13.6 [eV].
 int e_usebulletCrossSection;// 1 (dafault) or 0
+int e_useProtonScattering;// 1 (dafault) or 0, also for deuterium and tritium
+int e_useNeutonScattering;// 1 (dafault) or 0
+int e_useAlphaScattering;// 1 (dafault) or 0
+int e_useElectronScattering;// 1 (dafault) or 0
 int e_useComptonEffect;// 1 (dafault) or 0
+double e_rateForAlphaParticle;// 0.5 (dafault) (from 0.0 to 1.0), The alpha particle will take the part of the enegy of the mass defect by this rate.
+double e_rateForProtonAtBetaPlus;// 1.0/3.0 (dafault) (from 0.0 to 1.0),
+double e_rateFor2ProtonAtBetaPlus;// 0.5 (dafault) (from 0.0 to 1.0),
+double e_rateFor3ProtonAtBetaPlus;// 0.6 (dafault) (from 0.0 to 1.0),
+double e_rateForAlphaParticleAtBetaPlus;// 1.0/3.0 (dafault) (from 0.0 to 1.0),
+double e_rateForProtonAtEC;// 0.5 (dafault) (from 0.0 to 1.0),
+double e_rateFor2ProtonAtEC;// 2.0/3.0 (dafault) (from 0.0 to 1.0),
+double e_rateFor3ProtonAtEC;// 0.75 (dafault) (from 0.0 to 1.0),
+double e_rateForAlphaParticleAtEC;// 0.5 (dafault) (from 0.0 to 1.0),
+double e_rateForNeytonAtBetaMinus;// 1.0/3.0 (dafault) (from 0.0 to 1.0),
+double e_rateFor2NeytonAtBetaMinus;// 1.0/4.0 (dafault) (from 0.0 to 1.0),
+double e_rateFor3NeytonAtBetaMinus;// 1.0/5.0 (dafault) (from 0.0 to 1.0),
+double e_rateFor4NeytonAtBetaMinus;// 1.0/6.0 (dafault) (from 0.0 to 1.0),
+double e_rateForAlphaParticleAtBetaMinus;// 1.0/3.0 (dafault) (from 0.0 to 1.0),
 
 extern void initUserConditionsByDefault()
 {
 	e_rangeDecimalDigitPrecision = 2;
 	e_detectLimitRateForIsotope = 1.0E-21; //1.0E-15;
-	strcpy(e_negativeElectrodeAtomicMols, "H=0.6, Ni=1.0");
-	strcpy(e_positiveElectrodeAtomicMols, "H=0.6, Ni=1.0");
+	strcpy(e_negativeElectrodeAtomicMols, "Ni=1.0");
+	strcpy(e_positiveElectrodeAtomicMols, "H=0.1, Ni=1.0");
 	e_appliedVoltageScale = 1.06;// > 1.0516 = e_coulombBarrierOf2Protons / e_betaEnergyMeV
 	e_emittedElectronMol = 0.04E-10;
 	e_collideElectronRateOnElectrode = 1.0;
@@ -108,10 +126,28 @@ extern void initUserConditionsByDefault()
 	e_neutronGenInSpaceFallRate = 0.95;
 	e_hydrogenGenInSpaceProtonRate = 0.001;
 	e_collideProtonRateOnElectrode = 1.0;
-	e_collideElectronMidiMeV = 0.36;
-	e_collideElectronMiniMeV = 0.01;
+	e_collideMidiMeV = 0.36;
+	e_collideMiniMeV = 0.01;
 	e_usebulletCrossSection = 1;
+	e_useProtonScattering = 1;
+	e_useNeutonScattering = 1;
+	e_useAlphaScattering = 1;
+	e_useElectronScattering = 1;
 	e_useComptonEffect = 1;
+	e_rateForAlphaParticle = 0.5;
+	e_rateForProtonAtBetaPlus = 1.0 / 3.0;
+	e_rateFor2ProtonAtBetaPlus = 0.5;
+	e_rateFor3ProtonAtBetaPlus = 0.6;
+	e_rateForAlphaParticleAtBetaPlus = 1.0 / 3.0;
+	e_rateForProtonAtEC = 0.5;
+	e_rateFor2ProtonAtEC = 2.0/3.0;
+	e_rateFor3ProtonAtEC = 0.75;
+	e_rateForAlphaParticleAtEC = 0.5;
+	e_rateForNeytonAtBetaMinus = 1.0/3.0;
+	e_rateFor2NeytonAtBetaMinus = 1.0/4.0;
+	e_rateFor3NeytonAtBetaMinus = 1.0/5.0;
+	e_rateFor4NeytonAtBetaMinus = 1.0/6.0;
+	e_rateForAlphaParticleAtBetaMinus = 1.0/3.0;
 }
 //---------------------------------------------------------------------
 //[calcuated User conditions]
@@ -234,10 +270,28 @@ extern int RW ## UserConditions(FILE * a_fp) \
 	SERIALIZE_VALUE(RW, e_neutronGenInSpaceFallRate, a_fp)\
 	SERIALIZE_VALUE(RW, e_hydrogenGenInSpaceProtonRate, a_fp)\
 	SERIALIZE_VALUE(RW, e_collideProtonRateOnElectrode, a_fp)\
-	SERIALIZE_VALUE(RW, e_collideElectronMidiMeV, a_fp)\
-	SERIALIZE_VALUE(RW, e_collideElectronMiniMeV, a_fp)\
+	SERIALIZE_VALUE(RW, e_collideMidiMeV, a_fp)\
+	SERIALIZE_VALUE(RW, e_collideMiniMeV, a_fp)\
 	SERIALIZE_VALUE(RW, e_usebulletCrossSection, a_fp)\
+	SERIALIZE_VALUE(RW, e_useProtonScattering, a_fp)\
+	SERIALIZE_VALUE(RW, e_useNeutonScattering, a_fp)\
+	SERIALIZE_VALUE(RW, e_useAlphaScattering, a_fp)\
+	SERIALIZE_VALUE(RW, e_useElectronScattering, a_fp)\
 	SERIALIZE_VALUE(RW, e_useComptonEffect, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateForAlphaParticle, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateForProtonAtBetaPlus, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateFor2ProtonAtBetaPlus, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateFor3ProtonAtBetaPlus, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateForAlphaParticleAtBetaPlus, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateForProtonAtEC, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateFor2ProtonAtEC, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateFor3ProtonAtEC, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateForAlphaParticleAtEC, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateForNeytonAtBetaMinus, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateFor2NeytonAtBetaMinus, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateFor3NeytonAtBetaMinus, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateFor4NeytonAtBetaMinus, a_fp)\
+	SERIALIZE_VALUE(RW, e_rateForAlphaParticleAtBetaMinus, a_fp)\
 	return 1;\
 }
 #define CALL_SERIALIZE_USER_CONDITIONS(RW, FP) \
@@ -279,12 +333,12 @@ extern void initiallyCalculateUserContants()
 	e_stepsOfLostingEnergy = (int)(e_appliedVoltageScale * 2.0);
 	e_appliedVoltageMassU = e_betaEnergyMassU * e_appliedVoltageScale;
 	e_appliedVoltageMeV = e_betaEnergyMeV * e_appliedVoltageScale;
-	if(e_appliedVoltageMeV < e_collideElectronMidiMeV){
-		fprintf(stderr,"FATAL ERROR:%s:e_appliedVoltageMeV:%lg < e_collideElectronMidiMeV:%lg\n", __FUNCTION__, e_appliedVoltageMeV, e_collideElectronMidiMeV);
+	if(e_appliedVoltageMeV < e_collideMidiMeV){
+		fprintf(stderr,"FATAL ERROR:%s:e_appliedVoltageMeV:%lg < e_collideMidiMeV:%lg\n", __FUNCTION__, e_appliedVoltageMeV, e_collideMidiMeV);
 		exit(1);
 	}
-	if(e_collideElectronMiniMeV > e_collideElectronMidiMeV){
-		fprintf(stderr,"FATAL ERROR:%s:e_collideElectronMiniMeV:%lg < e_collideElectronMidiMeV:%lg\n", __FUNCTION__, e_collideElectronMiniMeV, e_collideElectronMidiMeV);
+	if(e_collideMiniMeV > e_collideMidiMeV){
+		fprintf(stderr,"FATAL ERROR:%s:e_collideMiniMeV:%lg < e_collideMidiMeV:%lg\n", __FUNCTION__, e_collideMiniMeV, e_collideMidiMeV);
 		exit(1);
 	}
 	e_appliedDefectMeV = e_appliedVoltageMeV - e_betaEnergyMeV;
@@ -408,10 +462,28 @@ extern void printContants(FILE * a_fp)
 	
 	fprintf(a_fp, "U%d e_hydrogenGenInSpaceProtonRate %lg\n", i++, e_hydrogenGenInSpaceProtonRate);
 	fprintf(a_fp, "U%d e_collideProtonRateOnElectrode %lg\n", i++, e_collideProtonRateOnElectrode);
-	fprintf(a_fp, "U%d e_collideElectronMidiMeV %lg\n", i++, e_collideElectronMidiMeV);
-	fprintf(a_fp, "U%d e_collideElectronMiniMeV %lg\n", i++, e_collideElectronMiniMeV);
+	fprintf(a_fp, "U%d e_collideMidiMeV %lg\n", i++, e_collideMidiMeV);
+	fprintf(a_fp, "U%d e_collideMiniMeV %lg\n", i++, e_collideMiniMeV);
 	fprintf(a_fp, "U%d e_usebulletCrossSection %d\n", i++, e_usebulletCrossSection);
+	fprintf(a_fp, "U%d e_useProtonScattering %d\n", i++, e_useProtonScattering);
+	fprintf(a_fp, "U%d e_useNeutonScattering %d\n", i++, e_useNeutonScattering);
+	fprintf(a_fp, "U%d e_useAlphaScattering %d\n", i++, e_useAlphaScattering);
+	fprintf(a_fp, "U%d e_useElectronScattering %d\n", i++, e_useElectronScattering);
 	fprintf(a_fp, "U%d e_useComptonEffect %d\n", i++, e_useComptonEffect);
+	fprintf(a_fp, "U%d e_rateForAlphaParticle %lg\n", i++, e_rateForAlphaParticle);
+	fprintf(a_fp, "U%d e_rateForProtonAtBetaPlus %lg\n", i++, e_rateForProtonAtBetaPlus);
+	fprintf(a_fp, "U%d e_rateFor2ProtonAtBetaPlus %lg\n", i++, e_rateFor2ProtonAtBetaPlus);
+	fprintf(a_fp, "U%d e_rateFor3ProtonAtBetaPlus %lg\n", i++, e_rateFor3ProtonAtBetaPlus);
+	fprintf(a_fp, "U%d e_rateForAlphaParticleAtBetaPlus %lg\n", i++, e_rateForAlphaParticleAtBetaPlus);
+	fprintf(a_fp, "U%d e_rateForProtonAtEC %lg\n", i++, e_rateForProtonAtEC);
+	fprintf(a_fp, "U%d e_rateFor2ProtonAtEC %lg\n", i++, e_rateFor2ProtonAtEC);
+	fprintf(a_fp, "U%d e_rateFor3ProtonAtEC %lg\n", i++, e_rateFor3ProtonAtEC);
+	fprintf(a_fp, "U%d e_rateForAlphaParticleAtEC %lg\n", i++, e_rateForAlphaParticleAtEC);
+	fprintf(a_fp, "U%d e_rateForNeytonAtBetaMinus %lg\n", i++, e_rateForNeytonAtBetaMinus);
+	fprintf(a_fp, "U%d e_rateFor2NeytonAtBetaMinus %lg\n", i++, e_rateFor2NeytonAtBetaMinus);
+	fprintf(a_fp, "U%d e_rateFor3NeytonAtBetaMinus %lg\n", i++, e_rateFor3NeytonAtBetaMinus);
+	fprintf(a_fp, "U%d e_rateFor4NeytonAtBetaMinus %lg\n", i++, e_rateFor4NeytonAtBetaMinus);
+	fprintf(a_fp, "U%d e_rateForAlphaParticleAtBetaMinus %lg\n", i++, e_rateForAlphaParticleAtBetaMinus);
 	
 	fprintf(a_fp, "U%d e_stepsOfLostingEnergy %d\n", i++, e_stepsOfLostingEnergy);
 	
@@ -579,10 +651,28 @@ extern void readUserConditions(char * a_fname)
 							SET_VALUE("%lg", double, e_neutronGenInSpaceFallRate)
 							SET_VALUE("%lg", double, e_hydrogenGenInSpaceProtonRate)
 							SET_VALUE("%lg", double, e_collideProtonRateOnElectrode)
-							SET_VALUE("%lg", double, e_collideElectronMidiMeV)
-							SET_VALUE("%lg", double, e_collideElectronMiniMeV)
+							SET_VALUE("%lg", double, e_collideMidiMeV)
+							SET_VALUE("%lg", double, e_collideMiniMeV)
 							SET_VALUE("%d", int, e_usebulletCrossSection)
+							SET_VALUE("%d", int, e_useProtonScattering)
+							SET_VALUE("%d", int, e_useNeutonScattering)
+							SET_VALUE("%d", int, e_useAlphaScattering)
+							SET_VALUE("%d", int, e_useElectronScattering)
 							SET_VALUE("%d", int, e_useComptonEffect)
+							SET_VALUE("%lg", double, e_rateForAlphaParticle)
+							SET_VALUE("%lg", double, e_rateForProtonAtBetaPlus)
+							SET_VALUE("%lg", double, e_rateFor2ProtonAtBetaPlus)
+							SET_VALUE("%lg", double, e_rateFor3ProtonAtBetaPlus)
+							SET_VALUE("%lg", double, e_rateForAlphaParticleAtBetaPlus)
+							SET_VALUE("%lg", double, e_rateForProtonAtEC)
+							SET_VALUE("%lg", double, e_rateFor2ProtonAtEC)
+							SET_VALUE("%lg", double, e_rateFor3ProtonAtEC)
+							SET_VALUE("%lg", double, e_rateForAlphaParticleAtEC)
+							SET_VALUE("%lg", double, e_rateForNeytonAtBetaMinus)
+							SET_VALUE("%lg", double, e_rateFor2NeytonAtBetaMinus)
+							SET_VALUE("%lg", double, e_rateFor3NeytonAtBetaMinus)
+							SET_VALUE("%lg", double, e_rateFor4NeytonAtBetaMinus)
+							SET_VALUE("%lg", double, e_rateForAlphaParticleAtBetaMinus)
 						}else{
 							//fprintf(stderr, "DEBUG:%s:sc %s\n", __FUNCTION__, sc);
 						}
@@ -622,16 +712,16 @@ extern void readUserConditions(char * a_fname)
 #define DECAY_MODE_BETA_MINUS              141 
 #define DECAY_MODE_DOUBLE_BETA_MINUS       142 
 #define DECAY_MODE_BETA_MINUS_AND_ALPHA    143 
-#define DECAY_MODE_BETA_MINUS_AND_NEWTRON  144
-#define DECAY_MODE_BETA_MINUS_AND_2NEWTRON 145
-#define DECAY_MODE_BETA_MINUS_AND_3NEWTRON 146
-#define DECAY_MODE_BETA_MINUS_AND_4NEWTRON 147
+#define DECAY_MODE_BETA_MINUS_AND_NEUTRON  144
+#define DECAY_MODE_BETA_MINUS_AND_2NEUTRON 145
+#define DECAY_MODE_BETA_MINUS_AND_3NEUTRON 146
+#define DECAY_MODE_BETA_MINUS_AND_4NEUTRON 147
 #define DECAY_MODE_PROTON_EMISSION  151
 #define DECAY_MODE_2PROTON_EMISSION 152
-#define DECAY_MODE_NEWTRON_EMISSION 161 
-#define DECAY_MODE_2NEWTRON_EMISSION 162 
-#define DECAY_MODE_3NEWTRON_EMISSION 163 
-#define DECAY_MODE_4NEWTRON_EMISSION 164 
+#define DECAY_MODE_NEUTRON_EMISSION 161 
+#define DECAY_MODE_2NEUTRON_EMISSION 162 
+#define DECAY_MODE_3NEUTRON_EMISSION 163 
+#define DECAY_MODE_4NEUTRON_EMISSION 164 
 #define DECAY_MODE_CLUSTER_DECAY_14C         106014
 //#define DECAY_MODE_CLUSTER_DECAY_20O       108020
 //#define DECAY_MODE_CLUSTER_DECAY_23F       109023
@@ -670,16 +760,16 @@ extern const char * getDecayModeText(int a_decayMode)
 		case DECAY_MODE_BETA_MINUS: modeText = "BETA_MINUS"; break;
 		case DECAY_MODE_DOUBLE_BETA_MINUS: modeText = "DOUBLE_BETA_MINUS"; break;
 		case DECAY_MODE_BETA_MINUS_AND_ALPHA: modeText = "BETA_MINUS_AND_ALPHA"; break;
-		case DECAY_MODE_BETA_MINUS_AND_NEWTRON: modeText = "BETA_MINUS_AND_NEWTRON"; break;
-		case DECAY_MODE_BETA_MINUS_AND_2NEWTRON: modeText = "BETA_MINUS_AND_2NEWTRON"; break;
-		case DECAY_MODE_BETA_MINUS_AND_3NEWTRON: modeText = "BETA_MINUS_AND_3NEWTRON"; break;
-		case DECAY_MODE_BETA_MINUS_AND_4NEWTRON: modeText = "BETA_MINUS_AND_4NEWTRON"; break;
+		case DECAY_MODE_BETA_MINUS_AND_NEUTRON: modeText = "BETA_MINUS_AND_NEUTRON"; break;
+		case DECAY_MODE_BETA_MINUS_AND_2NEUTRON: modeText = "BETA_MINUS_AND_2NEUTRON"; break;
+		case DECAY_MODE_BETA_MINUS_AND_3NEUTRON: modeText = "BETA_MINUS_AND_3NEUTRON"; break;
+		case DECAY_MODE_BETA_MINUS_AND_4NEUTRON: modeText = "BETA_MINUS_AND_4NEUTRON"; break;
 		case DECAY_MODE_PROTON_EMISSION: modeText = "PROTON_EMISSION"; break;
 		case DECAY_MODE_2PROTON_EMISSION: modeText = "2PROTON_EMISSION"; break;
-		case DECAY_MODE_NEWTRON_EMISSION: modeText = "NEWTRON_EMISSION"; break;
-		case DECAY_MODE_2NEWTRON_EMISSION: modeText = "2NEWTRON_EMISSION"; break;
-		case DECAY_MODE_3NEWTRON_EMISSION: modeText = "3NEWTRON_EMISSION"; break;
-		case DECAY_MODE_4NEWTRON_EMISSION: modeText = "4NEWTRON_EMISSION"; break;
+		case DECAY_MODE_NEUTRON_EMISSION: modeText = "NEUTRON_EMISSION"; break;
+		case DECAY_MODE_2NEUTRON_EMISSION: modeText = "2NEUTRON_EMISSION"; break;
+		case DECAY_MODE_3NEUTRON_EMISSION: modeText = "3NEUTRON_EMISSION"; break;
+		case DECAY_MODE_4NEUTRON_EMISSION: modeText = "4NEUTRON_EMISSION"; break;
 		case DECAY_MODE_CLUSTER_DECAY_14C: modeText = "CLUSTER_DECAY_14C"; break;
 		case DECAY_MODE_SELF_FISSION_80KR: modeText = "SELF_FISSION_80KR"; break;
 		default:
@@ -1181,10 +1271,10 @@ extern void initAtomProperties()
 		initIsotopePropertySymbols(1, 2, "D", "deuterium", "重水素", "d");
 		initIsotopePropertySymbols(1, 3, "T", "tritium", "三重水素", "t");
 		initDecayMode(1, 3, DECAY_MODE_BETA_MINUS);
-		initDecayMode(1, 4, DECAY_MODE_NEWTRON_EMISSION);
-		initDecayMode(1, 5, DECAY_MODE_2NEWTRON_EMISSION);
-		initDecayMode2(1, 6, DECAY_MODE_3NEWTRON_EMISSION, 50.0, DECAY_MODE_4NEWTRON_EMISSION);
-		initDecayMode(1, 7, DECAY_MODE_4NEWTRON_EMISSION);
+		initDecayMode(1, 4, DECAY_MODE_NEUTRON_EMISSION);
+		initDecayMode(1, 5, DECAY_MODE_2NEUTRON_EMISSION);
+		initDecayMode2(1, 6, DECAY_MODE_3NEUTRON_EMISSION, 50.0, DECAY_MODE_4NEUTRON_EMISSION);
+		initDecayMode(1, 7, DECAY_MODE_4NEUTRON_EMISSION);
 		
 		initAtomProperty(2, "He", "helium", "ヘリウム", 3, 10, 3, 4, 20.786);
 		initIsotopeProperty(2, 2, 2.015894, 1.0e-9, HLU_SECOND, 0.0);
@@ -1197,12 +1287,12 @@ extern void initAtomProperties()
 		initIsotopeProperty(2, 9, 9.04395, 7.0e-21, HLU_SECOND, 0.0);
 		initIsotopeProperty(2, 10, 10.05240, 2.7e-21, HLU_SECOND, 0.0);
 		initDecayMode2(2, 2, DECAY_MODE_PROTON_EMISSION, 99.99, DECAY_MODE_BETA_PLUS);
-		initDecayMode(2, 5, DECAY_MODE_NEWTRON_EMISSION);
+		initDecayMode(2, 5, DECAY_MODE_NEUTRON_EMISSION);
 		initDecayMode2(2, 6, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_ALPHA);
-		initDecayMode(2, 7, DECAY_MODE_NEWTRON_EMISSION);
-		initDecayMode2(2, 8, DECAY_MODE_BETA_MINUS, 84.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);//ignore "β-, fission (0.9%, 5He + 3H)"
-		initDecayMode(2, 9, DECAY_MODE_NEWTRON_EMISSION);
-		initDecayMode(2, 10, DECAY_MODE_2NEWTRON_EMISSION);
+		initDecayMode(2, 7, DECAY_MODE_NEUTRON_EMISSION);
+		initDecayMode2(2, 8, DECAY_MODE_BETA_MINUS, 84.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);//ignore "β-, fission (0.9%, 5He + 3H)"
+		initDecayMode(2, 9, DECAY_MODE_NEUTRON_EMISSION);
+		initDecayMode(2, 10, DECAY_MODE_2NEUTRON_EMISSION);
 
 		initAtomProperty(3, "Li", "lithium", "リチウム", 4, 11, 6, 7, 24.860);
 		initIsotopeProperty(3, 4, 4.02719, 91.0E-24, HLU_SECOND, 0.0);
@@ -1216,9 +1306,9 @@ extern void initAtomProperties()
 		initDecayMode(3, 4, DECAY_MODE_PROTON_EMISSION);
 		initDecayMode(3, 5, DECAY_MODE_PROTON_EMISSION);
 		initDecayMode(3, 8, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(3, 9, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 50.8, DECAY_MODE_BETA_MINUS);
-		initDecayMode(3, 10, DECAY_MODE_NEWTRON_EMISSION);
-		initDecayMode5(3, 11, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 84.9, DECAY_MODE_BETA_MINUS, 8.07, DECAY_MODE_BETA_MINUS_AND_2NEWTRON, 4.1, DECAY_MODE_BETA_MINUS_AND_3NEWTRON, 1.9, DECAY_MODE_BETA_MINUS_AND_ALPHA); //ignore "β-, fission (.014%) 8Li, 3H", "β-, fission (.013%), 9Li 2H"
+		initDecayMode2(3, 9, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 50.8, DECAY_MODE_BETA_MINUS);
+		initDecayMode(3, 10, DECAY_MODE_NEUTRON_EMISSION);
+		initDecayMode5(3, 11, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 84.9, DECAY_MODE_BETA_MINUS, 8.07, DECAY_MODE_BETA_MINUS_AND_2NEUTRON, 4.1, DECAY_MODE_BETA_MINUS_AND_3NEUTRON, 1.9, DECAY_MODE_BETA_MINUS_AND_ALPHA); //ignore "β-, fission (.014%) 8Li, 3H", "β-, fission (.013%), 9Li 2H"
 
 		initAtomProperty(4, "Be", "beryllium", "ベリリウム", 6, 14, 7, 11, 16.443);
 		initIsotopeProperty(4, 6, 6.019726, 5.0e-21, HLU_SECOND, 0.0);
@@ -1235,9 +1325,9 @@ extern void initAtomProperties()
 		initDecayMode(4, 8, DECAY_MODE_ALPHA);
 		initDecayMode(4, 10, DECAY_MODE_BETA_MINUS);
 		initDecayMode2(4, 11, DECAY_MODE_BETA_MINUS, 97.1, DECAY_MODE_BETA_MINUS_AND_ALPHA);
-		initDecayMode2(4, 12, DECAY_MODE_BETA_MINUS, 99.48, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode(4, 13, DECAY_MODE_NEWTRON_EMISSION);
-		initDecayMode3(4, 14, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 81.0, DECAY_MODE_BETA_MINUS, 14.0, DECAY_MODE_BETA_MINUS_AND_2NEWTRON);
+		initDecayMode2(4, 12, DECAY_MODE_BETA_MINUS, 99.48, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode(4, 13, DECAY_MODE_NEUTRON_EMISSION);
+		initDecayMode3(4, 14, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 81.0, DECAY_MODE_BETA_MINUS, 14.0, DECAY_MODE_BETA_MINUS_AND_2NEUTRON);
 
 		initAtomProperty(5, "B", "boron", "ホウ素", 7, 19, 10, 11, 11.087);
 		initIsotopeProperty(5, 7, 7.02992, 350.0e-24, HLU_SECOND, 0.0);
@@ -1257,12 +1347,12 @@ extern void initAtomProperties()
 		initDecayMode(5, 8, DECAY_MODE_BETA_PLUS_ALPHA);
 		initDecayMode(5, 9, DECAY_MODE_PROTON_EMISSION);
 		initDecayMode2(5, 12, DECAY_MODE_BETA_MINUS, 98.4, DECAY_MODE_BETA_MINUS_AND_ALPHA);
-		initDecayMode2(5, 13, DECAY_MODE_BETA_MINUS, 99.72, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(5, 14, DECAY_MODE_BETA_MINUS, 93.96, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode3(5, 15, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 93.6, DECAY_MODE_BETA_MINUS, 6.0, 	DECAY_MODE_BETA_MINUS_AND_2NEWTRON);
-		initDecayMode(5, 16, DECAY_MODE_NEWTRON_EMISSION);
-		initDecayMode5(5, 17, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 63.0, DECAY_MODE_BETA_MINUS, 22.1, DECAY_MODE_BETA_MINUS_AND_2NEWTRON, 11.0, DECAY_MODE_BETA_MINUS_AND_3NEWTRON, 3.5, DECAY_MODE_BETA_MINUS_AND_4NEWTRON);
-		initDecayMode(5, 18, DECAY_MODE_NEWTRON_EMISSION);
+		initDecayMode2(5, 13, DECAY_MODE_BETA_MINUS, 99.72, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(5, 14, DECAY_MODE_BETA_MINUS, 93.96, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode3(5, 15, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 93.6, DECAY_MODE_BETA_MINUS, 6.0, 	DECAY_MODE_BETA_MINUS_AND_2NEUTRON);
+		initDecayMode(5, 16, DECAY_MODE_NEUTRON_EMISSION);
+		initDecayMode5(5, 17, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 63.0, DECAY_MODE_BETA_MINUS, 22.1, DECAY_MODE_BETA_MINUS_AND_2NEUTRON, 11.0, DECAY_MODE_BETA_MINUS_AND_3NEUTRON, 3.5, DECAY_MODE_BETA_MINUS_AND_4NEUTRON);
+		initDecayMode(5, 18, DECAY_MODE_NEUTRON_EMISSION);
 		initDecayMode(5, 19, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(6, "C", "carbon", "炭素", 8, 22, 10, 16, 8.517);//8.517:graphite, 6.155:diamond
@@ -1287,12 +1377,12 @@ extern void initAtomProperties()
 		initDecayMode2(6, 11, DECAY_MODE_BETA_PLUS, 99.79, DECAY_MODE_ELECTRON_CAPTURE);
 		initDecayMode(6, 14, DECAY_MODE_BETA_MINUS);
 		initDecayMode(6, 15, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(6, 16, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 97.9, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(6, 17, DECAY_MODE_BETA_MINUS, 71.59, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(6, 18, DECAY_MODE_BETA_MINUS, 68.5, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode3(6, 19, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 47.0, DECAY_MODE_BETA_MINUS, 46.0, DECAY_MODE_BETA_MINUS_AND_2NEWTRON);
-		initDecayMode2(6, 20, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 72.0, DECAY_MODE_BETA_MINUS);
-		initDecayMode(6, 21, DECAY_MODE_NEWTRON_EMISSION);
+		initDecayMode2(6, 16, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 97.9, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(6, 17, DECAY_MODE_BETA_MINUS, 71.59, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(6, 18, DECAY_MODE_BETA_MINUS, 68.5, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode3(6, 19, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 47.0, DECAY_MODE_BETA_MINUS, 46.0, DECAY_MODE_BETA_MINUS_AND_2NEUTRON);
+		initDecayMode2(6, 20, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 72.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode(6, 21, DECAY_MODE_NEUTRON_EMISSION);
 		initDecayMode(6, 22, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(7, "N", "nitrogen", "窒素", 10, 24, 12, 17, 29.124);
@@ -1316,14 +1406,14 @@ extern void initAtomProperties()
 		initDecayMode2(7, 12, DECAY_MODE_BETA_PLUS, 96.5, DECAY_MODE_BETA_PLUS_ALPHA);
 		initDecayMode(7, 13, DECAY_MODE_BETA_PLUS);
 		initDecayMode2(7, 16, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_ALPHA);
-		initDecayMode3(7, 17, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 95.0, DECAY_MODE_BETA_MINUS, 4.99, DECAY_MODE_BETA_MINUS_AND_ALPHA);
-		initDecayMode3(7, 18, DECAY_MODE_BETA_MINUS, 76.9, DECAY_MODE_BETA_MINUS_AND_ALPHA, 12.2, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(7, 19, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 54.6, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(7, 20, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 56.99, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(7, 21, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 80.0, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(7, 22, DECAY_MODE_BETA_MINUS, 65.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode3(7, 17, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 95.0, DECAY_MODE_BETA_MINUS, 4.99, DECAY_MODE_BETA_MINUS_AND_ALPHA);
+		initDecayMode3(7, 18, DECAY_MODE_BETA_MINUS, 76.9, DECAY_MODE_BETA_MINUS_AND_ALPHA, 12.2, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(7, 19, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 54.6, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(7, 20, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 56.99, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(7, 21, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 80.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(7, 22, DECAY_MODE_BETA_MINUS, 65.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(7, 23, DECAY_MODE_BETA_MINUS);
-		initDecayMode(7, 24, DECAY_MODE_NEWTRON_EMISSION);
+		initDecayMode(7, 24, DECAY_MODE_NEUTRON_EMISSION);
 
 		initAtomProperty(8, "O", "oxygen", "酸素", 10, 24, 14, 22, 29.378);
 		initIsotopeProperty(8, 12, 12.034405, 580.0e-24, HLU_SECOND, 0.0);
@@ -1346,9 +1436,9 @@ extern void initAtomProperties()
 		initDecayMode(8, 19, DECAY_MODE_BETA_MINUS);
 		initDecayMode(8, 20, DECAY_MODE_BETA_MINUS);
 		initDecayMode(8, 21, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(8, 22, DECAY_MODE_BETA_MINUS, 78.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(8, 23, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 57.99, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(8, 24, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 57.99, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(8, 22, DECAY_MODE_BETA_MINUS, 78.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(8, 23, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 57.99, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(8, 24, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 57.99, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(9, "F", "fluorine", "フッ素", 15, 29, 17, 23, 31.304);
 		initIsotopeProperty(9, 15, 15.01801, 410.0e-22, HLU_SECOND, 0.0);
@@ -1372,13 +1462,13 @@ extern void initAtomProperties()
 		initDecayMode(9, 18, DECAY_MODE_BETA_PLUS);
 		initDecayMode(9, 20, DECAY_MODE_BETA_MINUS);
 		initDecayMode(9, 21, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(9, 22, DECAY_MODE_BETA_MINUS, 89.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(9, 23, DECAY_MODE_BETA_MINUS, 86.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(9, 24, DECAY_MODE_BETA_MINUS, 94.1, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(9, 25, DECAY_MODE_BETA_MINUS, 76.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(9, 26, DECAY_MODE_BETA_MINUS, 68.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(9, 22, DECAY_MODE_BETA_MINUS, 89.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(9, 23, DECAY_MODE_BETA_MINUS, 86.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(9, 24, DECAY_MODE_BETA_MINUS, 94.1, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(9, 25, DECAY_MODE_BETA_MINUS, 76.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(9, 26, DECAY_MODE_BETA_MINUS, 68.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(9, 27, DECAY_MODE_BETA_MINUS);
-		initDecayMode(9, 28, DECAY_MODE_NEWTRON_EMISSION);
+		initDecayMode(9, 28, DECAY_MODE_NEUTRON_EMISSION);
 		initDecayMode(9, 29, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(10, "Ne", "neon", "ネオン", 16, 32, 18, 24, 20.786);
@@ -1406,13 +1496,13 @@ extern void initAtomProperties()
 		initDecayMode(10, 23, DECAY_MODE_BETA_MINUS);
 		initDecayMode(10, 24, DECAY_MODE_BETA_MINUS);
 		initDecayMode(10, 25, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(10, 26, DECAY_MODE_BETA_MINUS, 99.87, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(10, 27, DECAY_MODE_BETA_MINUS, 98.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(10, 28, DECAY_MODE_BETA_MINUS, 78.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(10, 26, DECAY_MODE_BETA_MINUS, 99.87, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(10, 27, DECAY_MODE_BETA_MINUS, 98.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(10, 28, DECAY_MODE_BETA_MINUS, 78.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(10, 29, DECAY_MODE_BETA_MINUS);
 		initDecayMode(10, 30, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(10, 31, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(10, 32, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 50.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(10, 31, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(10, 32, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 50.0, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(11, "Na", "sodium", "ナトリウム", 18, 35, 21, 26, 28.230);
 		initIsotopeProperty(11, 18, 18.02597, 1.3e-21, HLU_SECOND, 0.0);
@@ -1441,15 +1531,15 @@ extern void initAtomProperties()
 		initDecayMode(11, 24, DECAY_MODE_BETA_MINUS);
 		initDecayMode(11, 25, DECAY_MODE_BETA_MINUS);
 		initDecayMode(11, 26, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(11, 27, DECAY_MODE_BETA_MINUS, 99.87, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(11, 28, DECAY_MODE_BETA_MINUS, 99.421, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(11, 29, DECAY_MODE_BETA_MINUS, 74.09, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode3(11, 30, DECAY_MODE_BETA_MINUS, 68.83, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 30.0, 	DECAY_MODE_BETA_MINUS_AND_2NEWTRON); //	DECAY_MODE_BETA_MINUS_AND_ALPHA
-		initDecayMode3(11, 31, DECAY_MODE_BETA_MINUS, 62.05, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 33.0, 	DECAY_MODE_BETA_MINUS_AND_2NEWTRON);// DECAY_MODE_BETA_MINUS_AND_3NEWTRON
-		initDecayMode3(11, 32, DECAY_MODE_BETA_MINUS, 60.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 35.0, 	DECAY_MODE_BETA_MINUS_AND_2NEWTRON);
-		initDecayMode3(11, 33, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 52.0, DECAY_MODE_BETA_MINUS, 36.0, 	DECAY_MODE_BETA_MINUS_AND_2NEWTRON);
-		initDecayMode3(11, 34, DECAY_MODE_BETA_MINUS_AND_2NEWTRON, 50.0, DECAY_MODE_BETA_MINUS, 35.0, 	DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(11, 35, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(11, 27, DECAY_MODE_BETA_MINUS, 99.87, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(11, 28, DECAY_MODE_BETA_MINUS, 99.421, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(11, 29, DECAY_MODE_BETA_MINUS, 74.09, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode3(11, 30, DECAY_MODE_BETA_MINUS, 68.83, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 30.0, 	DECAY_MODE_BETA_MINUS_AND_2NEUTRON); //	DECAY_MODE_BETA_MINUS_AND_ALPHA
+		initDecayMode3(11, 31, DECAY_MODE_BETA_MINUS, 62.05, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 33.0, 	DECAY_MODE_BETA_MINUS_AND_2NEUTRON);// DECAY_MODE_BETA_MINUS_AND_3NEUTRON
+		initDecayMode3(11, 32, DECAY_MODE_BETA_MINUS, 60.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 35.0, 	DECAY_MODE_BETA_MINUS_AND_2NEUTRON);
+		initDecayMode3(11, 33, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 52.0, DECAY_MODE_BETA_MINUS, 36.0, 	DECAY_MODE_BETA_MINUS_AND_2NEUTRON);
+		initDecayMode3(11, 34, DECAY_MODE_BETA_MINUS_AND_2NEUTRON, 50.0, DECAY_MODE_BETA_MINUS, 35.0, 	DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(11, 35, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(12, "Mg", "magnesium", "マグネシウム", 20, 37, 22, 29, 24.869);
 		initIsotopeProperty(12, 20, 20.018863, 90.8e-3, HLU_SECOND, 0.0);
@@ -1477,14 +1567,14 @@ extern void initAtomProperties()
 		initDecayMode(12, 27, DECAY_MODE_BETA_MINUS);
 		initDecayMode(12, 28, DECAY_MODE_BETA_MINUS);
 		initDecayMode(12, 29, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(12, 30, DECAY_MODE_BETA_MINUS, 99.94, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(12, 31, DECAY_MODE_BETA_MINUS, 98.3, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(12, 32, DECAY_MODE_BETA_MINUS, 97.6, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(12, 33, DECAY_MODE_BETA_MINUS, 83.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(12, 34, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(12, 35, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 52.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(12, 30, DECAY_MODE_BETA_MINUS, 99.94, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(12, 31, DECAY_MODE_BETA_MINUS, 98.3, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(12, 32, DECAY_MODE_BETA_MINUS, 97.6, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(12, 33, DECAY_MODE_BETA_MINUS, 83.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(12, 34, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(12, 35, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 52.0, DECAY_MODE_BETA_MINUS);
 		initDecayMode(12, 36, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(12, 37, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(12, 37, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(13, "Al", "aluminium", "アルミニウム", 19, 39, 24, 30, 24.200);
 		initIsotopeProperty(13, 19, 19.0218, 35.0e-6, HLU_SECOND, 0.0);
@@ -1519,12 +1609,12 @@ extern void initAtomProperties()
 		initDecayMode(13, 28, DECAY_MODE_BETA_MINUS);
 		initDecayMode(13, 29, DECAY_MODE_BETA_MINUS);
 		initDecayMode(13, 30, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(13, 31, DECAY_MODE_BETA_MINUS, 98.4, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(13, 32, DECAY_MODE_BETA_MINUS, 99.3, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(13, 33, DECAY_MODE_BETA_MINUS, 91.5, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(13, 34, DECAY_MODE_BETA_MINUS, 87.5, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(13, 35, DECAY_MODE_BETA_MINUS, 74.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(13, 36, DECAY_MODE_BETA_MINUS, 69.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(13, 31, DECAY_MODE_BETA_MINUS, 98.4, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(13, 32, DECAY_MODE_BETA_MINUS, 99.3, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(13, 33, DECAY_MODE_BETA_MINUS, 91.5, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(13, 34, DECAY_MODE_BETA_MINUS, 87.5, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(13, 35, DECAY_MODE_BETA_MINUS, 74.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(13, 36, DECAY_MODE_BETA_MINUS, 69.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(13, 37, DECAY_MODE_BETA_MINUS);
 		initDecayMode(13, 38, DECAY_MODE_BETA_MINUS);
 		initDecayMode(13, 39, DECAY_MODE_BETA_MINUS);
@@ -1561,10 +1651,10 @@ extern void initAtomProperties()
 		initDecayMode(14, 32, DECAY_MODE_BETA_MINUS);
 		initDecayMode(14, 33, DECAY_MODE_BETA_MINUS);
 		initDecayMode(14, 34, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(14, 35, DECAY_MODE_BETA_MINUS, 94.74, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(14, 36, DECAY_MODE_BETA_MINUS, 88.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(14, 37, DECAY_MODE_BETA_MINUS, 83.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(14, 38, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 50.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(14, 35, DECAY_MODE_BETA_MINUS, 94.74, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(14, 36, DECAY_MODE_BETA_MINUS, 88.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(14, 37, DECAY_MODE_BETA_MINUS, 83.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(14, 38, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 50.0, DECAY_MODE_BETA_MINUS);
 		initDecayMode(14, 39, DECAY_MODE_BETA_MINUS);
 		initDecayMode(14, 40, DECAY_MODE_BETA_MINUS);
 		initDecayMode(14, 41, DECAY_MODE_BETA_MINUS);
@@ -1607,12 +1697,12 @@ extern void initAtomProperties()
 		initDecayMode(15, 35, DECAY_MODE_BETA_MINUS);
 		initDecayMode(15, 36, DECAY_MODE_BETA_MINUS);
 		initDecayMode(15, 37, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(15, 38, DECAY_MODE_BETA_MINUS, 88.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(15, 39, DECAY_MODE_BETA_MINUS, 74.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(15, 40, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(15, 41, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(15, 42, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode(15, 43, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(15, 38, DECAY_MODE_BETA_MINUS, 88.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(15, 39, DECAY_MODE_BETA_MINUS, 74.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(15, 40, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(15, 41, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(15, 42, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode(15, 43, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(15, 44, DECAY_MODE_BETA_MINUS);
 		initDecayMode(15, 45, DECAY_MODE_BETA_MINUS);
 		initDecayMode(15, 46, DECAY_MODE_BETA_MINUS);
@@ -1653,15 +1743,15 @@ extern void initAtomProperties()
 		initDecayMode(16, 38, DECAY_MODE_BETA_MINUS);
 		initDecayMode(16, 39, DECAY_MODE_BETA_MINUS);
 		initDecayMode(16, 40, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(16, 41, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(16, 42, DECAY_MODE_BETA_MINUS, 96.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(16, 43, DECAY_MODE_BETA_MINUS, 60.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(16, 44, DECAY_MODE_BETA_MINUS, 82.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(16, 45, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 54.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(16, 41, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(16, 42, DECAY_MODE_BETA_MINUS, 96.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(16, 43, DECAY_MODE_BETA_MINUS, 60.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(16, 44, DECAY_MODE_BETA_MINUS, 82.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(16, 45, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 54.0, DECAY_MODE_BETA_MINUS);
 		initDecayMode(16, 46, DECAY_MODE_BETA_MINUS);
 		initDecayMode(16, 47, DECAY_MODE_BETA_MINUS);
 		initDecayMode(16, 48, DECAY_MODE_BETA_MINUS);
-		initDecayMode(16, 49, DECAY_MODE_NEWTRON_EMISSION);
+		initDecayMode(16, 49, DECAY_MODE_NEUTRON_EMISSION);
 
 		initAtomProperty(17, "Cl", "chlorine", "塩素", 29, 51, 33, 43, 33.949);
 		initIsotopeProperty(17, 29, 29.01411, 20.0e-9, HLU_SECOND, 0.0);
@@ -1697,11 +1787,11 @@ extern void initAtomProperties()
 		initDecayMode(17, 40, DECAY_MODE_BETA_MINUS);
 		initDecayMode(17, 41, DECAY_MODE_BETA_MINUS);
 		initDecayMode(17, 42, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(17, 43, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(17, 44, DECAY_MODE_BETA_MINUS, 92.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(17, 45, DECAY_MODE_BETA_MINUS, 76.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(17, 46, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 60.0, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(17, 47, DECAY_MODE_BETA_MINUS, 97.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(17, 43, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(17, 44, DECAY_MODE_BETA_MINUS, 92.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(17, 45, DECAY_MODE_BETA_MINUS, 76.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(17, 46, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 60.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(17, 47, DECAY_MODE_BETA_MINUS, 97.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(17, 48, DECAY_MODE_BETA_MINUS);
 		initDecayMode(17, 49, DECAY_MODE_BETA_MINUS);
 		initDecayMode(17, 50, DECAY_MODE_BETA_MINUS);
@@ -1746,13 +1836,13 @@ extern void initAtomProperties()
 		initDecayMode(18, 44, DECAY_MODE_BETA_MINUS);
 		initDecayMode(18, 45, DECAY_MODE_BETA_MINUS);
 		initDecayMode(18, 46, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(18, 47, DECAY_MODE_BETA_MINUS, 99.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(18, 47, DECAY_MODE_BETA_MINUS, 99.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(18, 48, DECAY_MODE_BETA_MINUS);
 		initDecayMode(18, 49, DECAY_MODE_BETA_MINUS);
 		initDecayMode(18, 50, DECAY_MODE_BETA_MINUS);
 		initDecayMode(18, 51, DECAY_MODE_BETA_MINUS);
 		initDecayMode(18, 52, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(18, 53, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(18, 53, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(19, "K", "potassium", "カリウム", 33, 55, 37, 49, 29.6);
 		initIsotopeProperty(19, 33, 33.00726, 25.0e-9, HLU_SECOND, 0.0);
@@ -1791,14 +1881,14 @@ extern void initAtomProperties()
 		initDecayMode(19, 45, DECAY_MODE_BETA_MINUS);
 		initDecayMode(19, 46, DECAY_MODE_BETA_MINUS);
 		initDecayMode(19, 47, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(19, 48, DECAY_MODE_BETA_MINUS, 98.86, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(19, 49, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 86.0, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(19, 50, DECAY_MODE_BETA_MINUS, 71.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(19, 51, DECAY_MODE_BETA_MINUS, 53.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode3(19, 52, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 64.0, DECAY_MODE_BETA_MINUS_AND_2NEWTRON, 21.0, DECAY_MODE_BETA_MINUS);
-		initDecayMode3(19, 53, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 67.0, DECAY_MODE_BETA_MINUS_AND_2NEWTRON, 17.0, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(19, 54, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(19, 55, DECAY_MODE_BETA_MINUS, 99.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(19, 48, DECAY_MODE_BETA_MINUS, 98.86, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(19, 49, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 86.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(19, 50, DECAY_MODE_BETA_MINUS, 71.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(19, 51, DECAY_MODE_BETA_MINUS, 53.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode3(19, 52, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 64.0, DECAY_MODE_BETA_MINUS_AND_2NEUTRON, 21.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode3(19, 53, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 67.0, DECAY_MODE_BETA_MINUS_AND_2NEUTRON, 17.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(19, 54, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(19, 55, DECAY_MODE_BETA_MINUS, 99.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(20, "Ca", "calcium", "カルシウム", 34, 57, 40, 52, 25.929);
 		initIsotopeProperty(20, 34, 34.01412, 35.0e-9, HLU_SECOND, 0.0);
@@ -1837,13 +1927,13 @@ extern void initAtomProperties()
 		initDecayMode(20, 48, DECAY_MODE_DOUBLE_BETA_MINUS);
 		initDecayMode(20, 49, DECAY_MODE_BETA_MINUS);
 		initDecayMode(20, 50, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(20, 51, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(20, 52, DECAY_MODE_BETA_MINUS, 98.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(20, 53, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(20, 54, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 50.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(20, 51, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(20, 52, DECAY_MODE_BETA_MINUS, 98.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(20, 53, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(20, 54, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 50.0, DECAY_MODE_BETA_MINUS);
 		initDecayMode(20, 55, DECAY_MODE_BETA_MINUS);
 		initDecayMode(20, 56, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(20, 57, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(20, 57, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(21, "Sc", "scandium", "スカンジウム", 38, 59, 43, 53, 25.52);
 		initIsotopeProperty(21, 38, 37.99470, 300.0e-9, HLU_SECOND, 0.0);
@@ -1883,13 +1973,13 @@ extern void initAtomProperties()
 		initDecayMode(21, 50, DECAY_MODE_BETA_MINUS);
 		initDecayMode(21, 51, DECAY_MODE_BETA_MINUS);
 		initDecayMode(21, 52, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(21, 53, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(21,54, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(21,55, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(21, 53, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(21,54, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(21,55, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(21, 56, DECAY_MODE_BETA_MINUS);
 		initDecayMode(21, 57, DECAY_MODE_BETA_MINUS);
 		initDecayMode(21, 58, DECAY_MODE_BETA_MINUS);
-		initDecayMode(21, 59, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode(21, 59, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(22, "Ti", "titanium", "チタン", 38, 61, 44, 54, 25.060);
 		initIsotopeProperty(22, 38, 38.00977, 120.0e-9, HLU_SECOND, 0.0);
@@ -1929,12 +2019,12 @@ extern void initAtomProperties()
 		initDecayMode(22, 53, DECAY_MODE_BETA_MINUS);
 		initDecayMode(22, 54, DECAY_MODE_BETA_MINUS);
 		initDecayMode(22, 55, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(22, 56, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(22, 57, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(22, 56, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(22, 57, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(22, 58, DECAY_MODE_BETA_MINUS);
 		initDecayMode(22, 59, DECAY_MODE_BETA_MINUS);
 		initDecayMode(22, 60, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(22, 61, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(22, 61, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(23, "V", "vanadium", "バナジウム", 42, 63, 47, 55, 24.89);
 		initIsotopeProperty(23, 42, 41.99123, 55.0e-9, HLU_SECOND, 0.0);
@@ -1973,11 +2063,11 @@ extern void initAtomProperties()
 		initDecayMode(23, 53, DECAY_MODE_BETA_MINUS);
 		initDecayMode(23, 54, DECAY_MODE_BETA_MINUS);
 		initDecayMode(23, 55, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(23, 56, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(23, 57, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(23, 58, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(23, 59, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(23, 60, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(23, 56, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(23, 57, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(23, 58, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(23, 59, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(23, 60, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(23, 61, DECAY_MODE_BETA_MINUS);
 		initDecayMode(23, 62, DECAY_MODE_BETA_MINUS);
 		initDecayMode(23, 63, DECAY_MODE_BETA_MINUS);
@@ -2113,7 +2203,7 @@ extern void initAtomProperties()
 		initDecayMode(28, 69, DECAY_MODE_BETA_MINUS);
 		initDecayMode(28, 70, DECAY_MODE_BETA_MINUS);
 		initDecayMode(28, 71, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(28, 72, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(28, 72, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(29, "Cu", "copper", "銅", 58, 76, 58, 76, 24.440);
 		initIsotopeProperty(29, 58, 57.9445385, 3.204, HLU_SECOND, 0.0);
@@ -2148,10 +2238,10 @@ extern void initAtomProperties()
 		initDecayMode(29, 70, DECAY_MODE_BETA_MINUS);
 		initDecayMode(29, 71, DECAY_MODE_BETA_MINUS);
 		initDecayMode(29, 72, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(29, 73, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(29, 73, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(29, 74, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(29, 75, DECAY_MODE_BETA_MINUS, 96.5, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(29, 76, DECAY_MODE_BETA_MINUS, 97.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(29, 75, DECAY_MODE_BETA_MINUS, 96.5, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(29, 76, DECAY_MODE_BETA_MINUS, 97.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		
 		initAtomProperty(30, "Zn", "zinc", "亜鉛", 60, 70, 60, 70, 25.470);
 		initIsotopeProperty(30, 60, 59.941827, 2.38, HLU_MINUTE, 0.0);
@@ -2215,12 +2305,12 @@ extern void initAtomProperties()
 		initDecayMode(31, 76, DECAY_MODE_BETA_MINUS);
 		initDecayMode(31, 77, DECAY_MODE_BETA_MINUS);
 		initDecayMode(31, 78, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(31, 79, DECAY_MODE_BETA_MINUS, 99.911, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(31, 80, DECAY_MODE_BETA_MINUS, 99.11, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(31, 81, DECAY_MODE_BETA_MINUS, 88.11, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(31, 82, DECAY_MODE_BETA_MINUS, 78.5, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(31, 83, DECAY_MODE_BETA_MINUS, 60.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(31, 84, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 70.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(31, 79, DECAY_MODE_BETA_MINUS, 99.911, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(31, 80, DECAY_MODE_BETA_MINUS, 99.11, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(31, 81, DECAY_MODE_BETA_MINUS, 88.11, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(31, 82, DECAY_MODE_BETA_MINUS, 78.5, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(31, 83, DECAY_MODE_BETA_MINUS, 60.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(31, 84, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 70.0, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(32, "Ge", "germanium", "ゲルマニウム", 60, 86, 60, 86, 23.222);
 		initIsotopeProperty(32, 60, 59.97019, 30.0e-3, HLU_SECOND, 0.0);	
@@ -2270,9 +2360,9 @@ extern void initAtomProperties()
 		initDecayMode(32, 81, DECAY_MODE_BETA_MINUS);
 		initDecayMode(32, 82, DECAY_MODE_BETA_MINUS);
 		initDecayMode(32, 83, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(32, 84, DECAY_MODE_BETA_MINUS, 89.2, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(32, 85, DECAY_MODE_BETA_MINUS, 86.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(32, 86, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 50.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(32, 84, DECAY_MODE_BETA_MINUS, 89.2, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(32, 85, DECAY_MODE_BETA_MINUS, 86.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(32, 86, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 50.0, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(33, "As", "arsenic", "ヒ素", 64, 89, 64, 89, 24.64);
 		initIsotopeProperty(33, 64, 63.95757, 40.0e-3, HLU_SECOND, 0.0);	
@@ -2317,11 +2407,11 @@ extern void initAtomProperties()
 		initDecayMode(33, 81, DECAY_MODE_BETA_MINUS);
 		initDecayMode(33, 82, DECAY_MODE_BETA_MINUS);
 		initDecayMode(33, 83, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(33, 84, DECAY_MODE_BETA_MINUS, 99.721, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(33, 85, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 59.4, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(33, 86, DECAY_MODE_BETA_MINUS, 67.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(33, 87, DECAY_MODE_BETA_MINUS, 84.6, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(33, 88, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(33, 84, DECAY_MODE_BETA_MINUS, 99.721, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(33, 85, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 59.4, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(33, 86, DECAY_MODE_BETA_MINUS, 67.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(33, 87, DECAY_MODE_BETA_MINUS, 84.6, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(33, 88, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(33, 89, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(34, "Se", "selenium", "セレン", 65, 92, 65, 92, 25.363);
@@ -2370,11 +2460,11 @@ extern void initAtomProperties()
 		initDecayMode(34, 84, DECAY_MODE_BETA_MINUS);
 		initDecayMode(34, 85, DECAY_MODE_BETA_MINUS);
 		initDecayMode(34, 86, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(34, 87, DECAY_MODE_BETA_MINUS, 99.64, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(34, 88, DECAY_MODE_BETA_MINUS, 99.01, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(34, 89, DECAY_MODE_BETA_MINUS, 92.2, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(34, 90, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 50.0, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(34, 91, DECAY_MODE_BETA_MINUS, 79.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(34, 87, DECAY_MODE_BETA_MINUS, 99.64, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(34, 88, DECAY_MODE_BETA_MINUS, 99.01, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(34, 89, DECAY_MODE_BETA_MINUS, 92.2, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(34, 90, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 50.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode2(34, 91, DECAY_MODE_BETA_MINUS, 79.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(34, 92, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(35, "Br", "bromine", "臭素", 68, 94, 68, 94, 75.69);
@@ -2422,14 +2512,14 @@ extern void initAtomProperties()
 		initDecayMode(35, 84, DECAY_MODE_BETA_MINUS);
 		initDecayMode(35, 85, DECAY_MODE_BETA_MINUS);
 		initDecayMode(35, 86, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(35, 87, DECAY_MODE_BETA_MINUS, 97.48, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(35, 88, DECAY_MODE_BETA_MINUS, 93.42, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(35, 89, DECAY_MODE_BETA_MINUS, 86.2, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(35, 90, DECAY_MODE_BETA_MINUS, 74.8, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(35, 91, DECAY_MODE_BETA_MINUS, 80.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(35, 92, DECAY_MODE_BETA_MINUS, 66.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(35, 93, DECAY_MODE_BETA_MINUS, 89.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(35, 94, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(35, 87, DECAY_MODE_BETA_MINUS, 97.48, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(35, 88, DECAY_MODE_BETA_MINUS, 93.42, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(35, 89, DECAY_MODE_BETA_MINUS, 86.2, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(35, 90, DECAY_MODE_BETA_MINUS, 74.8, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(35, 91, DECAY_MODE_BETA_MINUS, 80.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(35, 92, DECAY_MODE_BETA_MINUS, 66.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(35, 93, DECAY_MODE_BETA_MINUS, 89.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(35, 94, DECAY_MODE_BETA_MINUS, 70.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(36, "Kr", "krypton", "クリプトン", 69, 97, 69, 97, 20.786);
 		initIsotopeProperty(36, 69, 68.96518, 32.0e-3, HLU_SECOND, 0.0);
@@ -2478,12 +2568,12 @@ extern void initAtomProperties()
 		initDecayMode(36, 89, DECAY_MODE_BETA_MINUS);
 		initDecayMode(36, 90, DECAY_MODE_BETA_MINUS);
 		initDecayMode(36, 91, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(36, 92, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(36, 93, DECAY_MODE_BETA_MINUS, 98.05, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(36, 94, DECAY_MODE_BETA_MINUS, 94.3, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(36, 92, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(36, 93, DECAY_MODE_BETA_MINUS, 98.05, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(36, 94, DECAY_MODE_BETA_MINUS, 94.3, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(36, 95, DECAY_MODE_BETA_MINUS);
 		initDecayMode(36, 96, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(36, 97, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(36, 97, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(37, "Rb", "rubidium", "ルビジウム", 72, 102, 72, 102, 31.060);
 		initIsotopeProperty(37, 72, 71.95908, 1.5e-6, HLU_SECOND, 0.0);
@@ -2536,17 +2626,17 @@ extern void initAtomProperties()
 		initDecayMode(37, 89, DECAY_MODE_BETA_MINUS);
 		initDecayMode(37, 90, DECAY_MODE_BETA_MINUS);
 		initDecayMode(37, 91, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(37, 92, DECAY_MODE_BETA_MINUS, 99.98, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(37, 93, DECAY_MODE_BETA_MINUS, 98.65, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(37, 94, DECAY_MODE_BETA_MINUS, 89.99, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(37, 95, DECAY_MODE_BETA_MINUS, 91.27, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(37, 96, DECAY_MODE_BETA_MINUS, 86.6, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(37, 97, DECAY_MODE_BETA_MINUS, 74.3, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode3(37, 98, DECAY_MODE_BETA_MINUS, 86.14, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 13.8, DECAY_MODE_BETA_MINUS_AND_2NEWTRON);
-		initDecayMode2(37, 99, DECAY_MODE_BETA_MINUS, 84.1, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode3(37, 100, DECAY_MODE_BETA_MINUS, 94.25, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 5.6, DECAY_MODE_BETA_MINUS_AND_2NEWTRON);
-		initDecayMode2(37, 101, DECAY_MODE_BETA_MINUS, 69.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(37, 102, DECAY_MODE_BETA_MINUS, 82.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(37, 92, DECAY_MODE_BETA_MINUS, 99.98, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(37, 93, DECAY_MODE_BETA_MINUS, 98.65, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(37, 94, DECAY_MODE_BETA_MINUS, 89.99, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(37, 95, DECAY_MODE_BETA_MINUS, 91.27, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(37, 96, DECAY_MODE_BETA_MINUS, 86.6, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(37, 97, DECAY_MODE_BETA_MINUS, 74.3, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode3(37, 98, DECAY_MODE_BETA_MINUS, 86.14, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 13.8, DECAY_MODE_BETA_MINUS_AND_2NEUTRON);
+		initDecayMode2(37, 99, DECAY_MODE_BETA_MINUS, 84.1, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode3(37, 100, DECAY_MODE_BETA_MINUS, 94.25, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 5.6, DECAY_MODE_BETA_MINUS_AND_2NEUTRON);
+		initDecayMode2(37, 101, DECAY_MODE_BETA_MINUS, 69.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(37, 102, DECAY_MODE_BETA_MINUS, 82.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(38, "Sr", "strontium", "ストロンチウム", 73, 104, 73, 104, 26.4);
 		initIsotopeProperty(38, 73, 72.96597, 25.0e-3, HLU_SECOND, 0.0);
@@ -2602,12 +2692,12 @@ extern void initAtomProperties()
 		initDecayMode(38, 94, DECAY_MODE_BETA_MINUS);
 		initDecayMode(38, 95, DECAY_MODE_BETA_MINUS);
 		initDecayMode(38, 96, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(38, 97, DECAY_MODE_BETA_MINUS, 99.95, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(38, 98, DECAY_MODE_BETA_MINUS, 99.75, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(38, 99, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(38, 100, DECAY_MODE_BETA_MINUS, 99.02, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(38, 101, DECAY_MODE_BETA_MINUS, 97.63, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(38, 102, DECAY_MODE_BETA_MINUS, 94.5, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(38, 97, DECAY_MODE_BETA_MINUS, 99.95, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(38, 98, DECAY_MODE_BETA_MINUS, 99.75, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(38, 99, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(38, 100, DECAY_MODE_BETA_MINUS, 99.02, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(38, 101, DECAY_MODE_BETA_MINUS, 97.63, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(38, 102, DECAY_MODE_BETA_MINUS, 94.5, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(38, 103, DECAY_MODE_BETA_MINUS);
 		initDecayMode(38, 104, DECAY_MODE_BETA_MINUS);
 
@@ -2661,13 +2751,13 @@ extern void initAtomProperties()
 		initDecayMode(39, 94, DECAY_MODE_BETA_MINUS);
 		initDecayMode(39, 95, DECAY_MODE_BETA_MINUS);
 		initDecayMode(39, 96, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(39, 97, DECAY_MODE_BETA_MINUS, 99.942, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(39, 98, DECAY_MODE_BETA_MINUS, 99.669, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(39, 99, DECAY_MODE_BETA_MINUS, 98.1, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(39, 100, DECAY_MODE_BETA_MINUS, 98.98, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(39, 101, DECAY_MODE_BETA_MINUS, 98.06, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(39, 102, DECAY_MODE_BETA_MINUS, 95.1, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(39, 103, DECAY_MODE_BETA_MINUS, 91.7, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(39, 97, DECAY_MODE_BETA_MINUS, 99.942, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(39, 98, DECAY_MODE_BETA_MINUS, 99.669, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(39, 99, DECAY_MODE_BETA_MINUS, 98.1, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(39, 100, DECAY_MODE_BETA_MINUS, 98.98, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(39, 101, DECAY_MODE_BETA_MINUS, 98.06, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(39, 102, DECAY_MODE_BETA_MINUS, 95.1, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(39, 103, DECAY_MODE_BETA_MINUS, 91.7, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(39, 104, DECAY_MODE_BETA_MINUS);
 		initDecayMode(39, 105, DECAY_MODE_BETA_MINUS);
 		initDecayMode(39, 106, DECAY_MODE_BETA_MINUS);
@@ -2725,7 +2815,7 @@ extern void initAtomProperties()
 		initDecayMode(40, 102, DECAY_MODE_BETA_MINUS);
 		initDecayMode(40, 103, DECAY_MODE_BETA_MINUS);
 		initDecayMode(40, 104, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(40, 105, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(40, 105, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(40, 106, DECAY_MODE_BETA_MINUS);
 		initDecayMode(40, 107, DECAY_MODE_BETA_MINUS);
 		initDecayMode(40, 108, DECAY_MODE_BETA_MINUS);
@@ -2781,13 +2871,13 @@ extern void initAtomProperties()
 		initDecayMode(41, 101, DECAY_MODE_BETA_MINUS);
 		initDecayMode(41, 102, DECAY_MODE_BETA_MINUS);
 		initDecayMode(41, 103, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(41, 104, DECAY_MODE_BETA_MINUS, 99.94, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(41, 105, DECAY_MODE_BETA_MINUS, 98.3, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(41, 106, DECAY_MODE_BETA_MINUS, 95.5, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(41, 107, DECAY_MODE_BETA_MINUS, 94.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(41, 108, DECAY_MODE_BETA_MINUS, 93.8, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(41, 109, DECAY_MODE_BETA_MINUS, 69.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(41, 110, DECAY_MODE_BETA_MINUS, 60.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(41, 104, DECAY_MODE_BETA_MINUS, 99.94, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(41, 105, DECAY_MODE_BETA_MINUS, 98.3, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(41, 106, DECAY_MODE_BETA_MINUS, 95.5, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(41, 107, DECAY_MODE_BETA_MINUS, 94.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(41, 108, DECAY_MODE_BETA_MINUS, 93.8, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(41, 109, DECAY_MODE_BETA_MINUS, 69.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(41, 110, DECAY_MODE_BETA_MINUS, 60.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(42, "Mo", "molybdenum", "モリブデン", 84, 113, 84, 113, 24.06);
 		initIsotopeProperty(42, 84, 83.94009, 3.8, HLU_SECOND, 0.0);
@@ -2840,7 +2930,7 @@ extern void initAtomProperties()
 		initDecayMode(42, 107, DECAY_MODE_BETA_MINUS);
 		initDecayMode(42, 108, DECAY_MODE_BETA_MINUS);
 		initDecayMode(42, 109, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(42, 110, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(42, 110, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(42, 111, DECAY_MODE_BETA_MINUS);
 		initDecayMode(42, 112, DECAY_MODE_BETA_MINUS);
 		initDecayMode(42, 113, DECAY_MODE_BETA_MINUS);
@@ -2899,10 +2989,10 @@ extern void initAtomProperties()
 		initDecayMode(43, 106, DECAY_MODE_BETA_MINUS);
 		initDecayMode(43, 107, DECAY_MODE_BETA_MINUS);
 		initDecayMode(43, 108, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(43, 109, DECAY_MODE_BETA_MINUS, 99.92, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(43, 110, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(43, 111, DECAY_MODE_BETA_MINUS, 99.15, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(43, 112, DECAY_MODE_BETA_MINUS, 97.4, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(43, 109, DECAY_MODE_BETA_MINUS, 99.92, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(43, 110, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(43, 111, DECAY_MODE_BETA_MINUS, 99.15, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(43, 112, DECAY_MODE_BETA_MINUS, 97.4, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(43, 113, DECAY_MODE_BETA_MINUS);
 		initDecayMode(43, 114, DECAY_MODE_BETA_MINUS);
 		initDecayMode(43, 115, DECAY_MODE_BETA_MINUS);
@@ -2960,8 +3050,8 @@ extern void initAtomProperties()
 		initDecayMode(44, 111, DECAY_MODE_BETA_MINUS);
 		initDecayMode(44, 112, DECAY_MODE_BETA_MINUS);
 		initDecayMode(44, 113, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(44, 114, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(44, 115, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(44, 114, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(44, 115, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(44, 116, DECAY_MODE_BETA_MINUS);
 		initDecayMode(44, 117, DECAY_MODE_BETA_MINUS);
 		initDecayMode(44, 118, DECAY_MODE_BETA_MINUS);
@@ -3024,9 +3114,9 @@ extern void initAtomProperties()
 		initDecayMode(45, 111, DECAY_MODE_BETA_MINUS);
 		initDecayMode(45, 112, DECAY_MODE_BETA_MINUS);
 		initDecayMode(45, 113, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(45, 114, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(45, 114, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(45, 115, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(45, 116, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(45, 116, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(45, 117, DECAY_MODE_BETA_MINUS);
 		initDecayMode(45, 118, DECAY_MODE_BETA_MINUS);
 		initDecayMode(45, 119, DECAY_MODE_BETA_MINUS);
@@ -3154,14 +3244,14 @@ extern void initAtomProperties()
 		initDecayMode(47, 117, DECAY_MODE_BETA_MINUS);
 		initDecayMode(47, 118, DECAY_MODE_BETA_MINUS);
 		initDecayMode(47, 119, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(47, 120, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(47, 121, DECAY_MODE_BETA_MINUS, 99.92, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(47, 122, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(47, 123, DECAY_MODE_BETA_MINUS, 99.45, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(47, 124, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(47, 125, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(47, 126, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(47, 127, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(47, 120, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(47, 121, DECAY_MODE_BETA_MINUS, 99.92, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(47, 122, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(47, 123, DECAY_MODE_BETA_MINUS, 99.45, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(47, 124, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(47, 125, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(47, 126, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(47, 127, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(48, "Cd", "cadmium", "カドミウム", 96, 130, 96, 130, 26.02);
 		initIsotopeProperty(48, 96, 95.93977, 1.0, HLU_SECOND, 0.0);
@@ -3227,7 +3317,7 @@ extern void initAtomProperties()
 		initDecayMode(48, 127, DECAY_MODE_BETA_MINUS);
 		initDecayMode(48, 128, DECAY_MODE_BETA_MINUS);
 		initDecayMode(48, 129, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(48, 130, DECAY_MODE_BETA_MINUS, 96.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(48, 130, DECAY_MODE_BETA_MINUS, 96.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(49, "In", "indium", "インジウム", 98, 134, 98, 134, 26.74);
 		initIsotopeProperty(49, 98, 97.94214, 45.0e-3, HLU_SECOND, 0.0);	
@@ -3295,14 +3385,14 @@ extern void initAtomProperties()
 		initDecayMode(49, 124, DECAY_MODE_BETA_MINUS);
 		initDecayMode(49, 125, DECAY_MODE_BETA_MINUS);
 		initDecayMode(49, 126, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(49, 127, DECAY_MODE_BETA_MINUS, 99.97, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(49, 128, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(49, 129, DECAY_MODE_BETA_MINUS, 99.75, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(49, 130, DECAY_MODE_BETA_MINUS, 98.35, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(49, 131, DECAY_MODE_BETA_MINUS, 97.8, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(49, 132, DECAY_MODE_BETA_MINUS, 94.8, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(49, 133, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 85.0, DECAY_MODE_BETA_MINUS);
-		initDecayMode3(49, 124, DECAY_MODE_BETA_MINUS, 79.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON, 17.0, DECAY_MODE_BETA_MINUS_AND_2NEWTRON);
+		initDecayMode2(49, 127, DECAY_MODE_BETA_MINUS, 99.97, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(49, 128, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(49, 129, DECAY_MODE_BETA_MINUS, 99.75, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(49, 130, DECAY_MODE_BETA_MINUS, 98.35, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(49, 131, DECAY_MODE_BETA_MINUS, 97.8, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(49, 132, DECAY_MODE_BETA_MINUS, 94.8, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(49, 133, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 85.0, DECAY_MODE_BETA_MINUS);
+		initDecayMode3(49, 124, DECAY_MODE_BETA_MINUS, 79.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON, 17.0, DECAY_MODE_BETA_MINUS_AND_2NEUTRON);
 
 		initAtomProperty(50, "Sn", "Tin", "スズ", 100, 137, 100, 137, 27.112);
 		initIsotopeProperty(50, 100, 99.93904, 1.1, HLU_SECOND, 0.0);	
@@ -3366,10 +3456,10 @@ extern void initAtomProperties()
 		initDecayMode(50, 130, DECAY_MODE_BETA_MINUS);
 		initDecayMode(50, 131, DECAY_MODE_BETA_MINUS);
 		initDecayMode(50, 132, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(50, 133, DECAY_MODE_BETA_MINUS, 99.97, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(50, 134, DECAY_MODE_BETA_MINUS, 83.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(50, 135, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(50, 136, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(50, 133, DECAY_MODE_BETA_MINUS, 99.97, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(50, 134, DECAY_MODE_BETA_MINUS, 83.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(50, 135, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(50, 136, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(50, 137, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(51, "Sb", "antimony", "アンチモン", 103, 139, 103, 139, 25.23);
@@ -3440,10 +3530,10 @@ extern void initAtomProperties()
 		initDecayMode(51, 132, DECAY_MODE_BETA_MINUS);
 		initDecayMode(51, 133, DECAY_MODE_BETA_MINUS);
 		initDecayMode(51, 134, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(51, 135, DECAY_MODE_BETA_MINUS, 82.4, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(51, 136, DECAY_MODE_BETA_MINUS, 83.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(51, 137, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(51, 138, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(51, 135, DECAY_MODE_BETA_MINUS, 82.4, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(51, 136, DECAY_MODE_BETA_MINUS, 83.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(51, 137, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(51, 138, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(51, 139, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(52, "Te", "tellurium", "テルル", 106, 142, 106, 142, 25.73);
@@ -3508,12 +3598,12 @@ extern void initAtomProperties()
 		initDecayMode(52, 133, DECAY_MODE_BETA_MINUS);
 		initDecayMode(52, 134, DECAY_MODE_BETA_MINUS);
 		initDecayMode(52, 135, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(52, 136, DECAY_MODE_BETA_MINUS, 98.7, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(52, 137, DECAY_MODE_BETA_MINUS, 97.01, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(52, 138, DECAY_MODE_BETA_MINUS, 93.7, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(52, 139, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(52, 140, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(52, 141, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(52, 136, DECAY_MODE_BETA_MINUS, 98.7, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(52, 137, DECAY_MODE_BETA_MINUS, 97.01, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(52, 138, DECAY_MODE_BETA_MINUS, 93.7, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(52, 139, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(52, 140, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(52, 141, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(52, 142, DECAY_MODE_BETA_MINUS);
 
 		initAtomProperty(53, "I", " iodine", "ヨウ素", 108, 144, 108, 144, 54.44/2.0);
@@ -3582,12 +3672,12 @@ extern void initAtomProperties()
 		initDecayMode(53, 134, DECAY_MODE_BETA_MINUS);
 		initDecayMode(53, 135, DECAY_MODE_BETA_MINUS);
 		initDecayMode(53, 136, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(53, 137, DECAY_MODE_BETA_MINUS, 92.86, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(53, 138, DECAY_MODE_BETA_MINUS, 94.54, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(53, 139, DECAY_MODE_BETA_MINUS, 90.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(53, 140, DECAY_MODE_BETA_MINUS, 90.7, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(53, 141, DECAY_MODE_BETA_MINUS, 78.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(53, 142, DECAY_MODE_BETA_MINUS, 75.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(53, 137, DECAY_MODE_BETA_MINUS, 92.86, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(53, 138, DECAY_MODE_BETA_MINUS, 94.54, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(53, 139, DECAY_MODE_BETA_MINUS, 90.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(53, 140, DECAY_MODE_BETA_MINUS, 90.7, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(53, 141, DECAY_MODE_BETA_MINUS, 78.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(53, 142, DECAY_MODE_BETA_MINUS, 75.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(53, 143, DECAY_MODE_BETA_MINUS);
 		initDecayMode(53, 144, DECAY_MODE_BETA_MINUS);
 
@@ -3653,13 +3743,13 @@ extern void initAtomProperties()
 		initDecayMode(54, 138, DECAY_MODE_BETA_MINUS);
 		initDecayMode(54, 139, DECAY_MODE_BETA_MINUS);
 		initDecayMode(54, 140, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(54, 141, DECAY_MODE_BETA_MINUS, 99.45, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(54, 142, DECAY_MODE_BETA_MINUS, 99.59, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(54, 141, DECAY_MODE_BETA_MINUS, 99.45, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(54, 142, DECAY_MODE_BETA_MINUS, 99.59, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(54, 143, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(54, 144, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(54, 144, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(54, 145, DECAY_MODE_BETA_MINUS);
 		initDecayMode(54, 146, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(54, 147, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(54, 147, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(55, "Cs", "caesium", "セシウム", 112, 151, 112, 151, 32.21);
 		initIsotopeProperty(55, 112, 111.95030, 500.0e-6, HLU_SECOND, 0.0);
@@ -3730,17 +3820,17 @@ extern void initAtomProperties()
 		initDecayMode(55, 138, DECAY_MODE_BETA_MINUS);
 		initDecayMode(55, 139, DECAY_MODE_BETA_MINUS);
 		initDecayMode(55, 140, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(55, 141, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 142, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 143, DECAY_MODE_BETA_MINUS, 98.38, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 144, DECAY_MODE_BETA_MINUS, 96.8, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 145, DECAY_MODE_BETA_MINUS, 85.7, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 146, DECAY_MODE_BETA_MINUS, 85.8, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 147, DECAY_MODE_BETA_MINUS, 71.5, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 148, DECAY_MODE_BETA_MINUS, 74.9, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 149, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 150, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(55, 151, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(55, 141, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 142, DECAY_MODE_BETA_MINUS, 99.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 143, DECAY_MODE_BETA_MINUS, 98.38, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 144, DECAY_MODE_BETA_MINUS, 96.8, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 145, DECAY_MODE_BETA_MINUS, 85.7, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 146, DECAY_MODE_BETA_MINUS, 85.8, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 147, DECAY_MODE_BETA_MINUS, 71.5, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 148, DECAY_MODE_BETA_MINUS, 74.9, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 149, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 150, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(55, 151, DECAY_MODE_BETA_MINUS, 50.0, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(56, "Ba", "barium", "バリウム", 114, 153, 114, 153, 28.07);
 		initIsotopeProperty(56, 114, 113.95068, 530.0e-3, HLU_SECOND, 0.0);
@@ -3809,11 +3899,11 @@ extern void initAtomProperties()
 		initDecayMode(56, 143, DECAY_MODE_BETA_MINUS);
 		initDecayMode(56, 144, DECAY_MODE_BETA_MINUS);
 		initDecayMode(56, 145, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(56, 146, DECAY_MODE_BETA_MINUS, 99.98, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(56, 147, DECAY_MODE_BETA_MINUS, 99.94, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(56, 148, DECAY_MODE_BETA_MINUS, 99.6, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(56, 149, DECAY_MODE_BETA_MINUS, 99.57, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(56, 150, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(56, 146, DECAY_MODE_BETA_MINUS, 99.98, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(56, 147, DECAY_MODE_BETA_MINUS, 99.94, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(56, 148, DECAY_MODE_BETA_MINUS, 99.6, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(56, 149, DECAY_MODE_BETA_MINUS, 99.57, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(56, 150, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(56, 151, DECAY_MODE_BETA_MINUS);
 		initDecayMode(56, 152, DECAY_MODE_BETA_MINUS);
 		initDecayMode(56, 153, DECAY_MODE_BETA_MINUS);
@@ -3886,11 +3976,11 @@ extern void initAtomProperties()
 		initDecayMode(57, 143, DECAY_MODE_BETA_MINUS);
 		initDecayMode(57, 144, DECAY_MODE_BETA_MINUS);
 		initDecayMode(57, 145, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(57, 146, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(57, 147, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(57, 148, DECAY_MODE_BETA_MINUS, 99.85, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(57, 149, DECAY_MODE_BETA_MINUS, 98.6, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
-		initDecayMode2(57, 150, DECAY_MODE_BETA_MINUS, 97.3, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(57, 146, DECAY_MODE_BETA_MINUS, 99.99, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(57, 147, DECAY_MODE_BETA_MINUS, 99.96, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(57, 148, DECAY_MODE_BETA_MINUS, 99.85, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(57, 149, DECAY_MODE_BETA_MINUS, 98.6, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
+		initDecayMode2(57, 150, DECAY_MODE_BETA_MINUS, 97.3, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 		initDecayMode(57, 151, DECAY_MODE_BETA_MINUS);
 		initDecayMode(57, 152, DECAY_MODE_BETA_MINUS);
 		initDecayMode(57, 153, DECAY_MODE_BETA_MINUS);
@@ -5539,7 +5629,7 @@ extern void initAtomProperties()
 		initDecayMode(81, 207, DECAY_MODE_BETA_MINUS);
 		initDecayMode(81, 208, DECAY_MODE_BETA_MINUS);
 		initDecayMode(81, 209, DECAY_MODE_BETA_MINUS);
-		initDecayMode2(81,210, DECAY_MODE_BETA_MINUS, 99.991, DECAY_MODE_BETA_MINUS_AND_NEWTRON);
+		initDecayMode2(81,210, DECAY_MODE_BETA_MINUS, 99.991, DECAY_MODE_BETA_MINUS_AND_NEUTRON);
 
 		initAtomProperty(82, "Pb", "lead", "鉛", 181, 214, 185, 214, 26.650);
 		initIsotopeProperty(82, 181, 180.99662, 45.0e-3, HLU_SECOND, 0.0);
@@ -7147,18 +7237,18 @@ extern void mergeSumMeVMol(struct sumMeVMol * a_merge, struct sumMeVMol * a_src1
 }
 
 #define SCAT_BIG_MASS_DEFECT_NOW -3 
-#define SCAT_BIG_MASS_DEFECT_ALL -2//The big mass defect type is the part of energy by mass defection from either cillide of nucleus particles or decay of nuecuses and the amont of energy is eaual or bigger than "e_collideElectronMiniMeV".
+#define SCAT_BIG_MASS_DEFECT_ALL -2//The big mass defect type is the part of energy by mass defection from either cillide of nucleus particles or decay of nuecuses and the amont of energy is eaual or bigger than "e_collideMiniMeV".
 #define SCAT_LOST_BY_NEUTRINO -1 //the enegey type carryed out by neutrino in beta decays.
 
 #define SCAT_NOT_COLLIDE 0 // The not collide type is a part of enegy of input high voltage pulse current. The part is not used to collide of nucleus perticles by high voltage pulse current.
 #define SCAT_IMPERFECT 1  // The IMPERFECT type is a part of enegy of input high voltage pulse current.
 #define SCAT_IMPERFECT_IN_SPACE 2  // The IMPERFECT type is a part of enegy of input high voltage pulse current.
-#define SCAT_SMALL_MASS_DEFECT 3 // The small mass defect type is the output energy from neclear actions. But they are less than "e_collideElectronMiniMeV". Therefore they can't cause the next neclear action anymore.
-#define SCAT_SMALL_BY_COMPTON 4 // This Comton effect type is the reflection phton with less energy than "e_collideElectronMiniMeV". Therefore they can't cause the next neclear action anymore.
-#define SCAT_SMALL_BY_COMPTON_E 5 // This Comton effect type is the enegy passed to an electron from a photon. But the amount of energy is less than "e_collideElectronMiniMeV". Therefore they can't cause the next neclear action anymore.
+#define SCAT_SMALL_MASS_DEFECT 3 // The small mass defect type is the output energy from neclear actions. But they are less than "e_collideMiniMeV". Therefore they can't cause the next neclear action anymore.
+#define SCAT_SMALL_BY_COMPTON 4 // This Comton effect type is the reflection photon with less energy than "e_collideMiniMeV". Therefore they can't cause the next neclear action anymore.
+#define SCAT_SMALL_BY_COMPTON_E 5 // This Comton effect type is the enegy passed to an electron from a photon. But the amount of energy is less than "e_collideMiniMeV". Therefore they can't cause the next neclear action anymore.
 
 
-#define SCAT_DEGRADE_IN_COMPTON_B 6 //The too many SCAT_BIG_MASS_DEFECT_NOW nodes in the hash table, "massDefectHashTable", they waste the memory and power of a computer. So, we do degreade them by shopping the energy into 32 greades. The SCAT_DEGRADE_IN_COMPTON_B type contains shopped small remain part of BIG energy. The grading big energy is still in the "massDefectHashTable".
+#define SCAT_DEGRADE_IN_COMPTON_B 6 //If there are too many SCAT_BIG_MASS_DEFECT_NOW nodes in the hash table, "massDefectHashTable[MASS_DEFECT_BY_GANMMA]", they waste the memory and power of a computer. So, we do degreade them by shopping the energy into 32 greades. The SCAT_DEGRADE_IN_COMPTON_B type contains shopped small remain part of BIG energy. The grading big energy is still in the "massDefectHashTable[MASS_DEFECT_BY_GANMMA]".
 #define SCAT_DEGRADE_IN_COMPTON_S 7
 #define SIZE_OF_SCATTERD 8 //The array size of scatterd photon types. Those types of photon are reason of heat.
 
@@ -7225,10 +7315,35 @@ extern long double printScattered(FILE * a_fp, const char * a_titlePtr, struct s
 }
 
 //---------------------------------------------------------------------
+#define MASS_DEFECT_BY_NEUTRINO (-1) //No count
+#define MASS_DEFECT_BY_PROTON 0
+#define MASS_DEFECT_BY_DEUTERIUM 1
+#define MASS_DEFECT_BY_TRITIUM 2
+#define MASS_DEFECT_BY_NEUTRON 3
+#define MASS_DEFECT_BY_ALPHA 4
+#define MASS_DEFECT_BY_BETA 5
+#define MASS_DEFECT_BY_GANMMA 6
+#define COUNT_OF_MASS_DEFECT_HASH_TABLE 7
+
+extern const char * getMassDefectByName(int a_massDefectBy)
+{
+	const char * pRet = "";
+	switch(a_massDefectBy){
+	case MASS_DEFECT_BY_NEUTRINO: pRet = "MASS_DEFECT_BY_NEUTRINO"; break;
+	case MASS_DEFECT_BY_PROTON: pRet = "MASS_DEFECT_BY_PROTON"; break;
+	case MASS_DEFECT_BY_DEUTERIUM: pRet = "MASS_DEFECT_BY_DEUTERIUM"; break;
+	case MASS_DEFECT_BY_TRITIUM: pRet = "MASS_DEFECT_BY_TRITIUM"; break;
+	case MASS_DEFECT_BY_NEUTRON: pRet = "MASS_DEFECT_BY_NEUTRON"; break;
+	case MASS_DEFECT_BY_ALPHA: pRet = "MASS_DEFECT_BY_ALPHA"; break;
+	case MASS_DEFECT_BY_BETA: pRet = "MASS_DEFECT_BY_BETA"; break;
+	case MASS_DEFECT_BY_GANMMA: pRet = "MASS_DEFECT_BY_GANMMA"; break;
+	}
+	return pRet;
+}
 struct electrode {
 	double detectLimitMolForIsotope;
 	struct hashTable atomHashTable;
-	struct hashTable massDefectHashTable;
+	struct hashTable massDefectHashTable[COUNT_OF_MASS_DEFECT_HASH_TABLE];
 	struct sumMeVMol massDefectAll;
 	struct sumMeVMol byNeutrinoAll;
 	struct sumMeVMol scattered[SIZE_OF_SCATTERD];
@@ -7247,7 +7362,13 @@ extern int RW ## Electrode(struct electrode * a_electrodePtr, FILE * a_fp)\
 	SERIALIZE_VALUE(RW, a_electrodePtr->detectLimitMolForIsotope, a_fp)\
 	if((void *)RW == (void *)fwrite){\
 		if(!fwritedHashTable(&a_electrodePtr->atomHashTable, a_fp, fwriteAtomKey, fwriteAtomValue)){return 0;}\
-		if(!fwritedHashTable(&a_electrodePtr->massDefectHashTable, a_fp, fwriteRange, fwriteMassDefect)){return 0;}\
+		if(!fwritedHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_PROTON], a_fp, fwriteRange, fwriteMassDefect)){return 0;}\
+		if(!fwritedHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_DEUTERIUM], a_fp, fwriteRange, fwriteMassDefect)){return 0;}\
+		if(!fwritedHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_TRITIUM], a_fp, fwriteRange, fwriteMassDefect)){return 0;}\
+		if(!fwritedHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_NEUTRON], a_fp, fwriteRange, fwriteMassDefect)){return 0;}\
+		if(!fwritedHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_ALPHA], a_fp, fwriteRange, fwriteMassDefect)){return 0;}\
+		if(!fwritedHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_BETA], a_fp, fwriteRange, fwriteMassDefect)){return 0;}\
+		if(!fwritedHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_GANMMA], a_fp, fwriteRange, fwriteMassDefect)){return 0;}\
 	}else{\
 		if(!freadHashTable(&a_electrodePtr->atomHashTable, a_fp,\
 			allocFreadAtomKey, allocFreadAtomValue, \
@@ -7258,7 +7379,61 @@ extern int RW ## Electrode(struct electrode * a_electrodePtr, FILE * a_fp)\
 			allocCopyAtomValue,\
 			free,\
 			foundActionForAtomValue)){return 0;}\
-		if(!freadHashTable(&a_electrodePtr->massDefectHashTable, a_fp,\
+		if(!freadHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_PROTON], a_fp,\
+			allocFreadRange, allocFreadMassDefect, \
+			calcHashSeedOfRange,\
+			allocCopyRange,\
+			free,\
+			comparRange,\
+			allocCopyMassDefect,\
+			free,\
+			foundActionForMassDefect)){return 0;}\
+		if(!freadHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_DEUTERIUM], a_fp,\
+			allocFreadRange, allocFreadMassDefect, \
+			calcHashSeedOfRange,\
+			allocCopyRange,\
+			free,\
+			comparRange,\
+			allocCopyMassDefect,\
+			free,\
+			foundActionForMassDefect)){return 0;}\
+		if(!freadHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_TRITIUM], a_fp,\
+			allocFreadRange, allocFreadMassDefect, \
+			calcHashSeedOfRange,\
+			allocCopyRange,\
+			free,\
+			comparRange,\
+			allocCopyMassDefect,\
+			free,\
+			foundActionForMassDefect)){return 0;}\
+		if(!freadHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_NEUTRON], a_fp,\
+			allocFreadRange, allocFreadMassDefect, \
+			calcHashSeedOfRange,\
+			allocCopyRange,\
+			free,\
+			comparRange,\
+			allocCopyMassDefect,\
+			free,\
+			foundActionForMassDefect)){return 0;}\
+		if(!freadHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_ALPHA], a_fp,\
+			allocFreadRange, allocFreadMassDefect, \
+			calcHashSeedOfRange,\
+			allocCopyRange,\
+			free,\
+			comparRange,\
+			allocCopyMassDefect,\
+			free,\
+			foundActionForMassDefect)){return 0;}\
+		if(!freadHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_BETA], a_fp,\
+			allocFreadRange, allocFreadMassDefect, \
+			calcHashSeedOfRange,\
+			allocCopyRange,\
+			free,\
+			comparRange,\
+			allocCopyMassDefect,\
+			free,\
+			foundActionForMassDefect)){return 0;}\
+		if(!freadHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_GANMMA], a_fp,\
 			allocFreadRange, allocFreadMassDefect, \
 			calcHashSeedOfRange,\
 			allocCopyRange,\
@@ -7306,6 +7481,22 @@ extern struct atomNodeConst * findAtom(struct electrode * a_electrodePtr, int a_
 extern struct atomNodeConst * findElectronInElectrode(struct electrode * a_electrodePtr)
 {
 	return findAtom(a_electrodePtr, ATOMICNUMBER_ELECTRON, MASSNUMBER_ELECTRON);
+}
+extern struct atomNodeConst * findProtonInElectrode(struct electrode * a_electrodePtr)
+{
+	return findAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN);
+}
+extern struct atomNodeConst * findDeuteriumInElectrode(struct electrode * a_electrodePtr)
+{
+	return findAtom(a_electrodePtr, ATOMICNUMBER_DEUTERIUM, MASSNUMBER_DEUTERIUM);
+}
+extern struct atomNodeConst * findTritiumInElectrode(struct electrode * a_electrodePtr)
+{
+	return findAtom(a_electrodePtr, ATOMICNUMBER_TRITIUM, MASSNUMBER_TRITIUM);
+}
+extern struct atomNodeConst * findHeliumInElectrode(struct electrode * a_electrodePtr)
+{
+	return findAtom(a_electrodePtr, ATOMICNUMBER_HELIUM, MASSNUMBER_HELIUM);
 }
 extern struct atomNodeConst * findNeutronInElectrode(struct electrode * a_electrodePtr)
 {
@@ -7543,7 +7734,7 @@ extern void initElectrodes(struct electrode * a_electrodePtr, char * a_Electrode
 	increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, 0.0);
 	a_electrodePtr->detectLimitMolForIsotope = sumOfMol * a_detectLimitRateForIsotope;
 	
-	initHashTable(&a_electrodePtr->massDefectHashTable, 
+	initHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_PROTON], 
 		calcHashSeedOfRange,
 		allocCopyRange,
 		free,
@@ -7551,7 +7742,67 @@ extern void initElectrodes(struct electrode * a_electrodePtr, char * a_Electrode
 		allocCopyMassDefect,
 		free,
 		foundActionForMassDefect,
-		strcat(strcat(strcpy(name, a_electrodeName), " "), getScatName(SCAT_BIG_MASS_DEFECT_NOW)),
+		strcat(strcat(strcpy(name, a_electrodeName), " "), getMassDefectByName(MASS_DEFECT_BY_PROTON)),
+		100);
+	initHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_DEUTERIUM], 
+		calcHashSeedOfRange,
+		allocCopyRange,
+		free,
+		comparRange,
+		allocCopyMassDefect,
+		free,
+		foundActionForMassDefect,
+		strcat(strcat(strcpy(name, a_electrodeName), " "), getMassDefectByName(MASS_DEFECT_BY_DEUTERIUM)),
+		100);
+	initHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_TRITIUM], 
+		calcHashSeedOfRange,
+		allocCopyRange,
+		free,
+		comparRange,
+		allocCopyMassDefect,
+		free,
+		foundActionForMassDefect,
+		strcat(strcat(strcpy(name, a_electrodeName), " "), getMassDefectByName(MASS_DEFECT_BY_TRITIUM)),
+		100);
+	initHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_NEUTRON], 
+		calcHashSeedOfRange,
+		allocCopyRange,
+		free,
+		comparRange,
+		allocCopyMassDefect,
+		free,
+		foundActionForMassDefect,
+		strcat(strcat(strcpy(name, a_electrodeName), " "), getMassDefectByName(MASS_DEFECT_BY_NEUTRON)),
+		100);
+	initHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_ALPHA], 
+		calcHashSeedOfRange,
+		allocCopyRange,
+		free,
+		comparRange,
+		allocCopyMassDefect,
+		free,
+		foundActionForMassDefect,
+		strcat(strcat(strcpy(name, a_electrodeName), " "), getMassDefectByName(MASS_DEFECT_BY_ALPHA)),
+		100);
+	initHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_BETA], 
+		calcHashSeedOfRange,
+		allocCopyRange,
+		free,
+		comparRange,
+		allocCopyMassDefect,
+		free,
+		foundActionForMassDefect,
+		strcat(strcat(strcpy(name, a_electrodeName), " "), getMassDefectByName(MASS_DEFECT_BY_BETA)),
+		100);
+	initHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_GANMMA], 
+		calcHashSeedOfRange,
+		allocCopyRange,
+		free,
+		comparRange,
+		allocCopyMassDefect,
+		free,
+		foundActionForMassDefect,
+		strcat(strcat(strcpy(name, a_electrodeName), " "), getMassDefectByName(MASS_DEFECT_BY_GANMMA)),
 		100);
 	initSumMeVMol(&a_electrodePtr->massDefectAll);
 	initSumMeVMol(&a_electrodePtr->byNeutrinoAll);
@@ -7564,31 +7815,47 @@ extern void initElectrodes(struct electrode * a_electrodePtr, char * a_Electrode
 }
 //---------------------------------------------------------------------
 
-extern void registOutput(struct electrode * a_electrodePtr, int a_scatType, double a_MeV, double a_mol)
+extern void registOutput(struct electrode * a_electrodePtr, int a_scatType, int a_massDefectBy, double a_MeV, double a_mol)
 {
-	//fprintf(stderr, "DEBUG:%s:{BEGIN %lp, %s a_MeV:%lg * a_mol:%lg = %lg\n\n", __FUNCTION__, a_electrodePtr, getMassChangeName(a_scatType), a_MeV, a_mol, a_MeV * a_mol);
+	//fprintf(stderr, "DEBUG:%s:{BEGIN %lp, %s a_MeV:%lg * a_mol:%lg = %lg\n\n", __FUNCTION__, a_electrodePtr, getScatName(a_scatType), a_MeV, a_mol, a_MeV * a_mol);
+	if(a_scatType == SCAT_BIG_MASS_DEFECT_ALL){
+		fprintf(stderr, "FATAL:%s:%p, %s %s a_MeV:%lg * a_mol:%lg = %lg\n", __FUNCTION__, a_electrodePtr, getScatName(a_scatType), getMassDefectByName(a_massDefectBy), a_MeV, a_mol, a_MeV * a_mol);
+		exit(1);
+	}
 	if(a_mol > 0.0){
 		//Check data!
-		if(a_scatType == SCAT_BIG_MASS_DEFECT_NOW || a_scatType == SCAT_BIG_MASS_DEFECT_ALL){
-			if(a_MeV < e_collideElectronMiniMeV){
+		if(a_scatType == SCAT_BIG_MASS_DEFECT_NOW){
+			if(a_MeV < e_collideMiniMeV){
 				a_scatType = SCAT_SMALL_MASS_DEFECT;
-			}else{
-				a_scatType = SCAT_BIG_MASS_DEFECT_NOW;
 			}
 		}
 		if(a_scatType == SCAT_BIG_MASS_DEFECT_NOW){
-			struct range key;
-			struct massDefect value;
-			struct objectNodeConst nodeConst;
-			key = calcPrecisionRange(a_MeV);
-			value.MeV = a_MeV;
-			value.mol = a_mol;
-			nodeConst.keyPtr = &key;
-			nodeConst.valuePtr = &value;
-			insertObjectInHashTable(&a_electrodePtr->massDefectHashTable, &nodeConst);
-			addSumMeVMol(&a_electrodePtr->massDefectAll, a_MeV, a_mol);
+			if(MASS_DEFECT_BY_PROTON <= a_massDefectBy && a_massDefectBy <= MASS_DEFECT_BY_GANMMA){
+				struct range key;
+				struct massDefect value;
+				struct objectNodeConst nodeConst;
+				key = calcPrecisionRange(a_MeV);
+				value.MeV = a_MeV;
+				value.mol = a_mol;
+				nodeConst.keyPtr = &key;
+				nodeConst.valuePtr = &value;
+				//if(a_massDefectBy != MASS_DEFECT_BY_GANMMA){
+				//	fprintf(stderr, "DEBUG:%s(%d):%s %s a_MeV:%lg * a_mol:%lg = %lg\n\n", __FUNCTION__, __LINE__, getScatName(a_scatType), getMassDefectByName(a_massDefectBy), a_MeV, a_mol, a_MeV * a_mol);
+				//}
+				insertObjectInHashTable(&a_electrodePtr->massDefectHashTable[a_massDefectBy], &nodeConst);
+				//insertObjectInHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_GANMMA], &nodeConst);//DEBUG
+				addSumMeVMol(&a_electrodePtr->massDefectAll, a_MeV, a_mol);
+			}else{
+				fprintf(stderr, "FATAL:%s:%p, %s %s a_MeV:%lg * a_mol:%lg = %lg\n", __FUNCTION__, a_electrodePtr, getScatName(a_scatType), getMassDefectByName(a_massDefectBy), a_MeV, a_mol, a_MeV * a_mol);
+				exit(1);				
+			}
 		}else if(a_scatType == SCAT_LOST_BY_NEUTRINO){
-			addSumMeVMol(&a_electrodePtr->byNeutrinoAll, a_MeV, a_mol);
+			if(a_massDefectBy == MASS_DEFECT_BY_NEUTRINO){
+				addSumMeVMol(&a_electrodePtr->byNeutrinoAll, a_MeV, a_mol);
+			}else{
+				fprintf(stderr, "FATAL:%s:%p, %s %s a_MeV:%lg * a_mol:%lg = %lg\n", __FUNCTION__, a_electrodePtr, getScatName(a_scatType), getMassDefectByName(a_massDefectBy), a_MeV, a_mol, a_MeV * a_mol);
+				exit(1);
+			}
 		}else{
 			addSumMeVMol(a_electrodePtr->scattered + a_scatType, a_MeV, a_mol);
 		}
@@ -7640,9 +7907,9 @@ extern void registOutputOfBetaMinus(struct electrode * a_electrodePtr, double a_
 		double remainMassDefect = a_massDefectMeV - energyCarryedByNeutrino;
 		double molOfNeutrino = a_mol * e_probabilityForMol[i];
 		double molOfElectoron = molOfNeutrino;
-		registOutput(a_electrodePtr, SCAT_LOST_BY_NEUTRINO, energyCarryedByNeutrino, molOfNeutrino);
+		registOutput(a_electrodePtr, SCAT_LOST_BY_NEUTRINO, MASS_DEFECT_BY_NEUTRINO, energyCarryedByNeutrino, molOfNeutrino);
 		//debugSum += energyCarryedByNeutrino * molOfNeutrino;//DEBUG
-		registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, remainMassDefect, molOfElectoron);
+		registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_BETA, remainMassDefect, molOfElectoron);
 		//debugSum += remainMassDefect * molOfElectoron;//DEBUG
 	}
 	/*
@@ -7674,9 +7941,9 @@ extern void registOutputOfElectronCapture(struct electrode * a_electrodePtr, dou
 		double remainMassDefect = a_massDefectMeV - energyCarryedByNeutrino;
 		double molOfNeutrino = a_mol * e_probabilityForMol[i];
 		double molOfDaughter = molOfNeutrino;
-		registOutput(a_electrodePtr, SCAT_LOST_BY_NEUTRINO, energyCarryedByNeutrino, molOfNeutrino);
+		registOutput(a_electrodePtr, SCAT_LOST_BY_NEUTRINO, MASS_DEFECT_BY_NEUTRINO, energyCarryedByNeutrino, molOfNeutrino);
 		//debugSum += energyCarryedByNeutrino * molOfNeutrino;//DEBUG
-		registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, remainMassDefect, molOfDaughter);	
+		registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, remainMassDefect, molOfDaughter);	
 		//debugSum += remainMassDefect * molOfDaughter;//DEBUG
 	}
 	/*
@@ -7713,9 +7980,9 @@ extern void registOutputOfBetaPlusWithPositron(struct electrode * a_electrodePtr
 		double energyOfGamma = e_massElectronMeV + remainMassDefect * 0.5;
 		double molOfNeutrino = a_mol * e_probabilityForMol[i];
 		double molOfGamma = molOfNeutrino * 2.0;
-		registOutput(a_electrodePtr, SCAT_LOST_BY_NEUTRINO, energyCarryedByNeutrino, molOfNeutrino);
+		registOutput(a_electrodePtr, SCAT_LOST_BY_NEUTRINO, MASS_DEFECT_BY_NEUTRINO, energyCarryedByNeutrino, molOfNeutrino);
 		debugSum += energyCarryedByNeutrino * molOfNeutrino;//DEBUG
-		registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, energyOfGamma, molOfGamma);
+		registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, energyOfGamma, molOfGamma);
 		debugSum += energyOfGamma * molOfGamma;//DEBUG
 	}
 	
@@ -7745,12 +8012,12 @@ extern int iterateSumupMassDefect(void * a_total, struct objectNodeConst * a_nod
 extern void sumupBigMassDefect(struct electrode * a_electrodePtr, struct sumMeVMol * a_massDefectNowPtr)
 {
 	initSumMeVMol(a_massDefectNowPtr);
-	iterateInHashTable(&a_electrodePtr->massDefectHashTable, a_massDefectNowPtr, iterateSumupMassDefect);
+	iterateInHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_GANMMA], a_massDefectNowPtr, iterateSumupMassDefect);
 }
 extern long double printMassDefectHeat(FILE * a_fp, const char * a_titlePtr, const struct sumMeVMol * a_massDefectNowPtr, const struct sumMeVMol * a_massDefectAllPtr, const struct sumMeVMol * a_byNeutrinoAllPtr, struct sumMeVMol scatteredAry[SIZE_OF_SCATTERD])
 {
 	long double outputHeat;
-	fprintf(a_fp, "%s MASS DEFECT\n(gamma ray >= %lg [MeV], beta energy = %lg [MeV])\n", a_titlePtr, e_collideElectronMiniMeV, e_betaEnergyMeV);
+	fprintf(a_fp, "%s MASS DEFECT\n(gamma ray >= %lg [MeV], beta energy = %lg [MeV])\n", a_titlePtr, e_collideMiniMeV, e_betaEnergyMeV);
 	printSumMeVMol(a_fp, " ", SCAT_BIG_MASS_DEFECT_NOW, a_massDefectNowPtr, 0.0, "");
 	printSumMeVMol(a_fp, " ", SCAT_BIG_MASS_DEFECT_ALL, a_massDefectAllPtr, 0.0, "");
 	outputHeat = printScattered(a_fp, a_titlePtr, scatteredAry);
@@ -7772,23 +8039,31 @@ extern double printElectrode(FILE * a_fp, struct electrode * a_electrodePtr, str
 }
 //---------------------------------------------------------------------
 
-#define COLLIDE_PROTON     1 //by high volatage
-#define COLLIDE_DEUTERIUM  2 //by high volatage
-#define COLLIDE_TRITIUM    3 //by high volatage
-#define COLLIDE_ELECTRON   4 //by high volatage
-#define COLLIDE_NEUTRON    5
-#define COLLIDE_ELECTRON_C 6 //by the compton Effect
+#define COLLIDE_PROTON      1 //by high volatage
+#define COLLIDE_DEUTERIUM   2 //by high volatage
+#define COLLIDE_TRITIUM     3 //by high volatage
+#define COLLIDE_ELECTRON    4 //by high volatage
+#define COLLIDE_NEUTRON     5 //absorbing cold neutrons
+#define COLLIDE_PROTON_S    6 //by scattering
+#define COLLIDE_DEUTERIUM_S 7 //by scattering
+#define COLLIDE_TRITIUM_S   8 //by scattering
+#define COLLIDE_ALPHA_S     9 //by scattering
+#define COLLIDE_ELECTRON_S 10 //by scattering, the compton Effect
 
 extern const char * getCollideName(int a_collideType)
 {
 	const char * collideNamePtr = "unkown";
 	switch(a_collideType){
-	case COLLIDE_PROTON:     collideNamePtr = "COLLIDE_PROTON_BY_HIGH_VOLTAGE"; break;
-	case COLLIDE_DEUTERIUM:  collideNamePtr = "COLLIDE_DEUTERIUM_BY_HIGH_VOLTAGE"; break;
-	case COLLIDE_TRITIUM:    collideNamePtr = "COLLIDE_TRITIUM_BY_HIGH_VOLTAGE";  break;
-	case COLLIDE_ELECTRON:	 collideNamePtr = "COLLIDE_ELECTRON_BY_HIGH_VOLTAGE"; break;
-	case COLLIDE_NEUTRON:    collideNamePtr = "COLLIDE_NEUTRON";  break;
-	case COLLIDE_ELECTRON_C: collideNamePtr = "COLLIDE_ELECTRON_BY_COMPTON_EFFECT"; break;
+	case COLLIDE_PROTON:      collideNamePtr = "COLLIDE_PROTON_BY_HIGH_VOLTAGE"; break;
+	case COLLIDE_DEUTERIUM:   collideNamePtr = "COLLIDE_DEUTERIUM_BY_HIGH_VOLTAGE"; break;
+	case COLLIDE_TRITIUM:     collideNamePtr = "COLLIDE_TRITIUM_BY_HIGH_VOLTAGE";  break;
+	case COLLIDE_ELECTRON:	  collideNamePtr = "COLLIDE_ELECTRON_BY_HIGH_VOLTAGE"; break;
+	case COLLIDE_NEUTRON:     collideNamePtr = "COLLIDE_NEUTRON";  break;
+	case COLLIDE_PROTON_S:    collideNamePtr = "COLLIDE_PROTON_BY_SCATTERING"; break;
+	case COLLIDE_DEUTERIUM_S: collideNamePtr = "COLLIDE_DEUTERIUM_BY_SCATTERING"; break;
+	case COLLIDE_TRITIUM_S:   collideNamePtr = "COLLIDE_TRITIUM_BY_SCATTERING"; break;
+	case COLLIDE_ALPHA_S:     collideNamePtr = "COLLIDE_ALPHA_BY_SCATTERING"; break;
+	case COLLIDE_ELECTRON_S:  collideNamePtr = "COLLIDE_ELECTRON_BY_SCATTERING"; break;
 	default:
 		if(a_collideType > MIN_DECAY_MODE){
 			collideNamePtr = getDecayModeText(a_collideType);
@@ -7835,8 +8110,15 @@ struct collide {
 	
 	//{ set by getCollidedNewIsotopePropertyPtr
 #define MAX_NEWCOUNT 4
-	int isElectronCapture;
+
+#define EMISSION_IS_GAMMA 0 //default
+#define EMISSION_IS_ELECTRO_NEUTRINO 1
+#define EMISSION_IS_PROTON 4
+#define EMISSION_IS_NEUTRON 5
+#define EMISSION_IS_2_ELECTRONS 7 //collision between two electrons
+
 	int newCount;
+	int emissionType[MAX_NEWCOUNT];
 	int newAtomicNumber[MAX_NEWCOUNT];
 	int newMassNumber[MAX_NEWCOUNT];
 	const struct isotopeProperty * newIsotopePropertyPtr[MAX_NEWCOUNT];
@@ -7855,16 +8137,19 @@ struct collide {
 };
 extern void useElectronOrNeutron(struct collide * a_pX)
 {
-	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_C){
+	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_S){
 		a_pX->useElectron = 1;
 		a_pX->useNeutron = 0;
-	}else if(a_pX->collideType == COLLIDE_PROTON){
+	}else if(a_pX->collideType == COLLIDE_PROTON || a_pX->collideType == COLLIDE_PROTON_S){
 		a_pX->useElectron = 1;
 		a_pX->useNeutron = 1;
-	}else if(a_pX->collideType == COLLIDE_DEUTERIUM){
+	}else if(a_pX->collideType == COLLIDE_DEUTERIUM || a_pX->collideType == COLLIDE_DEUTERIUM_S){
 		a_pX->useElectron = 1;
 		a_pX->useNeutron = 1;
-	}else if(a_pX->collideType == COLLIDE_TRITIUM){
+	}else if(a_pX->collideType == COLLIDE_TRITIUM || a_pX->collideType == COLLIDE_TRITIUM_S){
+		a_pX->useElectron = 1;
+		a_pX->useNeutron = 1;
+	}else if(a_pX->collideType == COLLIDE_ALPHA_S){
 		a_pX->useElectron = 1;
 		a_pX->useNeutron = 1;
 	}else if(a_pX->collideType == COLLIDE_NEUTRON){
@@ -8376,11 +8661,15 @@ extern void checkNoDataOfAtom(struct collide * a_pX, int a_index)
 extern void calcElectroPotentialMeVByCollide(struct collide * a_pX)
 {
 	int sign;
-	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_C){
+	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_S){
 		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
 			sign = 1;//The coulomb barrier between an electron and an electron
-			a_pX->electroPotentialMeV = a_pX->appliedVoltageMeV;//Coulomb potential to allow a moving electron and a static electron to approach
+			if(a_pX->appliedVoltageMeV <= 0.0){
+				fprintf(stderr, "FATAL:%s(%d):invalid appliedVoltageMeV:%lg\n", __FUNCTION__, __LINE__, a_pX->appliedVoltageMeV);
+				exit(1);
+			}
+			a_pX->electroPotentialMeV = a_pX->appliedVoltageMeV * 2.0;//Coulomb potential to allow a moving electron and a static electron to approach
 			
 			//a_pX->electroPotentialMeV = e_coefElectroPotentialMeV / (e_radiusOfElectronByWeakBoson + e_radiusOfElectronByWeakBoson);//287.9[MeV]
 		}else if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_NEUTRON 
@@ -8393,9 +8682,10 @@ extern void calcElectroPotentialMeVByCollide(struct collide * a_pX)
 		}else{
 			sign = -1;
 		}
-	}else if(a_pX->collideType == COLLIDE_PROTON 
-	|| a_pX->collideType == COLLIDE_DEUTERIUM
-	|| a_pX->collideType == COLLIDE_TRITIUM){
+	}else if(a_pX->collideType == COLLIDE_PROTON || a_pX->collideType == COLLIDE_PROTON_S
+	|| a_pX->collideType == COLLIDE_DEUTERIUM || a_pX->collideType == COLLIDE_DEUTERIUM_S
+	|| a_pX->collideType == COLLIDE_TRITIUM || a_pX->collideType == COLLIDE_TRITIUM_S
+	|| a_pX->collideType == COLLIDE_ALPHA_S){
 		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
 			sign = -1;
@@ -8450,10 +8740,10 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 	a_pX->plusAlpha[0] = "";//for safety
 	a_pX->nuclearReactionStr[0][0] = 0;//for safety
 	a_pX->rate[0] = 1.0;
-	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_C){
+	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_S){
 		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
-			a_pX->isElectronCapture = 2;
+			a_pX->emissionType[0] = EMISSION_IS_2_ELECTRONS;
 			a_pX->newAtomicNumber[0] = a_pX->targetIsotopePropertyPtr->atomicNumber;
 			a_pX->newMassNumber[0] = a_pX->targetIsotopePropertyPtr->massNumber;
 			a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
@@ -8472,7 +8762,7 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 				checkNoDataOfAtom(a_pX, 0);
 			}
 		}else{
-			a_pX->isElectronCapture = 1;
+			a_pX->emissionType[0] = EMISSION_IS_ELECTRO_NEUTRINO;
 			a_pX->newAtomicNumber[0] = a_pX->targetIsotopePropertyPtr->atomicNumber - 1;
 			a_pX->newMassNumber[0] = a_pX->targetIsotopePropertyPtr->massNumber;
 			if(a_pX->newAtomicNumber[0] != ATOMICNUMBER_ELECTRON || a_pX->newMassNumber[0] != MASSNUMBER_ELECTRON){
@@ -8505,18 +8795,25 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 				fprintf(stderr, "FATAL:%s(%d):COLLIDE_ELECTRON:%d\n", __FUNCTION__, __LINE__, a_pX->collideType);
 			}
 		}
-	}else if(a_pX->collideType == COLLIDE_PROTON 
-	|| a_pX->collideType == COLLIDE_DEUTERIUM 
-	|| a_pX->collideType == COLLIDE_TRITIUM){
+	}else if(a_pX->collideType == COLLIDE_PROTON || a_pX->collideType == COLLIDE_PROTON_S
+	|| a_pX->collideType == COLLIDE_DEUTERIUM || a_pX->collideType == COLLIDE_DEUTERIUM_S
+	|| a_pX->collideType == COLLIDE_TRITIUM || a_pX->collideType == COLLIDE_TRITIUM_S
+	|| a_pX->collideType == COLLIDE_ALPHA_S){
 		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
 			//fprintf(stderr, "DEBUG:%s:COLLIDE_PROTON... ATOMICNUMBER_ELECTRON\n", __FUNCTION__);
-			a_pX->isElectronCapture = 1;
+			a_pX->emissionType[0] = EMISSION_IS_ELECTRO_NEUTRINO;
 			a_pX->newAtomicNumber[0] = ATOMICNUMBER_NEUTRON;
 			switch(a_pX->collideType){
-				case COLLIDE_PROTON:    a_pX->newMassNumber[0] = MASSNUMBER_NEUTRON;    break;
-				case COLLIDE_DEUTERIUM: a_pX->newMassNumber[0] = MASSNUMBER_DINEUTRON;  break;
-				case COLLIDE_TRITIUM:   a_pX->newMassNumber[0] = MASSNUMBER_TRINEUTRON; break;
+				case COLLIDE_PROTON:
+				case COLLIDE_PROTON_S:    a_pX->newMassNumber[0] = MASSNUMBER_NEUTRON;    break;
+				case COLLIDE_DEUTERIUM:
+				case COLLIDE_DEUTERIUM_S: a_pX->newMassNumber[0] = MASSNUMBER_DINEUTRON;  break;
+				case COLLIDE_TRITIUM:
+				case COLLIDE_TRITIUM_S:   a_pX->newMassNumber[0] = MASSNUMBER_TRINEUTRON; break;
+				case COLLIDE_ALPHA_S:
+					a_pX->newAtomicNumber[0] = MASSNUMBER_HYDROGEN;
+					a_pX->newMassNumber[0] = 4; break;
 			}
 			a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
 			if(a_pX->newIsotopePropertyPtr[0]){
@@ -8540,12 +8837,12 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 			}
 		}else{
 			//fprintf(stderr, "DEBUG:%s:COLLIDE_PROTON... other\n", __FUNCTION__);
-			a_pX->isElectronCapture = 0;
 			if(a_pX->collideType == COLLIDE_DEUTERIUM
 			&& a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_DEUTERIUM 
 			&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_DEUTERIUM){
 				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
 				a_pX->newCount = 3;
+				a_pX->emissionType[0] = EMISSION_IS_PROTON;
 				a_pX->newAtomicNumber[0] = ATOMICNUMBER_TRITIUM;
 				a_pX->newMassNumber[0] = MASSNUMBER_TRITIUM;
 				a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
@@ -8570,6 +8867,7 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 				}
 
 				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+				a_pX->emissionType[1] = EMISSION_IS_NEUTRON;
 				a_pX->newAtomicNumber[1] = ATOMICNUMBER_HELIUM;
 				a_pX->newMassNumber[1] = MASSNUMBER_HELIUM3;
 				a_pX->newIsotopePropertyPtr[1] = getIsotopePropertyPtr(a_pX->newAtomicNumber[1], a_pX->newMassNumber[1]);
@@ -8595,6 +8893,7 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 				}
 
 				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
+				a_pX->emissionType[2] = EMISSION_IS_GAMMA;
 				a_pX->newAtomicNumber[2] = ATOMICNUMBER_HELIUM;
 				a_pX->newMassNumber[2] = MASSNUMBER_HELIUM;
 				a_pX->newIsotopePropertyPtr[2] = getIsotopePropertyPtr(a_pX->newAtomicNumber[2], a_pX->newMassNumber[2]);
@@ -8618,6 +8917,7 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 				}
 				//fprintf(stderr, "DEBUG:%s(%d):D + D\n", __FUNCTION__, __LINE__);
 			}else{
+				a_pX->emissionType[0] = EMISSION_IS_GAMMA;
 				a_pX->newAtomicNumber[0] = a_pX->targetIsotopePropertyPtr->atomicNumber + a_pX->bulletPropertyPtr->atomicNumber;
 				a_pX->newMassNumber[0] = a_pX->targetIsotopePropertyPtr->massNumber + a_pX->bulletPropertyPtr->massNumber;
 				a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
@@ -8665,7 +8965,7 @@ extern void getCollidedNewIsotopePropertyPtr(struct collide * a_pX)
 			}
 		}
 	}else if(a_pX->collideType == COLLIDE_NEUTRON){ 
-		a_pX->isElectronCapture = 0;
+		a_pX->emissionType[0] = EMISSION_IS_GAMMA;
 		a_pX->newAtomicNumber[0] = a_pX->targetIsotopePropertyPtr->atomicNumber + a_pX->bulletPropertyPtr->atomicNumber;
 		a_pX->newMassNumber[0] = a_pX->targetIsotopePropertyPtr->massNumber + a_pX->bulletPropertyPtr->massNumber;
 		a_pX->newIsotopePropertyPtr[0] = getIsotopePropertyPtr(a_pX->newAtomicNumber[0], a_pX->newMassNumber[0]);
@@ -8709,7 +9009,7 @@ extern double getCrossSection(struct collide * a_pX)
 {
 	double relativeR;
 	double CrossSection;
-	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_C){
+	if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_S){
 		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
 			// U = - (Z * e^2) / (4 * π * ε0 * r)
@@ -8729,9 +9029,10 @@ extern double getCrossSection(struct collide * a_pX)
 			}
 			CrossSection = relativeR * relativeR * a_pX->targetIsotopePropertyPtr->atomicNumber * 2 * a_pX->targetAtomMol;
 		}
-	}else if(a_pX->collideType == COLLIDE_PROTON 
-	|| a_pX->collideType == COLLIDE_DEUTERIUM 
-	|| a_pX->collideType == COLLIDE_TRITIUM){
+	}else if(a_pX->collideType == COLLIDE_PROTON || a_pX->collideType == COLLIDE_PROTON_S
+	|| a_pX->collideType == COLLIDE_DEUTERIUM || a_pX->collideType == COLLIDE_DEUTERIUM_S
+	|| a_pX->collideType == COLLIDE_TRITIUM || a_pX->collideType == COLLIDE_TRITIUM_S
+	|| a_pX->collideType == COLLIDE_ALPHA_S){
 		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
 			if(e_usebulletCrossSection){
@@ -8741,12 +9042,41 @@ extern double getCrossSection(struct collide * a_pX)
 			}
 			CrossSection = relativeR * relativeR * a_pX->bulletPropertyPtr->atomicNumber * 2 * a_pX->targetAtomMol;
 		}else{
-			if(e_usebulletCrossSection){
-				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+			if(a_pX->appliedVoltageMeV >= a_pX->electroPotentialMeV){
+				if(e_usebulletCrossSection){
+					relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+				}else{
+					relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+				}
+				CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
 			}else{
-				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+				// U = - (Z * e^2) / (4 * π * ε0 * r)
+				// r = - (Z * e^2) / (4 * π * ε0 * U)
+				// Z = Zbullet * Ztarget, U [J] = U' [MeV] * 1.0e6 * 1.60217662E-19 [J/eV]
+				
+				//I think that the radius of electrons is treated larger up to the Coulomb Barrier in the case of collision between an electron and an electron.
+
+				if(e_usebulletCrossSection){
+					relativeR = a_pX->bulletPropertyPtr->atomicNumber * a_pX->targetIsotopePropertyPtr->atomicNumber * e_coefElectroPotentialMeV / (a_pX->appliedVoltageMeV * e_r0) + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+				}else{
+					relativeR = a_pX->bulletPropertyPtr->atomicNumber * a_pX->targetIsotopePropertyPtr->atomicNumber * e_coefElectroPotentialMeV / (a_pX->appliedVoltageMeV * e_r0);
+				}
+				CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
+				{//DEBUG
+					double relativeR2;
+					double CrossSection2;
+					if(e_usebulletCrossSection){
+						relativeR2 = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+					}else{
+						relativeR2 = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+					}
+					CrossSection2 = relativeR * relativeR * a_pX->targetAtomMol;
+					if(CrossSection < CrossSection2){
+						fprintf(stderr, "FATAL:DEBUG:%s(%d):CrossSection:%lg < CrossSection2:%lg relativeR:%lg relativeR2:%lg\n", __FUNCTION__, __LINE__, CrossSection, CrossSection2, relativeR, relativeR2);
+						exit(1);
+					}
+				}//DEBUG
 			}
-			CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
 		}
 	}else{//COLLIDE_NEUTRON
 		if(e_usebulletCrossSection){
@@ -8778,16 +9108,17 @@ extern int iterateCrossSection(void * a_total, struct objectNodeConst * a_nodePt
 	if(checkCollidingUsage(pX)){
 		getCollidedNewIsotopePropertyPtr(pX);
 		if(pX->newIsotopePropertyPtr[0]){
-			if(pX->collideType == COLLIDE_ELECTRON || pX->collideType == COLLIDE_ELECTRON_C){
+			if(pX->collideType == COLLIDE_ELECTRON || pX->collideType == COLLIDE_ELECTRON_S){
 				if(pX->massDefectMeV[0] > 0.0){
 					sumTotalCollideCrossSection(pX);
 				}
 				//if(pX->collideType == COLLIDE_ELECTRON){
 				//	fprintf(stderr, "DEBUG:%s(%d):%p ELECTRON+target:%s new:%s massDefectMeV[0]:%lg totalCollideCrossSection:%lg\n", __FUNCTION__, __LINE__, pX, pX->targetIsotopePropertyPtr->symbol, pX->newIsotopePropertyPtr[0]->symbol, pX->massDefectMeV[0], pX->totalCollideCrossSection);
 				//}
-			}else if(pX->collideType == COLLIDE_PROTON 
-			|| pX->collideType == COLLIDE_DEUTERIUM 
-			|| pX->collideType == COLLIDE_TRITIUM){
+			}else if(pX->collideType == COLLIDE_PROTON || pX->collideType == COLLIDE_PROTON_S
+			|| pX->collideType == COLLIDE_DEUTERIUM || pX->collideType == COLLIDE_DEUTERIUM_S
+			|| pX->collideType == COLLIDE_TRITIUM || pX->collideType == COLLIDE_TRITIUM_S
+			|| pX->collideType == COLLIDE_ALPHA_S){
 				sumTotalCollideCrossSection(pX);
 			}else{//COLLIDE_NEUTRON
 				if(pX->massDefectMeV[0] > 0.0){
@@ -8812,12 +9143,44 @@ extern double calcCollideCrossSectionRate(struct collide * a_pX)
 	}
 	return collideCrossSectionRate;
 }
-
+extern int calcTargetAtomMolAndNewIsotopeMol(struct collide * a_pX, int a_registNuclearReaction)
+{
+	int iRet = 0;
+	a_pX->targetAtomMol = getMol(a_pX->targetAtomValuePtr);
+	if(a_pX->targetAtomMol >= a_pX->electrodePtr->detectLimitMolForIsotope){
+		double collideCrossSectionRate = calcCollideCrossSectionRate(a_pX);
+		a_pX->newIsotopeMol = a_pX->collideBulletMol * collideCrossSectionRate;
+		if(a_pX->newIsotopeMol < 0.0){
+			a_pX->newIsotopeMol = 0.0;//collect tolelance.
+		}
+		if(a_pX->newIsotopeMol > a_pX->targetAtomMol){
+			//if(a_pX->newIsotopeMol > a_pX->targetAtomMol * 8.0){
+			//	fprintf(e_logFp, "WARN:%s(%d):%s newIsotope %s Mol:%lg > targetAtom %s mol:%lg\n",
+			//		__FUNCTION__, __LINE__, getCollideName(a_pX->collideType), 
+			//		a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopeMol, 
+			//		a_pX->targetIsotopePropertyPtr->symbol, a_pX->targetAtomMol);
+			//}
+			//if(a_pX->newIsotopeMol > a_pX->targetAtomMol * 4.0){
+			//	fprintf(stderr, "WARN:%s(%d):%s newIsotope %s Mol:%lg > targetAtom %s mol:%lg\n",
+			//		__FUNCTION__, __LINE__, getCollideName(a_pX->collideType), 
+			//		a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopeMol, 
+			//		a_pX->targetIsotopePropertyPtr->symbol, a_pX->targetAtomMol);
+			//}
+			a_pX->newIsotopeMol = a_pX->targetAtomMol;
+		}
+		iRet = 1;
+	}else{
+		if(a_registNuclearReaction){
+			registNuclearReaction(a_pX->electrodePtr, REACTION_CANT_DETECT, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], a_pX->targetAtomMol, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
+		}
+	}
+	return 	iRet;
+}
 extern double collideParticleAtom(struct collide * a_pX)
 {
 	//The collision of a particle like an electron, a proton, a deterium or a tritium, it may have kinetic energy,  it will be absorbed by neuclaus.
 	int i;
-	double collidedMol = 0.0, collideCrossSectionRate;
+	double collidedMol = 0.0;
 	//if(a_pX->collideType == COLLIDE_ELECTRON){
 	//	fprintf(stderr, "DEBUG:%s:{BEGIN %s\n", __FUNCTION__, a_pX->targetIsotopePropertyPtr->symbol);
 	//}
@@ -8826,42 +9189,29 @@ extern double collideParticleAtom(struct collide * a_pX)
 		if(a_pX->newIsotopePropertyPtr[0]){
 			if(a_pX->appliedVoltageMeV >= a_pX->electroPotentialMeV){
 				if(a_pX->massDefectMeV[0] > 0.0){
-					a_pX->targetAtomMol = getMol(a_pX->targetAtomValuePtr);
-					if(a_pX->targetAtomMol >= a_pX->electrodePtr->detectLimitMolForIsotope){
-						collideCrossSectionRate = calcCollideCrossSectionRate(a_pX);
-						a_pX->newIsotopeMol = a_pX->collideBulletMol * collideCrossSectionRate;
-						if(a_pX->newIsotopeMol < 0.0){
-							a_pX->newIsotopeMol = 0.0;//collect tolelance.
-						}
-						if(a_pX->newIsotopeMol > a_pX->targetAtomMol){
-							if(a_pX->newIsotopeMol > a_pX->targetAtomMol * 8.0){
-								fprintf(e_logFp, "WARN:%s(%d):%s newIsotope %s Mol:%lg > targetAtom %s mol:%lg\n",
-									__FUNCTION__, __LINE__, getCollideName(a_pX->collideType), 
-									a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopeMol, 
-									a_pX->targetIsotopePropertyPtr->symbol, a_pX->targetAtomMol);
-							}
-							if(a_pX->newIsotopeMol > a_pX->targetAtomMol * 4.0){
-								fprintf(stderr, "WARN:%s(%d):%s newIsotope %s Mol:%lg > targetAtom %s mol:%lg\n",
-									__FUNCTION__, __LINE__, getCollideName(a_pX->collideType), 
-									a_pX->newIsotopePropertyPtr[0]->symbol, a_pX->newIsotopeMol, 
-									a_pX->targetIsotopePropertyPtr->symbol, a_pX->targetAtomMol);
-							}
-							a_pX->newIsotopeMol = a_pX->targetAtomMol;
-						}
+					if(calcTargetAtomMolAndNewIsotopeMol(a_pX, 1)){
 						for(i = 0; i < a_pX->newCount; ++i){
 							double newIsotopeMolRate = a_pX->newIsotopeMol * a_pX->rate[i];
-							//if(a_pX->collideType == COLLIDE_ELECTRON){
-								//fprintf(stderr, "DEBUG:%s(%d):%s collideCrossSectionRate:%lg (i:%d/newCount:%d) newIsotopeMol:%lg, rate:%lg, newIsotopeMolRate:%lg detectLimitMolForIsotope:%lg\n", __FUNCTION__, __LINE__, a_pX->newIsotopePropertyPtr[0]->symbol, collideCrossSectionRate, i, a_pX->newCount, a_pX->newIsotopeMol, a_pX->rate[i], newIsotopeMolRate, a_pX->electrodePtr->detectLimitMolForIsotope);
+							//if(a_pX->collideType == COLLIDE_ELECTRON){//DEBUG
+								//fprintf(stderr, "DEBUG:%s(%d):%s (i:%d/newCount:%d) newIsotopeMol:%lg, rate:%lg, newIsotopeMolRate:%lg detectLimitMolForIsotope:%lg\n", __FUNCTION__, __LINE__, a_pX->newIsotopePropertyPtr[0]->symbol, i, a_pX->newCount, a_pX->newIsotopeMol, a_pX->rate[i], newIsotopeMolRate, a_pX->electrodePtr->detectLimitMolForIsotope);
 							//}
 							if(newIsotopeMolRate >= a_pX->electrodePtr->detectLimitMolForIsotope){
-								if(a_pX->isElectronCapture == 2){//collision between two electrons
-									registOutput(a_pX->electrodePtr, SCAT_IMPERFECT, a_pX->massDefectMeV[i], newIsotopeMolRate);
+								if(a_pX->emissionType[i] == EMISSION_IS_2_ELECTRONS){
+									fprintf(stderr, "FATAL:%s(%d):a_pX->collideType:%s EMISSION_IS_2_ELECTRONS i:%d\n", __FUNCTION__, __LINE__, getCollideName(a_pX->collideType), i);
+									exit(1);
 								}else{
 									registNuclearReaction(a_pX->electrodePtr, REACTION_DETECT, a_pX->collideType, a_pX->nuclearReactionStr[i], a_pX->massDefectMeV[i], newIsotopeMolRate, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
-									if(a_pX->isElectronCapture == 1){
+									if(a_pX->emissionType[i] == EMISSION_IS_GAMMA){
+										registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, a_pX->massDefectMeV[i], newIsotopeMolRate);
+									}else if(a_pX->emissionType[i] == EMISSION_IS_ELECTRO_NEUTRINO){
 										registOutputOfElectronCapture(a_pX->electrodePtr, a_pX->massDefectMeV[i], newIsotopeMolRate);
+									}else if(a_pX->emissionType[i] == EMISSION_IS_PROTON){
+										registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, a_pX->massDefectMeV[i], newIsotopeMolRate);
+									}else if(a_pX->emissionType[i] == EMISSION_IS_NEUTRON){
+										registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_NEUTRON, a_pX->massDefectMeV[i], newIsotopeMolRate);
 									}else{
-										registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, a_pX->massDefectMeV[i], newIsotopeMolRate);
+										fprintf(stderr, "FATAL:%s(%d):invalid emissionType:%d\n", __FUNCTION__, __LINE__, a_pX->emissionType[i]);
+										exit(1);
 									}
 									collidedMol += newIsotopeMolRate;
 									setMolSub(a_pX->targetAtomValuePtr, newIsotopeMolRate);
@@ -8887,14 +9237,49 @@ extern double collideParticleAtom(struct collide * a_pX)
 								;//Do nothing!
 							}
 						}
-					}else{
-						registNuclearReaction(a_pX->electrodePtr, REACTION_CANT_DETECT, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], a_pX->targetAtomMol, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
 					}
 				}else{
 					registNuclearReaction(a_pX->electrodePtr, REACTION_ENDOTHERMIC, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
 				}
 			}else{
-				registNuclearReaction(a_pX->electrodePtr, REACTION_COULOMB_BARRIER, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
+				if(calcTargetAtomMolAndNewIsotopeMol(a_pX, 0)){
+					if(a_pX->emissionType[0] == EMISSION_IS_2_ELECTRONS){
+						//The bullet electrons lost the half of energy and pass it to target electrons.
+						registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_BETA, a_pX->appliedVoltageMeV * 0.5, a_pX->newIsotopeMol * 2.0);
+						collidedMol += a_pX->newIsotopeMol;
+					}else{
+						int sumMassNumber = a_pX->bulletPropertyPtr->massNumber + a_pX->targetIsotopePropertyPtr->massNumber;
+						if(sumMassNumber > 0){
+							if(a_pX->collideType == COLLIDE_ELECTRON || a_pX->collideType == COLLIDE_ELECTRON_S){
+								fprintf(stderr, "FATAL:%s(%d):a_pX->collideType:%s\n", __FUNCTION__, __LINE__, getCollideName(a_pX->collideType));
+								exit(1);
+							}else if(a_pX->collideType == COLLIDE_PROTON || a_pX->collideType == COLLIDE_PROTON_S){
+								registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, a_pX->appliedVoltageMeV * a_pX->targetIsotopePropertyPtr->massNumber / sumMassNumber, a_pX->newIsotopeMol);
+								registOutput(a_pX->electrodePtr, SCAT_NOT_COLLIDE, MASS_DEFECT_BY_GANMMA, a_pX->appliedVoltageMeV * a_pX->bulletPropertyPtr->massNumber / sumMassNumber, a_pX->newIsotopeMol);
+								collidedMol += a_pX->newIsotopeMol;
+							}else if(a_pX->collideType == COLLIDE_DEUTERIUM || a_pX->collideType == COLLIDE_DEUTERIUM_S){
+								registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_DEUTERIUM, a_pX->appliedVoltageMeV * a_pX->targetIsotopePropertyPtr->massNumber / sumMassNumber, a_pX->newIsotopeMol);
+								registOutput(a_pX->electrodePtr, SCAT_NOT_COLLIDE, MASS_DEFECT_BY_GANMMA, a_pX->appliedVoltageMeV * a_pX->bulletPropertyPtr->massNumber / sumMassNumber, a_pX->newIsotopeMol);
+								collidedMol += a_pX->newIsotopeMol;
+							}else if(a_pX->collideType == COLLIDE_TRITIUM || a_pX->collideType == COLLIDE_TRITIUM_S){
+								registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_TRITIUM, a_pX->appliedVoltageMeV * a_pX->targetIsotopePropertyPtr->massNumber / sumMassNumber, a_pX->newIsotopeMol);
+								registOutput(a_pX->electrodePtr, SCAT_NOT_COLLIDE, MASS_DEFECT_BY_GANMMA, a_pX->appliedVoltageMeV * a_pX->bulletPropertyPtr->massNumber / sumMassNumber, a_pX->newIsotopeMol);
+								collidedMol += a_pX->newIsotopeMol;
+							}else if(a_pX->collideType == COLLIDE_ALPHA_S){
+								registOutput(a_pX->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_ALPHA, a_pX->appliedVoltageMeV * a_pX->targetIsotopePropertyPtr->massNumber / sumMassNumber, a_pX->newIsotopeMol);
+								registOutput(a_pX->electrodePtr, SCAT_NOT_COLLIDE, MASS_DEFECT_BY_GANMMA, a_pX->appliedVoltageMeV * a_pX->bulletPropertyPtr->massNumber / sumMassNumber, a_pX->newIsotopeMol);
+								collidedMol += a_pX->newIsotopeMol;
+							}else if(a_pX->collideType == COLLIDE_NEUTRON){
+								fprintf(stderr, "FATAL:%s(%d):a_pX->collideType:%s\n", __FUNCTION__, __LINE__, getCollideName(a_pX->collideType));
+								exit(1);
+							}
+							registNuclearReaction(a_pX->electrodePtr, REACTION_COULOMB_BARRIER, a_pX->collideType, a_pX->nuclearReactionStr[0], a_pX->massDefectMeV[0], 0.0, a_pX->appliedVoltageMeV, a_pX->electroPotentialMeV);
+						}else{
+							fprintf(stderr, "FATAL:%s(%d):sumMassNumber:%d\n", __FUNCTION__, __LINE__, sumMassNumber);
+							exit(1);
+						}
+					}
+				}
 			}
 		}else{
 			if(a_pX->nuclearReactionStr[0][0]){
@@ -8921,7 +9306,7 @@ extern int iterateCollide(void * a_total, struct objectNodeConst * a_nodePtr)
 }
 //int e_inComptonEffect = 0;//DEBUG
 //int e_cntCollideBulletToElectrode = 0;//DEBUG
-extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_collideType, double a_appliedVoltageMeV, double a_arriveBulletMol, double a_collideBulletRate, struct atomNodeConst * a_decreaseBulletPtr)
+extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_collideType, double a_appliedVoltageMeV, double a_arriveBulletMol, double a_collideBulletRate, struct atomNodeConst * a_decreaseBulletPtr, int a_nest)
 {
 	struct collide col;
 	//fprintf(stderr, "DEBUG:%s:{BEGIN a_collideType:%s a_appliedVoltageMeV:%lg a_arriveBulletMol:%lg a_collideBulletRate:%lg\n", __FUNCTION__, getCollideName(a_collideType), a_appliedVoltageMeV, a_arriveBulletMol, a_collideBulletRate);
@@ -8934,16 +9319,21 @@ extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_co
 	//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
 	switch(col.collideType){
 		case COLLIDE_ELECTRON:
-		case COLLIDE_ELECTRON_C: col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_ELECTRON, MASSNUMBER_ELECTRON); break;
-		case COLLIDE_PROTON:    col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN); break;
-		case COLLIDE_DEUTERIUM: col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_DEUTERIUM, MASSNUMBER_DEUTERIUM);  break;
-		case COLLIDE_TRITIUM:   col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_TRITIUM, MASSNUMBER_TRITIUM); break;
-		case COLLIDE_NEUTRON:   col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON);
+		case COLLIDE_ELECTRON_S:  col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_ELECTRON, MASSNUMBER_ELECTRON); break;
+		case COLLIDE_PROTON:
+		case COLLIDE_PROTON_S:    col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN); break;
+		case COLLIDE_DEUTERIUM:
+		case COLLIDE_DEUTERIUM_S: col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_DEUTERIUM, MASSNUMBER_DEUTERIUM);  break;
+		case COLLIDE_TRITIUM:
+		case COLLIDE_TRITIUM_S:   col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_TRITIUM, MASSNUMBER_TRITIUM); break;
+		case COLLIDE_ALPHA_S:     col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_HELIUM, MASSNUMBER_HELIUM); break;
+		case COLLIDE_NEUTRON:	  col.bulletPropertyPtr = getIsotopePropertyPtr(ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON); break;
+	}
+	if(col.collideType == COLLIDE_NEUTRON){
 		if(a_appliedVoltageMeV != 0.0){
 			fprintf(stderr, "FATAL ERROR:%s:%s a_appliedVoltageMeV:%lg!= 0.0\n", __FUNCTION__, getCollideName(col.collideType), a_appliedVoltageMeV);
 			exit(1);
 		}
-		break;
 	}
 	//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
 	col.appliedVoltageMeV = a_appliedVoltageMeV;
@@ -9000,21 +9390,30 @@ extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_co
 	if(col.remainBulletMol < 0.0){
 		col.remainBulletMol = 0.0;//collect tolelance.
 	}
+	if(col.remainBulletMol > col.electrodePtr->detectLimitMolForIsotope){
+		if(a_nest < 8){
+			collideBulletToElectrode(a_electrodePtr, a_collideType, a_appliedVoltageMeV, col.remainBulletMol, a_collideBulletRate, a_decreaseBulletPtr, a_nest + 1);
+			col.remainBulletMol = 0.0;
+		}else{
+			fprintf(stderr, "WARN:%s(%d):a_nest:%d reached to the limit at remainBulletMol:%lg a_collideType:%s\n", __FUNCTION__, __LINE__, a_nest, col.remainBulletMol, getCollideName(a_collideType));
+		}
+	}
 	col.imperfectCollideMol += col.remainBulletMol;
 	//fprintf(stderr, "DEBUG:%s:col.imperfectCollideMol:%lg\n", __FUNCTION__, col.imperfectCollideMol);
 	if(col.imperfectCollideMol > 0.0){
 		if(col.appliedVoltageMeV > 0.0){
-			registOutput(col.electrodePtr, SCAT_IMPERFECT, col.appliedVoltageMeV, col.imperfectCollideMol);
-			//fprintf(stderr, "DEBUG:%s:appliedVoltageMeV:%lg imperfectCollideMol:%lg remainBulletMol:%lg collideBulletMol:%lg collidedBulletMol:%lg\n", __FUNCTION__, col.appliedVoltageMeV, col.imperfectCollideMol, col.remainBulletMol, col.collideBulletMol, col.collidedBulletMol);
+			registOutput(col.electrodePtr, SCAT_IMPERFECT, MASS_DEFECT_BY_GANMMA, col.appliedVoltageMeV, col.imperfectCollideMol);
 		}
-		if(col.collideType == COLLIDE_ELECTRON || col.collideType == COLLIDE_ELECTRON_C){
-			;//The electrons flew from the negative electrode to the positive electorode. But the electric circuit rotate electrons from the positive electrode to the negative electorode. So the amount of electrons is always same.
-		}else if(col.collideType == COLLIDE_PROTON || col.collideType == COLLIDE_DEUTERIUM || col.collideType == COLLIDE_TRITIUM){
+		if(col.collideType == COLLIDE_PROTON || col.collideType == COLLIDE_DEUTERIUM || col.collideType == COLLIDE_TRITIUM){
 			//When the protons, deuteriums and tritiums flew from the positive electrode to the negative electorode with huge energy greater than the energy of beta decay, some of them collide imperfectly, so they will change from neurcuses to atoms.
 			//We need to append the isotopes of hydrogen onto the negative electorode.
 			increaseAtom(col.electrodePtr, col.bulletPropertyPtr->atomicNumber, col.bulletPropertyPtr->massNumber, col.imperfectCollideMol);
+		}else if(col.collideType == COLLIDE_ELECTRON){
+			;//The electrons flew from the negative electrode to the positive electorode. But the electric circuit rotate electrons from the positive electrode to the negative electorode. So the amount of electrons is always same.
 		}else  if(col.collideType == COLLIDE_NEUTRON){
 			;//The neutrons do not fly from a electrode to another electrodes, because they do not have any electoric charge.
+		}else if(col.collideType == COLLIDE_PROTON_S || col.collideType == COLLIDE_DEUTERIUM_S || col.collideType == COLLIDE_TRITIUM_S || col.collideType == COLLIDE_ALPHA_S || col.collideType == COLLIDE_ELECTRON_S){
+			;//The sacttering particles are in the electrode, they do not fly from a electrode to another electrodes.
 		}
 	}
 	//fprintf(stderr, "DEBUG:%s:}END\n", __FUNCTION__);
@@ -9068,7 +9467,7 @@ extern void generateNeutronInSpace(double a_pastSecond, int a_DeuteriumMassnumbe
 			col.imperfectCollideMol += col.remainBulletMol;
 			if(col.imperfectCollideMol > 0.0){
 				if(col.appliedVoltageMeV > 0.0){
-					registOutput(col.electrodePtr, SCAT_IMPERFECT_IN_SPACE, col.appliedVoltageMeV, col.imperfectCollideMol);
+					registOutput(col.electrodePtr, SCAT_IMPERFECT_IN_SPACE, MASS_DEFECT_BY_GANMMA, col.appliedVoltageMeV, col.imperfectCollideMol);
 				}
 			}
 		}
@@ -9178,7 +9577,8 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_HELIUM, MASSNUMBER_HELIUM, partialMol);
 								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + 						e_helium4Ptr->massMeV - a_isotopePropertyPtr->massMeV) * partialMol;
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, massDefectMeV * (1.0 - e_rateForAlphaParticle), partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_ALPHA, massDefectMeV * e_rateForAlphaParticle, partialMol);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
@@ -9291,17 +9691,26 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_ELECTRON, MASSNUMBER_ELECTRON, - partialMol);
 								if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_PLUS_PROTON){
 									increaseAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN, partialMol);
+									
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfBetaPlusWithPositron(a_electrodePtr, massDefectMeV * (1.0 - e_rateForProtonAtBetaPlus), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, massDefectMeV * e_rateForProtonAtBetaPlus, partialMol);
 								}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_PLUS_2PROTON){
 									increaseAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN, partialMol * 2.0);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfBetaPlusWithPositron(a_electrodePtr, massDefectMeV * (1.0 - e_rateFor2ProtonAtBetaPlus), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, massDefectMeV * e_rateFor2ProtonAtBetaPlus * 0.5 , partialMol * 2.0);
 								}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_PLUS_3PROTON){
 									increaseAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN, partialMol * 3.0);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfBetaPlusWithPositron(a_electrodePtr, massDefectMeV * (1.0 - e_rateFor3ProtonAtBetaPlus), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, massDefectMeV * e_rateFor3ProtonAtBetaPlus / 3.0, partialMol * 3.0);
 								}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_PLUS_ALPHA){
 									increaseAtom(a_electrodePtr, ATOMICNUMBER_HELIUM, MASSNUMBER_HELIUM, partialMol);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfBetaPlusWithPositron(a_electrodePtr, massDefectMeV * (1.0 - e_rateForAlphaParticleAtBetaPlus), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_ALPHA, massDefectMeV * e_rateForAlphaParticleAtBetaPlus, partialMol);
 								}
-								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
-								//The mass defect is devided into Beta Plus and Protons, But the rate is fixed just half.
-								registOutputOfBetaPlusWithPositron(a_electrodePtr, massDefectMeV * 0.5, partialMol);
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV * 0.5, partialMol);
 							}else if((massDefectMeV = a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + zMeV)) > 0.0){
 								//The electron capture and proton emition
 								//The Nuclear Reaction is : X+ + e- -> Y + νe + (p+ + e-)
@@ -9328,18 +9737,26 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								if(decayMode == DECAY_MODE_ELECTRON_CAPTURE_PROTON
 								|| decayMode == DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_PROTON){
 									increaseAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN, partialMol);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfElectronCapture(a_electrodePtr, massDefectMeV * (1.0 - e_rateForProtonAtEC), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, massDefectMeV * e_rateForProtonAtEC, partialMol);
 								}else if(decayMode == DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_2PROTON){
 									increaseAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN, partialMol * 2.0);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfElectronCapture(a_electrodePtr, massDefectMeV * (1.0 - e_rateFor2ProtonAtEC), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, massDefectMeV * e_rateFor2ProtonAtEC * 0.5, partialMol * 2.0);
 								}else if(decayMode == DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_3PROTON){
 									increaseAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN, partialMol * 3.0);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfElectronCapture(a_electrodePtr, massDefectMeV * (1.0 - e_rateFor3ProtonAtEC), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, massDefectMeV * e_rateFor3ProtonAtEC / 3.0, partialMol * 3.0);
 								}else if(decayMode == DECAY_MODE_ELECTRON_CAPTURE_ALPHA
 								|| decayMode == DECAY_MODE_ELECTRON_CAPTURE_DEGRADE_ALPHA){
 									increaseAtom(a_electrodePtr, ATOMICNUMBER_HELIUM, MASSNUMBER_HELIUM, partialMol);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfElectronCapture(a_electrodePtr, massDefectMeV * (1.0 - e_rateForAlphaParticleAtEC), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_ALPHA, massDefectMeV * e_rateForAlphaParticleAtEC, partialMol);
 								}
-								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + zMeV - a_isotopePropertyPtr->massMeV) * partialMol;
-								//The mass defect is devided into Electron Capture and Protons, But the rate is fixed just half.
-								registOutputOfElectronCapture(a_electrodePtr, massDefectMeV * 0.5, partialMol);
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV * 0.5, partialMol);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
@@ -9490,22 +9907,22 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 						}else{
 							showErrorOfUndefinedDaughter = 1;
 						}
-					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_NEWTRON
-					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_2NEWTRON
-					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_3NEWTRON
-					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_4NEWTRON
+					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_NEUTRON
+					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_2NEUTRON
+					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_3NEUTRON
+					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_4NEUTRON
 					){
-						int newtronCnt;
-						char * newtronTxtPtr;
+						int neutronCnt;
+						char * neutronTxtPtr;
 						char * scalePtr;
 						switch(a_isotopePropertyPtr->decayMode[i]){
-							case DECAY_MODE_BETA_MINUS_AND_NEWTRON: newtronCnt = 1; newtronTxtPtr = "n"; scalePtr = ""; break;
-							case DECAY_MODE_BETA_MINUS_AND_2NEWTRON: newtronCnt = 2; newtronTxtPtr = "n2"; scalePtr = " * 2"; break;
-							case DECAY_MODE_BETA_MINUS_AND_3NEWTRON: newtronCnt = 3; newtronTxtPtr = "n3"; scalePtr = " * 3"; break;
-							case DECAY_MODE_BETA_MINUS_AND_4NEWTRON: newtronCnt = 4; newtronTxtPtr = "n4"; scalePtr = " * 4"; break;
+							case DECAY_MODE_BETA_MINUS_AND_NEUTRON: neutronCnt = 1; neutronTxtPtr = "n"; scalePtr = ""; break;
+							case DECAY_MODE_BETA_MINUS_AND_2NEUTRON: neutronCnt = 2; neutronTxtPtr = "n2"; scalePtr = " * 2"; break;
+							case DECAY_MODE_BETA_MINUS_AND_3NEUTRON: neutronCnt = 3; neutronTxtPtr = "n3"; scalePtr = " * 3"; break;
+							case DECAY_MODE_BETA_MINUS_AND_4NEUTRON: neutronCnt = 4; neutronTxtPtr = "n4"; scalePtr = " * 4"; break;
 						}
 						daughterAtomicNumber = a_isotopePropertyPtr->atomicNumber + 1;
-						daughterMassNumber = a_isotopePropertyPtr->massNumber - newtronCnt;
+						daughterMassNumber = a_isotopePropertyPtr->massNumber - neutronCnt;
 						daughterIsotopePropertyPtr = getIsotopePropertyPtr(daughterAtomicNumber, daughterMassNumber);
 						if(daughterIsotopePropertyPtr){
 							char * daughterSymbolPtr; 
@@ -9515,24 +9932,42 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								daughterSymbolPtr = daughterIsotopePropertyPtr->symbol;
 							}
 							double daughterIonMassMeV = daughterIsotopePropertyPtr->massMeV - e_massElectronMeV;
-							massDefectMeV = a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * newtronCnt);
+							massDefectMeV = a_isotopePropertyPtr->massMeV - (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * neutronCnt);
 							if(massDefectMeV > 0.0){
 								snprintf(nuclearReactionStr, REACTION_LEN,
 								"%s(%lg) -> %s+(%lg) + e-(%lg) + ~νe(0) + %s(%lg%s) + %lg[MeV/c^2]", 
 								a_isotopePropertyPtr->symbol, a_isotopePropertyPtr->massMeV,
 								daughterSymbolPtr, daughterIonMassMeV,
 								e_massElectronMeV,
-								newtronTxtPtr, e_massNeutronMeV, scalePtr,
+								neutronTxtPtr, e_massNeutronMeV, scalePtr,
 								massDefectMeV);
-								checkMassInNuclearReaction(a_isotopePropertyPtr->massMeV - (daughterIonMassMeV + e_massElectronMeV + e_massNeutronMeV * newtronCnt), massDefectMeV, nuclearReactionStr);
+								checkMassInNuclearReaction(a_isotopePropertyPtr->massMeV - (daughterIonMassMeV + e_massElectronMeV + e_massNeutronMeV * neutronCnt), massDefectMeV, nuclearReactionStr);
 								registNuclearReaction(a_electrodePtr, REACTION_DETECT, a_isotopePropertyPtr->decayMode[i], nuclearReactionStr, massDefectMeV, partialMol, 0.0, 0.0);
 								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_ELECTRON, MASSNUMBER_ELECTRON, partialMol);
 								//The mass defect is devided into Beta Minus and Neutrons, But the rate is fixed just half.
-								registOutputOfBetaMinus(a_electrodePtr, massDefectMeV * 0.5, partialMol);
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV * 0.5, partialMol);
-								increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, partialMol * newtronCnt);
-								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * newtronCnt - a_isotopePropertyPtr->massMeV) * partialMol;
+								if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_NEUTRON){
+									increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, partialMol);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * neutronCnt - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfBetaMinus(a_electrodePtr, massDefectMeV * (1.0 - e_rateForNeytonAtBetaMinus), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_NEUTRON, massDefectMeV * e_rateForNeytonAtBetaMinus, partialMol);
+									
+								}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_2NEUTRON){
+									increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, partialMol * neutronCnt);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * neutronCnt - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfBetaMinus(a_electrodePtr, massDefectMeV * (1.0 - e_rateFor2NeytonAtBetaMinus), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_NEUTRON, massDefectMeV * e_rateFor2NeytonAtBetaMinus / neutronCnt, partialMol * neutronCnt);
+								}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_3NEUTRON){
+									increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, partialMol * neutronCnt);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * neutronCnt - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfBetaMinus(a_electrodePtr, massDefectMeV * (1.0 - e_rateFor3NeytonAtBetaMinus), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_NEUTRON, massDefectMeV * e_rateFor3NeytonAtBetaMinus / neutronCnt, partialMol * neutronCnt);
+								}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_BETA_MINUS_AND_4NEUTRON){
+									increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, partialMol * neutronCnt);
+									//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV * neutronCnt - a_isotopePropertyPtr->massMeV) * partialMol;
+									registOutputOfBetaMinus(a_electrodePtr, massDefectMeV * (1.0 - e_rateFor4NeytonAtBetaMinus), partialMol);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_NEUTRON, massDefectMeV * e_rateFor4NeytonAtBetaMinus / neutronCnt, partialMol * neutronCnt);
+								}
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
@@ -9567,8 +10002,8 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_HELIUM, MASSNUMBER_HELIUM, partialMol);
 								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_helium4Ptr->massMeV - a_isotopePropertyPtr->massMeV) * partialMol;
 								//The mass defect is devided into Beta Minus and ALPHA, But the rate is fixed just half.
-								registOutputOfBetaMinus(a_electrodePtr, massDefectMeV * 0.5, partialMol);
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV * 0.5, partialMol);
+								registOutputOfBetaMinus(a_electrodePtr, massDefectMeV * (1.0 - e_rateForAlphaParticleAtBetaMinus), partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_ALPHA, massDefectMeV * e_rateForAlphaParticleAtBetaMinus, partialMol);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
@@ -9592,7 +10027,7 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN, partialMol);
 								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_hydrogenPtr->massMeV - a_isotopePropertyPtr->massMeV) * partialMol;
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, massDefectMeV, partialMol);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
@@ -9616,14 +10051,14 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_HYDROGEN, MASSNUMBER_HYDROGEN, partialMol * 2.0);
 								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_hydrogenPtr->massMeV * 2.0 - a_isotopePropertyPtr->massMeV) * partialMol;
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_PROTON, massDefectMeV * 0.5, partialMol * 2.0);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
 						}else{
 							showErrorOfUndefinedDaughter = 1;
 						}
-					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_NEWTRON_EMISSION){
+					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_NEUTRON_EMISSION){
 						daughterAtomicNumber = a_isotopePropertyPtr->atomicNumber;
 						daughterMassNumber = a_isotopePropertyPtr->massNumber - 1;
 						daughterIsotopePropertyPtr = getIsotopePropertyPtr(daughterAtomicNumber, daughterMassNumber);
@@ -9640,21 +10075,21 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, partialMol);
 								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV - a_isotopePropertyPtr->massMeV) * partialMol;
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_NEUTRON, massDefectMeV, partialMol);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
 						}else{
 							showErrorOfUndefinedDaughter = 1;
 						}
-					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_2NEWTRON_EMISSION
-					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_3NEWTRON_EMISSION
-					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_4NEWTRON_EMISSION){
+					}else if(a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_2NEUTRON_EMISSION
+					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_3NEUTRON_EMISSION
+					|| a_isotopePropertyPtr->decayMode[i] == DECAY_MODE_4NEUTRON_EMISSION){
 						int ncnt = 2;
 						switch(a_isotopePropertyPtr->decayMode[i]){
-						case DECAY_MODE_2NEWTRON_EMISSION: ncnt = 2; break;
-						case DECAY_MODE_3NEWTRON_EMISSION: ncnt = 3; break;
-						case DECAY_MODE_4NEWTRON_EMISSION: ncnt = 4; break;
+						case DECAY_MODE_2NEUTRON_EMISSION: ncnt = 2; break;
+						case DECAY_MODE_3NEUTRON_EMISSION: ncnt = 3; break;
+						case DECAY_MODE_4NEUTRON_EMISSION: ncnt = 4; break;
 						}
 						daughterAtomicNumber = a_isotopePropertyPtr->atomicNumber;
 						daughterMassNumber = a_isotopePropertyPtr->massNumber - ncnt;
@@ -9673,7 +10108,7 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_NEUTRON, MASSNUMBER_NEUTRON, partialMol * ncnt);
 								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_massNeutronMeV - a_isotopePropertyPtr->massMeV) * partialMol;
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_NEUTRON, massDefectMeV / ncnt, partialMol * ncnt);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
@@ -9697,7 +10132,7 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_CARBON, MASSNUMBER_CARBON14, partialMol);
 								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_C14Ptr->massMeV - a_isotopePropertyPtr->massMeV) * partialMol;
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, massDefectMeV, partialMol);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
@@ -9721,7 +10156,7 @@ extern void decayNeuclay(struct electrode * a_electrodePtr, const struct isotope
 								increaseAtom(a_electrodePtr, daughterAtomicNumber, daughterMassNumber, partialMol);
 								increaseAtom(a_electrodePtr, ATOMICNUMBER_Kr, MASSNUMBER_Kr80, partialMol);
 								//e_debugDecayMassDiff += (daughterIsotopePropertyPtr->massMeV + e_Kr80Ptr->massMeV - a_isotopePropertyPtr->massMeV) * partialMol;
-								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, massDefectMeV, partialMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, massDefectMeV, partialMol);
 							}else{
 								showErrorNegativeMassDefect = 1;
 							}
@@ -9782,7 +10217,7 @@ extern void absorbeOrDecayNeutronInElectrode(struct electrode * a_electrodePtr, 
 		decayNeuclay(a_electrodePtr, neutronPtr->key->isotopePropertyPtr, neutronPtr->vPtr, neutronPastSecond);
 		
 		neutronMol = getMol(neutronPtr->vPtr);//get mol of neutrons after decay.
-		collideBulletToElectrode(a_electrodePtr, COLLIDE_NEUTRON, neutronVoltageMeV, neutronMol, collideNeutronRate, neutronPtr);
+		collideBulletToElectrode(a_electrodePtr, COLLIDE_NEUTRON, neutronVoltageMeV, neutronMol, collideNeutronRate, neutronPtr, 1);
 	}
 	//fprintf(stderr, "DEBUG:%s:}END\n", __FUNCTION__);
 }
@@ -9792,7 +10227,7 @@ struct decayBase {
 	struct electrode * electrodePtr;
 	double pastSecond;
 };
-extern int iterateDecayWithoutNewtron(void * a_total, struct objectNodeConst * a_nodePtr)
+extern int iterateDecayWithoutNeutron(void * a_total, struct objectNodeConst * a_nodePtr)
 {
 	struct decayBase * pDb = (struct decayBase *)a_total;
 	const struct isotopeProperty * isotopePropertyPtr = ((const struct atomKey *)a_nodePtr->key)->isotopePropertyPtr;
@@ -9805,7 +10240,7 @@ extern int iterateDecayWithoutNewtron(void * a_total, struct objectNodeConst * a
 	return KEEP_NODE;
 }
 #endif
-extern void decayNeuclayWithoutNewtron(struct electrode * a_electrodePtr, double a_pastSecond)
+extern void decayNeuclayWithoutNeutron(struct electrode * a_electrodePtr, double a_pastSecond)
 {
 #if  KEEP_ATMIC_ORDER == 1
 	//fprintf(stderr, "DEBUG:%s:KEEP_ATMIC_ORDER == 1\n", __FUNCTION__);
@@ -9833,7 +10268,7 @@ extern void decayNeuclayWithoutNewtron(struct electrode * a_electrodePtr, double
 		Db.electrodePtr = a_electrodePtr;
 		Db.pastSecond = a_pastSecond;
 		//fprintf(stderr, "DEBUG:%s:iterateInHashTable\n", __FUNCTION__);
-		iterateInHashTable(&a_electrodePtr->atomHashTable, &Db, iterateDecayWithoutNewtron);
+		iterateInHashTable(&a_electrodePtr->atomHashTable, &Db, iterateDecayWithoutNeutron);
 	}
 #endif	
 }
@@ -9893,7 +10328,7 @@ extern void scatterPhoton(struct electrode * a_electrodePtr, double a_MeV, doubl
 		}
 	}
 	//The next if-statement should be checked out of this function. 
-	//if(a_MeV >= e_collideElectronMiniMeV && a_mol >= a_electrodePtr->detectLimitMolForIsotope * SCATTER_CNT && a_nest < 16)
+	//if(a_MeV >= e_collideMiniMeV && a_mol >= a_electrodePtr->detectLimitMolForIsotope * SCATTER_CNT && a_nest < 16)
 	{
 		//double debugCheck = 0.0, debugRate;
 		struct atomNodeConst * electronPtr;
@@ -9910,32 +10345,32 @@ extern void scatterPhoton(struct electrode * a_electrodePtr, double a_MeV, doubl
 			//	molDivideBy6);
 			if(scatteredElectronMeV >= e_appliedVoltageMeV){		
 				//fprintf(stderr, " LINE:%d{ \n", __LINE__);
-				collideBulletToElectrode(a_electrodePtr, COLLIDE_ELECTRON_C, scatteredElectronMeV, molDivideBy6, e_collideElectronRateOnElectrode, electronPtr);
+				collideBulletToElectrode(a_electrodePtr, COLLIDE_ELECTRON_S, scatteredElectronMeV, molDivideBy6, e_collideElectronRateOnElectrode, electronPtr, 1);
 				//fprintf(stderr, " LINE:%d} \n", __LINE__);
 				//debugCheck += (scatteredElectronMeV * molDivideBy6);
-			}else if(scatteredElectronMeV >= e_collideElectronMidiMeV){				
+			}else if(scatteredElectronMeV >= e_collideMidiMeV){				
 				//fprintf(stderr, " LINE:%d{ \n", __LINE__);
-				collideBulletToElectrode(a_electrodePtr, COLLIDE_ELECTRON_C, scatteredElectronMeV, molDivideBy6, e_collideElectronRateForMidiMeV, electronPtr);
+				collideBulletToElectrode(a_electrodePtr, COLLIDE_ELECTRON_S, scatteredElectronMeV, molDivideBy6, e_collideElectronRateForMidiMeV, electronPtr, 1);
 				electronPtr = findElectronInElectrode(a_electrodePtr);
 				//fprintf(stderr, " LINE:%d} \n", __LINE__);
 				//debugCheck += (scatteredElectronMeV * molDivideBy6);
-			}else if(scatteredElectronMeV >= e_collideElectronMiniMeV){				
+			}else if(scatteredElectronMeV >= e_collideMiniMeV){				
 				//fprintf(stderr, " LINE:%d{ \n", __LINE__);
-				collideBulletToElectrode(a_electrodePtr, COLLIDE_ELECTRON_C, scatteredElectronMeV, molDivideBy6, e_collideElectronRateForMiniMeV, electronPtr);
+				collideBulletToElectrode(a_electrodePtr, COLLIDE_ELECTRON_S, scatteredElectronMeV, molDivideBy6, e_collideElectronRateForMiniMeV, electronPtr, 1);
 				electronPtr = findElectronInElectrode(a_electrodePtr);
 				//fprintf(stderr, " LINE:%d} \n", __LINE__);
 				//debugCheck += (scatteredElectronMeV * molDivideBy6);
 			}else if(scatteredElectronMeV > 0.0){
 				//fprintf(stderr, " LINE:%d{ registOutput SCAT_SMALL_BY_COMPTON_E call\n", __LINE__);
-				registOutput(a_electrodePtr, SCAT_SMALL_BY_COMPTON_E, scatteredElectronMeV, molDivideBy6);
+				registOutput(a_electrodePtr, SCAT_SMALL_BY_COMPTON_E, MASS_DEFECT_BY_GANMMA, scatteredElectronMeV, molDivideBy6);
 				//fprintf(stderr, " LINE:%d} registOutput SCAT_SMALL_BY_COMPTON_E return\n", __LINE__);
 				//debugCheck += (scatteredElectronMeV * molDivideBy6);
 			}
-			if(scatteredPhotonMeV >= e_collideElectronMiniMeV){
-				registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, scatteredPhotonMeV, molDivideBy6);	
+			if(scatteredPhotonMeV >= e_collideMiniMeV){
+				registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, scatteredPhotonMeV, molDivideBy6);	
 			}else if(scatteredPhotonMeV > 0.0){
 				//fprintf(stderr, " LINE:%d{ registOutput SCAT_SMALL_BY_COMPTON call\n", __LINE__);
-				registOutput(a_electrodePtr, SCAT_SMALL_BY_COMPTON, scatteredPhotonMeV, molDivideBy6);
+				registOutput(a_electrodePtr, SCAT_SMALL_BY_COMPTON, MASS_DEFECT_BY_GANMMA, scatteredPhotonMeV, molDivideBy6);
 				//fprintf(stderr, " LINE:%d} registOutput SCAT_SMALL_BY_COMPTON return\n", __LINE__);
 				//debugCheck += (scatteredPhotonMeV * molDivideBy6);
 			}
@@ -9953,7 +10388,7 @@ extern void scatterPhoton(struct electrode * a_electrodePtr, double a_MeV, doubl
 #define DEGRADE_DIV 16
 
 struct cleanUp {
-	//{ set by comptonEffect
+	//{ set by scatterIn
 	struct electrode * electrodePtr;
 	double detectLimitMolForIsotopeSC;
 	//}
@@ -10032,7 +10467,7 @@ extern int iterateDegreadeMassDefect(void * a_total, struct objectNodeConst * a_
 			}else{
 				scat_degrade = SCAT_DEGRADE_IN_COMPTON_B;
 			}
-			registOutput(cleanUpPtr->electrodePtr, scat_degrade, val, valuePtr->mol);
+			registOutput(cleanUpPtr->electrodePtr, scat_degrade, MASS_DEFECT_BY_GANMMA, val, valuePtr->mol);
 			cleanUpPtr->degradeMeVMol += (val * valuePtr->mol);//DEBUG
 		}
 		valuePtr->mol = 0.0;
@@ -10047,7 +10482,7 @@ extern void moveFromClenup(struct cleanUp * a_cleanUpPtr)
 	for(j = 0; j < DEGRADE_MAG; ++j){
 		for(k = 0; k < DEGRADE_DIV; ++k){
 			if(a_cleanUpPtr->md[j][k].mol > 0.0){
-				registOutput(a_cleanUpPtr->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, a_cleanUpPtr->md[j][k].MeV, a_cleanUpPtr->md[j][k].mol);
+				registOutput(a_cleanUpPtr->electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, a_cleanUpPtr->md[j][k].MeV, a_cleanUpPtr->md[j][k].mol);
 			}
 		}
 	}
@@ -10095,7 +10530,7 @@ extern int iterateClenupMassDefect(void * a_total, struct objectNodeConst * a_no
 		}else{
 			if(cleanUpPtr->cntOfBigMolNode == 0){
 				cleanUpPtr->maxMeV[0] = valuePtr->MeV;
-				cleanUpPtr->minMeV[2] = e_collideElectronMiniMeV;
+				cleanUpPtr->minMeV[2] = e_collideMiniMeV;
 			}else{
 				if(cleanUpPtr->maxMeV[0] < valuePtr->MeV){
 					cleanUpPtr->maxMeV[0] = valuePtr->MeV;
@@ -10115,58 +10550,263 @@ extern double calcPastTime(struct timeval * tv2, const struct timeval * tv1)
 	double diff = t2 - t1;
 	return diff;
 }
-
-extern void comptonEffect(struct electrode * a_electrodePtr)
+extern void scatterProtonByNeutron(struct electrode * a_electrodePtr, double a_MeV, double a_scale, int a_collideType, double a_Mol, struct atomNodeConst * a_protonPtr)
+{
+	//The neutrons with high energy scatter same number of protons step-half by shep-half.
+	double MeV, op;
+	double debugMeVMol = 0.0;//DEBUG
+	//fprintf(stderr, "DEBUG:%s(%d):{a_MeV:%lg a_scale:%lg a_collideType:%d a_Mol:%lg, a_MeV * a_Mol=%lg\n", __FUNCTION__, __LINE__, a_MeV, a_scale, a_collideType, a_Mol, a_MeV * a_Mol);
+	op = 1 - a_scale;
+	for(MeV = a_MeV * a_scale; MeV >= e_collideMiniMeV; MeV *= op){
+		collideBulletToElectrode(a_electrodePtr, a_collideType, MeV, a_Mol, e_collideProtonRateOnElectrode, a_protonPtr, 1);
+		debugMeVMol += (MeV * a_Mol);//DEBUG
+		//fprintf(stderr, "DEBUG:%s(%d):MeV:%lg * a_Mol:%lg = %lg, debugMeVMol:%lg\n", __FUNCTION__, __LINE__, MeV, a_Mol, MeV * a_Mol, debugMeVMol);
+	}
+	registOutput(a_electrodePtr, SCAT_SMALL_MASS_DEFECT, MASS_DEFECT_BY_GANMMA, MeV , a_Mol / a_scale);
+	debugMeVMol += (MeV * a_Mol / a_scale);//DEBUG
+	//fprintf(stderr, "DEBUG:%s(%d):(MeV:%lg * a_Mol:%lg / a_scale:%lg) = %lg, debugMeVMol:%lg\n", __FUNCTION__, __LINE__, MeV, a_Mol, a_scale, MeV * a_Mol / a_scale, debugMeVMol);
+	
+	//DEBUG, check code
+	if(debugMeVMol > 0.0){
+		double debugRate = ((a_MeV * a_Mol) - debugMeVMol) / debugMeVMol;
+		if(debugRate < 0.0){
+			debugRate = - debugRate;
+		}
+		if(debugRate > 0.00001){
+			fprintf(stderr, "ERROR:%s(%d):a_MeV:%lg a_scale:%lg a_collideType:%d a_Mol:%lg debugRate:%lg\n", __FUNCTION__, __LINE__, a_MeV, a_scale, a_collideType, a_Mol, debugRate);
+			exit(1);
+		}
+	}
+	//fprintf(stderr, "DEBUG:%s(%d):}a_MeV:%lg a_scale:%lg a_collideType:%d a_Mol:%lg\n", __FUNCTION__, __LINE__, a_MeV, a_scale, a_collideType, a_Mol);
+}
+extern void scatterIn(struct electrode * a_electrodePtr, int a_massDefectBy)
 {
 	int doProcess;
 	struct cleanUp cUp;
 	//struct timeval tv1, tv2;//DEBUG
     //gettimeofday(&tv1, NULL);//DEBUG
 	//e_inComptonEffect = 1;//DEBUG
-	//fprintf(stderr, "DEBUG:%s:{BEGIN %s usedCnt:%d\n", __FUNCTION__, a_electrodePtr->atomHashTable.tableName, a_electrodePtr->atomHashTable.usedCnt);	
+	//fprintf(stderr, "DEBUG:%s(%d):{BEGIN %s usedCnt:%d %s\n", __FUNCTION__, __LINE__, a_electrodePtr->atomHashTable.tableName, a_electrodePtr->atomHashTable.usedCnt, getMassDefectByName(a_massDefectBy));	
 	cUp.electrodePtr = a_electrodePtr;
-	cUp.detectLimitMolForIsotopeSC = a_electrodePtr->detectLimitMolForIsotope * SCATTER_CNT;
+	if(a_massDefectBy == MASS_DEFECT_BY_GANMMA){
+		cUp.detectLimitMolForIsotopeSC = a_electrodePtr->detectLimitMolForIsotope * SCATTER_CNT;
+	}else{
+		cUp.detectLimitMolForIsotopeSC = a_electrodePtr->detectLimitMolForIsotope;	
+	}
 	for(doProcess = 0; doProcess < 10; ++doProcess){
 		unsigned int size, i, j = 0;
 		struct objectNodeConst ** oPtr;
 		
-		oPtr = getFlatTable(&a_electrodePtr->massDefectHashTable, SORT_ASCEND, &size);
+		oPtr = getFlatTable(&a_electrodePtr->massDefectHashTable[a_massDefectBy], SORT_ASCEND, &size);
 		//e_cntScatterPhotonUnnest = 0;//DEBUG
 		//e_cntScatterPhoton = 0;//DEBUG
-		//fprintf(stderr, "DEBUG:%s:doProcess:%d getFlatTable size:%d\n", __FUNCTION__, doProcess, size);
+		if(a_massDefectBy != MASS_DEFECT_BY_GANMMA){
+			//fprintf(stderr, "DEBUG:%s(%d):doProcess:%d getFlatTable size:%d\n", __FUNCTION__, __LINE__, doProcess, size);
+		}
 		//fprintf(stderr, "DEBUG:%s:calcPastTime-1:%lg[sec]\n", __FUNCTION__, calcPastTime(&tv2, &tv1));
 		if(oPtr){
 			struct massDefect * valuePtr;
-
+			//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
 			for(i = 0; i < size; ++i){
 				valuePtr = (struct massDefect *)oPtr[i]->valuePtr;
-				if(valuePtr->MeV >= e_collideElectronMiniMeV){
-					if(valuePtr->mol >= cUp.detectLimitMolForIsotopeSC){
-						int nest = 0;
-						double saveMol = valuePtr->mol;
-						valuePtr->mol = 0.0;
-						if(e_useComptonEffect){
-						//fprintf(stderr, "DEBUG:%s:loop:%lg[sec] i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, calcPastTime(&tv2, &tv1), i, valuePtr->MeV, saveMol);
-						//fprintf(stderr, "DEBUG:%s:loop:i:%d tableName:%s usedCnt:%d\n", __FUNCTION__, i, a_electrodePtr->atomHashTable.tableName, a_electrodePtr->atomHashTable.usedCnt);
-						//fprintf(stderr, "DEBUG:%s:e_cntScatterPhotonUnnest:%d e_cntScatterPhoton:%d\n", __FUNCTION__, e_cntScatterPhotonUnnest, e_cntScatterPhoton);
-						//fprintf(stderr, "DEBUG:%s:massDefectHashTable.usedCnt:%u\n", __FUNCTION__, a_electrodePtr->massDefectHashTable.usedCnt);
-						//e_cntScatterPhotonUnnest_s = 0;//DEBUG
-						//e_cntScatterPhoton_s = 0;//DEBUG
-						scatterPhoton(a_electrodePtr, valuePtr->MeV, saveMol, nest);
-						//fprintf(stderr, "DEBUG:%s:e_cntScatterPhotonUnnes_s:%d e_cntScatterPhoton_s:%d\n", __FUNCTION__, e_cntScatterPhotonUnnest_s, e_cntScatterPhoton_s);
-						//fprintf(stderr, "DEBUG:%s:massDefectHashTable.usedCnt:%u\n", __FUNCTION__, a_electrodePtr->massDefectHashTable.usedCnt);
-						/*
-						[!!CAUTION!!!] We can't use "scatterPhoton" as the argument of "iterateInHashTable", 
-						because "scatterPhoton" will uses "insertObjectInHashTable" or "iterateInHashTable" through nesting calls.
-						*/
+				if(a_massDefectBy != MASS_DEFECT_BY_GANMMA){
+					//fprintf(stderr, "DEBUG:%s(%d):%s i:%d/size:%d \n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy), i, size);
+				}
+				if(valuePtr->mol >= cUp.detectLimitMolForIsotopeSC){
+					int nest = 0;
+					double saveMol = valuePtr->mol;
+					if(a_massDefectBy != MASS_DEFECT_BY_GANMMA){
+						//fprintf(stderr, "DEBUG:%s(%d):valuePtr->mol:%lg >= cUp.detectLimitMolForIsotopeSC:%lg\n", __FUNCTION__, __LINE__, valuePtr->mol, cUp.detectLimitMolForIsotopeSC);
+					}
+					if(a_massDefectBy == MASS_DEFECT_BY_PROTON){
+						//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy));
+						if(valuePtr->MeV >= e_collideMiniMeV){
+							//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+							valuePtr->mol = 0.0;
+							if(e_useProtonScattering){
+								struct atomNodeConst * protonPtr;
+								protonPtr = findProtonInElectrode(a_electrodePtr);
+								//fprintf(stderr, "DEBUG:%s(%d):e_useProtonScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useProtonScattering, i, valuePtr->MeV, saveMol);
+								collideBulletToElectrode(a_electrodePtr, COLLIDE_PROTON_S, valuePtr->MeV, saveMol, e_collideProtonRateOnElectrode, protonPtr, 1);
+							}else{
+								//fprintf(stderr, "DEBUG:%s(%d):e_useProtonScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useProtonScattering, i, valuePtr->MeV, saveMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, saveMol);
+							}
+							++j;
 						}else{
-							registOutput(a_electrodePtr, SCAT_DEGRADE_IN_COMPTON_B, valuePtr->MeV, saveMol);
+							fprintf(stderr, "FATAL:%s(%d):%d %s valuePtr->MeV:%lg < e_collideMiniMeV:%lg\n", __FUNCTION__, __LINE__, a_massDefectBy, a_electrodePtr->massDefectHashTable[a_massDefectBy].tableName, valuePtr->MeV, e_collideMiniMeV);
+							exit(1);
 						}
-						++j;
+					}else if(a_massDefectBy == MASS_DEFECT_BY_DEUTERIUM){
+						//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy));
+						if(valuePtr->MeV >= e_collideMiniMeV){
+							//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+							valuePtr->mol = 0.0;
+							if(e_useProtonScattering){
+								struct atomNodeConst * deuteriumPtr;
+								deuteriumPtr = findDeuteriumInElectrode(a_electrodePtr);
+								//fprintf(stderr, "DEBUG:%s(%d):e_useProtonScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useProtonScattering, i, valuePtr->MeV, saveMol);
+								collideBulletToElectrode(a_electrodePtr, COLLIDE_DEUTERIUM_S, valuePtr->MeV, saveMol, e_collideProtonRateOnElectrode, deuteriumPtr, 1);
+							}else{
+								//fprintf(stderr, "DEBUG:%s(%d):e_useProtonScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useProtonScattering, i, valuePtr->MeV, saveMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, saveMol);
+							}
+							++j;
+						}else{
+							fprintf(stderr, "FATAL:%s(%d):%d %s valuePtr->MeV:%lg < e_collideMiniMeV:%lg\n", __FUNCTION__, __LINE__, a_massDefectBy, a_electrodePtr->massDefectHashTable[a_massDefectBy].tableName, valuePtr->MeV, e_collideMiniMeV);
+							exit(1);
+						}
+					}else if(a_massDefectBy == MASS_DEFECT_BY_TRITIUM){
+						//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy));
+						if(valuePtr->MeV >= e_collideMiniMeV){
+							//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+							valuePtr->mol = 0.0;
+							if(e_useProtonScattering){
+								struct atomNodeConst * tritiumPtr;
+								tritiumPtr = findTritiumInElectrode(a_electrodePtr);
+								//fprintf(stderr, "DEBUG:%s(%d):e_useProtonScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useProtonScattering, i, valuePtr->MeV, saveMol);
+								collideBulletToElectrode(a_electrodePtr, COLLIDE_TRITIUM_S, valuePtr->MeV, saveMol, e_collideProtonRateOnElectrode, tritiumPtr, 1);
+							}else{
+								//fprintf(stderr, "DEBUG:%s(%d):e_useProtonScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useProtonScattering, i, valuePtr->MeV, saveMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, saveMol);
+							}
+							++j;
+						}else{
+							fprintf(stderr, "FATAL:%s(%d):%d %s valuePtr->MeV:%lg < e_collideMiniMeV:%lg\n", __FUNCTION__, __LINE__, a_massDefectBy, a_electrodePtr->massDefectHashTable[a_massDefectBy].tableName, valuePtr->MeV, e_collideMiniMeV);
+							exit(1);
+						}
+					}else if(a_massDefectBy == MASS_DEFECT_BY_NEUTRON){
+						//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy));
+						if(valuePtr->MeV >= e_collideMiniMeV){
+							//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+							valuePtr->mol = 0.0;
+							if(e_useNeutonScattering){
+								struct atomNodeConst * protonPtr;
+								struct atomNodeConst * deuteriumPtr;
+								struct atomNodeConst * tritiumPtr;
+								double protonMol, deuteriumMol, tritiumMol, totalMol, actMol, remMol;
+								//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+								protonPtr = findProtonInElectrode(a_electrodePtr);
+								deuteriumPtr = findDeuteriumInElectrode(a_electrodePtr);
+								tritiumPtr = findTritiumInElectrode(a_electrodePtr);
+								protonMol = (protonPtr) ? getMol(protonPtr->vPtr) : 0.0;
+								deuteriumMol = (deuteriumPtr) ? getMol(deuteriumPtr->vPtr) : 0.0;
+								tritiumMol = (tritiumPtr) ? getMol(tritiumPtr->vPtr) : 0.0;
+								totalMol = protonMol + deuteriumMol + tritiumMol;
+								if(totalMol > saveMol){
+									//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+									actMol = saveMol;
+									remMol = 0.0;
+								}else{
+									//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+									actMol = totalMol;
+									remMol = saveMol - totalMol;
+								}
+								//fprintf(stderr, "DEBUG:%s(%d):e_useNeutonScattering:%d i:%d MeV:%lg saveMol:%lg actMol:%lg remMol:%lg\n", __FUNCTION__, __LINE__, e_useNeutonScattering, i, valuePtr->MeV, saveMol, actMol, remMol);
+								
+								if(actMol > 0.0){
+									//The neutrons with high energy scatter protons, deutriums and tritiums.
+									//We ignore that the neutrons with high energy scatter other atoms.
+									if(protonPtr){
+										//fprintf(stderr, "DEBUG:%s(%d):scatterProtonByNeutron(actMol * protonMol:%lg / totalMol:%lg = %lg)\n", __FUNCTION__, __LINE__, protonMol, totalMol, actMol * protonMol / totalMol);
+										scatterProtonByNeutron(a_electrodePtr, valuePtr->MeV, 0.5, COLLIDE_PROTON_S, actMol * protonMol / totalMol, protonPtr);
+									}
+									if(deuteriumPtr){
+										//fprintf(stderr, "DEBUG:%s(%d):scatterProtonByNeutron(actMol * deuteriumMol:%lg / totalMol:%lg = %lg)\n", __FUNCTION__, __LINE__, deuteriumMol, totalMol, actMol * deuteriumMol / totalMol);
+										scatterProtonByNeutron(a_electrodePtr, valuePtr->MeV, 1.0 / 3.0, COLLIDE_DEUTERIUM_S, actMol * deuteriumMol / totalMol, deuteriumPtr);
+									}
+									if(tritiumPtr){
+										//fprintf(stderr, "DEBUG:%s(%d):scatterProtonByNeutron(actMol * tritiumMol:%lg / totalMol:%lg = %lg)\n", __FUNCTION__, __LINE__, tritiumMol, totalMol, actMol * tritiumMol / totalMol);
+										scatterProtonByNeutron(a_electrodePtr, valuePtr->MeV, 0.25, COLLIDE_TRITIUM_S, actMol * tritiumMol / totalMol, tritiumPtr);
+									}
+								}
+								if(remMol > 0.0){
+									//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+									registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, remMol);
+								}
+							}else{
+								//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, saveMol);
+							}
+							++j;
+						}else{
+							fprintf(stderr, "FATAL:%s(%d):%d %s valuePtr->MeV:%lg < e_collideMiniMeV:%lg\n", __FUNCTION__, __LINE__, a_massDefectBy, a_electrodePtr->massDefectHashTable[a_massDefectBy].tableName, valuePtr->MeV, e_collideMiniMeV);
+							exit(1);
+						}
+					}else if(a_massDefectBy == MASS_DEFECT_BY_ALPHA){
+						//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy));
+						if(valuePtr->MeV >= e_collideMiniMeV){
+							//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+							valuePtr->mol = 0.0;
+							if(e_useAlphaScattering){
+								struct atomNodeConst * heliumPtr;
+								//fprintf(stderr, "DEBUG:%s(%d):e_useAlphaScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useAlphaScattering, i, valuePtr->MeV, saveMol);
+								heliumPtr = findHeliumInElectrode(a_electrodePtr);
+								collideBulletToElectrode(a_electrodePtr, COLLIDE_ALPHA_S, valuePtr->MeV, saveMol, e_collideProtonRateOnElectrode, heliumPtr, 1);
+							}else{
+								//fprintf(stderr, "DEBUG:%s(%d):e_useAlphaScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useAlphaScattering, i, valuePtr->MeV, saveMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, saveMol);
+							}
+							++j;
+						}else{
+							fprintf(stderr, "FATAL:%s(%d):%d %s valuePtr->MeV:%lg < e_collideMiniMeV:%lg\n", __FUNCTION__, __LINE__, a_massDefectBy, a_electrodePtr->massDefectHashTable[a_massDefectBy].tableName, valuePtr->MeV, e_collideMiniMeV);
+							exit(1);
+						}
+					}else if(a_massDefectBy == MASS_DEFECT_BY_BETA){
+						//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy));
+						if(valuePtr->MeV >= e_collideMiniMeV){
+							//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+							valuePtr->mol = 0.0;
+							if(e_useElectronScattering){
+								struct atomNodeConst * electronPtr;
+								//fprintf(stderr, "DEBUG:%s(%d):e_useElectronScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useElectronScattering, i, valuePtr->MeV, saveMol);
+								electronPtr = findElectronInElectrode(a_electrodePtr);
+								collideBulletToElectrode(a_electrodePtr, COLLIDE_ELECTRON_S, valuePtr->MeV, saveMol, e_collideProtonRateOnElectrode, electronPtr, 1);								
+							}else{
+								//fprintf(stderr, "DEBUG:%s(%d):e_useElectronScattering:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useElectronScattering, i, valuePtr->MeV, saveMol);
+								registOutput(a_electrodePtr, SCAT_BIG_MASS_DEFECT_NOW, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, saveMol);
+							}
+							++j;
+						}else{
+							fprintf(stderr, "FATAL:%s(%d):%d %s valuePtr->MeV:%lg < e_collideMiniMeV:%lg\n", __FUNCTION__, __LINE__, a_massDefectBy, a_electrodePtr->massDefectHashTable[a_massDefectBy].tableName, valuePtr->MeV, e_collideMiniMeV);
+							exit(1);
+						}
+					}else if(a_massDefectBy == MASS_DEFECT_BY_GANMMA){
+						//fprintf(stderr, "DEBUG:%s(%d):%s\n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy));
+						if(valuePtr->MeV >= e_collideMiniMeV){
+							//fprintf(stderr, "DEBUG:%s(%d):\n", __FUNCTION__, __LINE__);
+							valuePtr->mol = 0.0;
+							if(e_useComptonEffect){
+								//fprintf(stderr, "DEBUG:%s(%d):e_useComptonEffect:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useComptonEffect, i, valuePtr->MeV, saveMol);
+								//fprintf(stderr, "DEBUG:%s:loop:%lg[sec] i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, calcPastTime(&tv2, &tv1), i, valuePtr->MeV, saveMol);
+								//fprintf(stderr, "DEBUG:%s:loop:i:%d tableName:%s usedCnt:%d\n", __FUNCTION__, i, a_electrodePtr->atomHashTable.tableName, a_electrodePtr->atomHashTable.usedCnt);
+								//fprintf(stderr, "DEBUG:%s:e_cntScatterPhotonUnnest:%d e_cntScatterPhoton:%d\n", __FUNCTION__, e_cntScatterPhotonUnnest, e_cntScatterPhoton);
+								//fprintf(stderr, "DEBUG:%s:massDefectHashTable[a_massDefectBy].usedCnt:%u\n", __FUNCTION__, a_electrodePtr->massDefectHashTable[a_massDefectBy].usedCnt);
+								//e_cntScatterPhotonUnnest_s = 0;//DEBUG
+								//e_cntScatterPhoton_s = 0;//DEBUG
+								scatterPhoton(a_electrodePtr, valuePtr->MeV, saveMol, nest);
+								//fprintf(stderr, "DEBUG:%s:e_cntScatterPhotonUnnes_s:%d e_cntScatterPhoton_s:%d\n", __FUNCTION__, e_cntScatterPhotonUnnest_s, e_cntScatterPhoton_s);
+								//fprintf(stderr, "DEBUG:%s:massDefectHashTable[a_massDefectBy].usedCnt:%u\n", __FUNCTION__, a_electrodePtr->massDefectHashTable[a_massDefectBy].usedCnt);
+								/*
+								[!!CAUTION!!!] We can't use "scatterPhoton" as the argument of "iterateInHashTable", 
+								because "scatterPhoton" will uses "insertObjectInHashTable" or "iterateInHashTable" through nesting calls.
+								*/
+							}else{
+								//fprintf(stderr, "DEBUG:%s(%d):e_useComptonEffect:%d i:%d MeV:%lg saveMol:%lg\n", __FUNCTION__, __LINE__, e_useComptonEffect, i, valuePtr->MeV, saveMol);
+								registOutput(a_electrodePtr, SCAT_DEGRADE_IN_COMPTON_B, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, saveMol);
+							}
+							++j;
+						}else{
+							fprintf(stderr, "FATAL:%s(%d):%d %s valuePtr->MeV:%lg < e_collideMiniMeV:%lg\n", __FUNCTION__, __LINE__, a_massDefectBy, a_electrodePtr->massDefectHashTable[a_massDefectBy].tableName, valuePtr->MeV, e_collideMiniMeV);
+							exit(1);
+						}
 					}
 				}else{
-					fprintf(stderr, "ERROR:%s:%s valuePtr->MeV:%lg < e_collideElectronMiniMeV:%lg\n", __FUNCTION__, 
-					a_electrodePtr->massDefectHashTable.tableName, valuePtr->MeV, e_collideElectronMiniMeV);
+					double saveMol = valuePtr->mol;
+					//fprintf(stderr, "DEBUG:%s(%d):%s valuePtr->mol:%lg < cUp.detectLimitMolForIsotopeSC:%lg\n", __FUNCTION__, __LINE__, getMassDefectByName(a_massDefectBy), valuePtr->mol, cUp.detectLimitMolForIsotopeSC);
+					valuePtr->mol = 0.0;
+					++j;
+					registOutput(a_electrodePtr, SCAT_DEGRADE_IN_COMPTON_B, MASS_DEFECT_BY_GANMMA, valuePtr->MeV, saveMol);
 				}
 			}
 			free(oPtr);
@@ -10174,38 +10814,40 @@ extern void comptonEffect(struct electrode * a_electrodePtr)
 		}
 		//fprintf(stderr, "DEBUG:%s:calcPastTime-3:%lg[sec] scatterPhoton * size:%d\n", __FUNCTION__, calcPastTime(&tv2, &tv1), size);
 		//fprintf(stderr, "DEBUG:%s:e_cntScatterPhotonUnnest:%d e_cntScatterPhoton:%d\n", __FUNCTION__, e_cntScatterPhotonUnnest, e_cntScatterPhoton);
-		//fprintf(stderr, "DEBUG:%s:doProcess:%d size:%u j:%u massDefectHashTable.usedCnt:%u\n", __FUNCTION__, doProcess, size, j, a_electrodePtr->massDefectHashTable.usedCnt);
+		//fprintf(stderr, "DEBUG:%s:doProcess:%d size:%u j:%u massDefectHashTable[a_massDefectBy].usedCnt:%u\n", __FUNCTION__, doProcess, size, j, a_electrodePtr->massDefectHashTable[a_massDefectBy].usedCnt);
+		//fprintf(stderr, "DEBUG:%s(%d):j:%d\n", __FUNCTION__, __LINE__, j);
 		if(j > 0){
-			//It's better to clean up "massDefectHashTable" for both small usage of memory and faster processing.
+			//It's better to clean up "massDefectHashTable[a_massDefectBy]" for both small usage of memory and faster processing.
 			cUp.cntOfBigMolNode = 0;
 			cUp.maxChangeMeVOfBigMol = 0.0;
 			cUp.minChangeMeVOfBigMol = 0.0;
 			cUp.cntOfSmallMolNode = 0;
 			cUp.totalMeVMol = 0.0;
 			cUp.degradeMeVMol = 0.0;
-			iterateInHashTable(&a_electrodePtr->massDefectHashTable, &cUp, iterateClenupMassDefect);
+			iterateInHashTable(&a_electrodePtr->massDefectHashTable[a_massDefectBy], &cUp, iterateClenupMassDefect);
 			if(initMaxMinOfClenup(&cUp)){
 				//I recommend the degrading process of SCAT_BIG_MASS_DEFECT_NOW with using the aproximatic calculation for faster calculation.
 				//fprintf(stderr, "DEBUG:%s:doProcess:%d cUp.cntOfBigMolNode:%d cUp.maxChangeMeVOfBigMol:%lg cUp.minChangeMeVOfBigMol:%lg\n", __FUNCTION__, doProcess, cUp.cntOfBigMolNode, cUp.maxChangeMeVOfBigMol, cUp.minChangeMeVOfBigMol);
 				//fprintf(stderr, "DEBUG:%s:doProcess:%d cUp.cntOfSmallMolNode:%d\n", __FUNCTION__, doProcess, cUp.cntOfSmallMolNode);
 				if(cUp.cntOfBigMolNode > DEGRADE_MAG * DEGRADE_DIV || cUp.cntOfSmallMolNode > DEGRADE_MAG * DEGRADE_DIV * 8){
-					iterateInHashTable(&a_electrodePtr->massDefectHashTable, &cUp, iterateDegreadeMassDefect);
+					iterateInHashTable(&a_electrodePtr->massDefectHashTable[a_massDefectBy], &cUp, iterateDegreadeMassDefect);
 					if(abs((int)(10000 * (cUp.degradeMeVMol - cUp.totalMeVMol) / cUp.totalMeVMol)) > 1){
-						fprintf(stderr, "ERROR:%s(%d):cUp.degradeMeVMol:%lf != cUp.totalMeVMol:%lf\n", __FUNCTION__, __LINE__, cUp.degradeMeVMol, cUp.totalMeVMol);
+						fprintf(stderr, "ERROR:%s(%d):a_massDefectBy:%d cUp.degradeMeVMol:%lg != cUp.totalMeVMol:%lg\n", __FUNCTION__, __LINE__, a_massDefectBy, cUp.degradeMeVMol, cUp.totalMeVMol);
 						exit(1);
 					}
 					moveFromClenup(&cUp);
 				}
 			}
 		}
-		//fprintf(stderr, "DEBUG:%s:massDefectHashTable.usedCnt:%u j:%d\n", __FUNCTION__, a_electrodePtr->massDefectHashTable.usedCnt, j);
+		//fprintf(stderr, "DEBUG:%s:massDefectHashTable[a_massDefectBy].usedCnt:%u j:%d\n", __FUNCTION__, a_electrodePtr->massDefectHashTable[a_massDefectBy].usedCnt, j);
 
 		if(j == 0){
 			break;
 		}
 	}
 	//fprintf(stderr, "DEBUG:%s:tableName:%s usedCnt:%d\n", __FUNCTION__, a_electrodePtr->atomHashTable.tableName, a_electrodePtr->atomHashTable.usedCnt);
-	//fprintf(stderr, "DEBUG:%s:}END calcPastTime-E:%lg[sec]\n", __FUNCTION__, calcPastTime(&tv2, &tv1));	
+	//fprintf(stderr, "DEBUG:%s(%d):}END calcPastTime-E:%lg[sec]\n", __FUNCTION__, __LINE__, calcPastTime(&tv2, &tv1));	
+	//fprintf(stderr, "DEBUG:%s(%d):}END\n", __FUNCTION__, __LINE__);	
 	//e_inComptonEffect = 0;//DEBUG
 }
 extern double calcDeuteriumRate(struct electrode * a_electrodePtr, double * a_tritiumRatePtr, double * a_hydrogenRatePtr)
@@ -10270,10 +10912,10 @@ extern void pulseCurrent(double a_pastSecond)
 	//upper[e_negative Electrode]==>(electron)==>|collide|<==(proton)<==[e_positive Electrode]lower
 	int i;
 	double protonRate, deuteriumRate, tritiumRate;
-	struct atomNodeConst * positiveElectronPtr;
-	struct atomNodeConst * negativeElectronPtr;
-	positiveElectronPtr = findElectronInElectrode(&e_positiveElectrode);	
-	negativeElectronPtr = findElectronInElectrode(&e_negativeElectrode);	
+	//struct atomNodeConst * positiveElectronPtr;
+	//struct atomNodeConst * negativeElectronPtr;
+	//positiveElectronPtr = findElectronInElectrode(&e_positiveElectrode);	
+	//negativeElectronPtr = findElectronInElectrode(&e_negativeElectrode);	
 	
 	//fprintf(stderr, "\nDEBUG:%s:{BEGINa_pastSecond:%lg\n", __FUNCTION__, a_pastSecond);
 	//While prcessing, The rates of proton, deuterium and tritium will be changing step by step.
@@ -10292,19 +10934,19 @@ extern void pulseCurrent(double a_pastSecond)
 
 	for(i = 0; i < e_stepsOfLostingEnergy; ++i){
 		//fprintf(stderr, "\nDEBUG:%s:i:%d e_stepByStepLostingEnergyMeV:%lg e_genedHydrogenInSpaceMol:%lg\n", __FUNCTION__, i, e_stepByStepLostingEnergyMeV, e_genedHydrogenInSpaceMol);
-		registOutput(&e_negativeElectrode, SCAT_NOT_COLLIDE, e_stepByStepLostingEnergyMeV, a_pastSecond * e_genedHydrogenInSpaceMol * 0.5);
-		registOutput(&e_positiveElectrode, SCAT_NOT_COLLIDE, e_stepByStepLostingEnergyMeV, a_pastSecond * e_genedHydrogenInSpaceMol * 0.5);
+		registOutput(&e_negativeElectrode, SCAT_NOT_COLLIDE, MASS_DEFECT_BY_GANMMA, e_stepByStepLostingEnergyMeV, a_pastSecond * e_genedHydrogenInSpaceMol * 0.5);
+		registOutput(&e_positiveElectrode, SCAT_NOT_COLLIDE, MASS_DEFECT_BY_GANMMA, e_stepByStepLostingEnergyMeV, a_pastSecond * e_genedHydrogenInSpaceMol * 0.5);
 	}
 
 	collideBulletToElectrode(&e_positiveElectrode, COLLIDE_ELECTRON, e_appliedVoltageMeV, 
-		a_pastSecond * e_arrivedElectronMol, e_collideElectronRateOnElectrode, positiveElectronPtr);
+		a_pastSecond * e_arrivedElectronMol, e_collideElectronRateOnElectrode, NULL, 1);
 
 	collideBulletToElectrode(&e_negativeElectrode, COLLIDE_PROTON, e_appliedVoltageMeV, 
-		a_pastSecond * e_arrivedProtonMol * protonRate, e_collideProtonRateOnElectrode, negativeElectronPtr);
+		a_pastSecond * e_arrivedProtonMol * protonRate, e_collideProtonRateOnElectrode, NULL, 1);
 	collideBulletToElectrode(&e_negativeElectrode, COLLIDE_DEUTERIUM, e_appliedVoltageMeV,
-		a_pastSecond * e_arrivedProtonMol * deuteriumRate, e_collideProtonRateOnElectrode, negativeElectronPtr);
+		a_pastSecond * e_arrivedProtonMol * deuteriumRate, e_collideProtonRateOnElectrode, NULL, 1);
 	collideBulletToElectrode(&e_negativeElectrode, COLLIDE_TRITIUM, e_appliedVoltageMeV,
-		a_pastSecond * e_arrivedProtonMol * tritiumRate, e_collideProtonRateOnElectrode, negativeElectronPtr);
+		a_pastSecond * e_arrivedProtonMol * tritiumRate, e_collideProtonRateOnElectrode, NULL, 1);
 
 	//fprintf(stderr, "DEBUG:%s:}END\n\n", __FUNCTION__);
 }
@@ -10861,10 +11503,28 @@ extern void checkArgs(int argc, char * argv[], time_t * a_timeBeginPtr)
 		double e_neutronGenInSpaceFallRate = %lg;\n\
 		double e_hydrogenGenInSpaceProtonRate = %lg;\n\
 		double e_collideProtonRateOnElectrode = %lg;\n\
-		double e_collideElectronMidiMeV = %lg;\n\
-		double e_collideElectronMiniMeV = %lg;\n\
+		double e_collideMidiMeV = %lg;\n\
+		double e_collideMiniMeV = %lg;\n\
 		int e_usebulletCrossSection = %d;\n\
+		int e_useProtonScattering = %d;\n\
+		int e_useNeutonScattering = %d;\n\
+		int e_useAlphaScattering = %d;\n\
+		int e_useElectronScattering = %d;\n\
 		int e_useComptonEffect = %d;\n\
+		double e_rateForAlphaParticle = %lg;\n\
+		double e_rateForProtonAtBetaPlus = %lg;\n\
+		double e_rateFor2ProtonAtBetaPlus = %lg;\n\
+		double e_rateFor3ProtonAtBetaPlus = %lg;\n\
+		double e_rateForAlphaParticleAtBetaPlus = %lg;\n\
+		double e_rateForProtonAtEC = %lg;\n\
+		double e_rateFor2ProtonAtEC = %lg;\n\
+		double e_rateFor3ProtonAtEC = %lg;\n\
+		double e_rateForAlphaParticleAtEC = %lg;\n\
+		double e_rateForNeytonAtBetaMinus = %lg;\n\
+		double e_rateFor2NeytonAtBetaMinus = %lg;\n\
+		double e_rateFor3NeytonAtBetaMinus = %lg;\n\
+		double e_rateFor4NeytonAtBetaMinus = %lg;\n\
+		double e_rateForAlphaParticleAtBetaMinus = %lg;\n\
 -H- : It specifies to reduce the amount of hydrogen and helium in the positive electrode\n\
     into one-1,000,000th before running the simulation.\n\
 -EC : Print the property of Electron Capture in decay modes. Not simulate.\n\
@@ -10885,10 +11545,28 @@ extern void checkArgs(int argc, char * argv[], time_t * a_timeBeginPtr)
 			e_neutronGenInSpaceFallRate,
 			e_hydrogenGenInSpaceProtonRate,
 			e_collideProtonRateOnElectrode,
-			e_collideElectronMidiMeV,
-			e_collideElectronMiniMeV,
+			e_collideMidiMeV,
+			e_collideMiniMeV,
 			e_usebulletCrossSection,
-			e_useComptonEffect);
+			e_useProtonScattering,
+			e_useNeutonScattering,
+			e_useAlphaScattering,
+			e_useElectronScattering,
+			e_useComptonEffect,
+			e_rateForAlphaParticle,
+			e_rateForProtonAtBetaPlus,
+			e_rateFor2ProtonAtBetaPlus,
+			e_rateFor3ProtonAtBetaPlus,
+			e_rateForAlphaParticleAtBetaPlus,
+			e_rateForProtonAtEC,
+			e_rateFor2ProtonAtEC,
+			e_rateFor3ProtonAtEC,
+			e_rateForAlphaParticleAtEC,
+			e_rateForNeytonAtBetaMinus,
+			e_rateFor2NeytonAtBetaMinus,
+			e_rateFor3NeytonAtBetaMinus,
+			e_rateFor4NeytonAtBetaMinus,
+			e_rateForAlphaParticleAtBetaMinus);
 			exit(0);
 		}
 	}
@@ -11108,16 +11786,29 @@ int main(int argc, char * argv[])
 		e_rc.inputTotalEnergy += (e_emittedPulseEnergyMeV * e_rc.intervalTime);
 		//printSumup(e_logFp, "after pulseCurrent", loop, tail, MID_PRINT);
 
+		scatterIn(&e_negativeElectrode, MASS_DEFECT_BY_NEUTRON);//It must be here before absorbeOrDecayNeutronInElectrode()
+		scatterIn(&e_positiveElectrode, MASS_DEFECT_BY_NEUTRON);//It must be here before absorbeOrDecayNeutronInElectrode()
+
 		absorbeOrDecayNeutronInElectrode(&e_negativeElectrode, e_rc.intervalTime);
 		absorbeOrDecayNeutronInElectrode(&e_positiveElectrode, e_rc.intervalTime);
 		//printSumup(e_logFp, "after absorbeOrDecayNeutronInElectrode", loop, tail, MID_PRINT);
 		
-		decayNeuclayWithoutNewtron(&e_negativeElectrode, e_rc.intervalTime);
-		decayNeuclayWithoutNewtron(&e_positiveElectrode, e_rc.intervalTime);
-		//printSumup(e_logFp, "after decayNeuclayWithoutNewtron", loop, tail, MID_PRINT);
+		decayNeuclayWithoutNeutron(&e_negativeElectrode, e_rc.intervalTime);
+		decayNeuclayWithoutNeutron(&e_positiveElectrode, e_rc.intervalTime);
+		//printSumup(e_logFp, "after decayNeuclayWithoutNeutron", loop, tail, MID_PRINT);
 		
-		comptonEffect(&e_negativeElectrode);
-		comptonEffect(&e_positiveElectrode);
+		scatterIn(&e_negativeElectrode, MASS_DEFECT_BY_PROTON);
+		scatterIn(&e_positiveElectrode, MASS_DEFECT_BY_PROTON);
+		scatterIn(&e_negativeElectrode, MASS_DEFECT_BY_DEUTERIUM);
+		scatterIn(&e_positiveElectrode, MASS_DEFECT_BY_DEUTERIUM);
+		scatterIn(&e_negativeElectrode, MASS_DEFECT_BY_TRITIUM);
+		scatterIn(&e_positiveElectrode, MASS_DEFECT_BY_TRITIUM);
+		scatterIn(&e_negativeElectrode, MASS_DEFECT_BY_ALPHA);
+		scatterIn(&e_positiveElectrode, MASS_DEFECT_BY_ALPHA);
+		scatterIn(&e_negativeElectrode, MASS_DEFECT_BY_BETA);
+		scatterIn(&e_positiveElectrode, MASS_DEFECT_BY_BETA);
+		scatterIn(&e_negativeElectrode, MASS_DEFECT_BY_GANMMA);
+		scatterIn(&e_positiveElectrode, MASS_DEFECT_BY_GANMMA);
 	}
 	e_rc.simulatedLastTime = e_rc.startTime + e_rc.intervalTime * loop;
 	fprintf(stderr, "%d/%d\n", loop, e_rc.loopEnd);
