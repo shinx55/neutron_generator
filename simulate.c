@@ -7251,6 +7251,7 @@ extern void mergeSumMeVMol(struct sumMeVMol * a_merge, struct sumMeVMol * a_src1
 #define SCAT_DEGRADE_IN_COMPTON_B 6 //If there are too many SCAT_BIG_MASS_DEFECT_NOW nodes in the hash table, "massDefectHashTable[MASS_DEFECT_BY_GANMMA]", they waste the memory and power of a computer. So, we do degreade them by shopping the energy into 32 greades. The SCAT_DEGRADE_IN_COMPTON_B type contains shopped small remain part of BIG energy. The grading big energy is still in the "massDefectHashTable[MASS_DEFECT_BY_GANMMA]".
 #define SCAT_DEGRADE_IN_COMPTON_S 7
 #define SIZE_OF_SCATTERD 8 //The array size of scatterd photon types. Those types of photon are reason of heat.
+extern const char * getMassDefectByName(int a_massDefectBy);
 
 extern const char * getScatName(int a_scatType)
 {
@@ -7259,7 +7260,7 @@ extern const char * getScatName(int a_scatType)
 		case SCAT_BIG_MASS_DEFECT_NOW: retPtr = "BIG_MASS_DEFECT_NOW"; break;
 		case SCAT_BIG_MASS_DEFECT_ALL: retPtr = "BIG_MASS_DEFECT_ALL"; break;
 		case SCAT_LOST_BY_NEUTRINO: retPtr = "LOST_BY_NEUTRINO"; break;
-		
+		//
 		case SCAT_NOT_COLLIDE: retPtr = "NOT_COLLIDE"; break;
 		case SCAT_IMPERFECT: retPtr = "IMPERFECT:"; break;
 		case SCAT_IMPERFECT_IN_SPACE: retPtr = "IMPERFECT_IN_SPACE"; break;
@@ -7271,19 +7272,25 @@ extern const char * getScatName(int a_scatType)
 	}
 	return retPtr;
 }
-extern void printSumMeVMol(FILE * a_fp, const char * a_operatorStr, int a_scatType, const struct sumMeVMol * a_sumMeVMol, long double a_grandTotal, const char * a_rateName)
+extern long double printSumMeVMol(FILE * a_fp, const char * a_operatorStr, int a_scatType, int a_massDefectBy, const struct sumMeVMol * a_sumMeVMol, long double a_grandTotal, const char * a_rateName)
 {
 	long double MeVMolNAvogadro, rate = 0.0;
 	MeVMolNAvogadro = a_sumMeVMol->MeVMol * NAvogadro;
-	fprintf(a_fp, "%s %s %Lg [MeV] %lld[cnt]",
-		a_operatorStr, getScatName(a_scatType), MeVMolNAvogadro, a_sumMeVMol->cnt);
+	if(a_scatType == SCAT_BIG_MASS_DEFECT_NOW){
+		fprintf(a_fp, "%s %s %Lg [MeV] %lld[cnt]",
+			a_operatorStr, getMassDefectByName(a_massDefectBy), MeVMolNAvogadro, a_sumMeVMol->cnt);
+	}else{
+		fprintf(a_fp, "%s %s %Lg [MeV] %lld[cnt]",
+			a_operatorStr, getScatName(a_scatType), MeVMolNAvogadro, a_sumMeVMol->cnt);
+	}
 	if(a_grandTotal > 0.0){
 		rate = 100.0 * MeVMolNAvogadro / a_grandTotal;
-		fprintf(a_fp, " %Lg %s", rate, a_rateName);		
+		fprintf(a_fp, " %Lg %s", rate, a_rateName);
 	}
 	fprintf(a_fp, "\n (range[ %lg , %lg ][MeV] * [ %lg , %lg ][mol])\n", 
 			a_sumMeVMol->minMeV, a_sumMeVMol->maxMeV,
 			a_sumMeVMol->minMol, a_sumMeVMol->maxMol);
+	return MeVMolNAvogadro;
 }
 extern void mergeScattered(struct sumMeVMol * a_mergeAry, struct sumMeVMol * a_src1, struct sumMeVMol * a_src2)
 {
@@ -7308,7 +7315,7 @@ extern long double printScattered(FILE * a_fp, const char * a_titlePtr, struct s
 	long double grandTotal = calcGrandTotalOfScattered(a_scatteredAry);
 	fprintf(a_fp, "%s OUTPUT HEAT =\n", a_titlePtr);
 	for(i = 0; i < SIZE_OF_SCATTERD; ++i){
-		printSumMeVMol(a_fp, (i == 0) ? " " : "+", i, &a_scatteredAry[i], grandTotal, "[%]");
+		printSumMeVMol(a_fp, (i == 0) ? " " : "+", i, 0, &a_scatteredAry[i], grandTotal, "[%]");
 	}
 	fprintf(a_fp, "= %Lg [MeV]\n",  grandTotal);
 	return grandTotal;
@@ -8009,31 +8016,38 @@ extern int iterateSumupMassDefect(void * a_total, struct objectNodeConst * a_nod
 	return KEEP_NODE;
 }
 
-extern void sumupBigMassDefect(struct electrode * a_electrodePtr, struct sumMeVMol * a_massDefectNowPtr)
+extern void sumupBigMassDefect(struct electrode * a_electrodePtr, int a_i, struct sumMeVMol a_massDefectNow[COUNT_OF_MASS_DEFECT_HASH_TABLE])
 {
-	initSumMeVMol(a_massDefectNowPtr);
-	iterateInHashTable(&a_electrodePtr->massDefectHashTable[MASS_DEFECT_BY_GANMMA], a_massDefectNowPtr, iterateSumupMassDefect);
+	initSumMeVMol(&a_massDefectNow[a_i]);
+	iterateInHashTable(&a_electrodePtr->massDefectHashTable[a_i], &a_massDefectNow[a_i], iterateSumupMassDefect);
 }
-extern long double printMassDefectHeat(FILE * a_fp, const char * a_titlePtr, const struct sumMeVMol * a_massDefectNowPtr, const struct sumMeVMol * a_massDefectAllPtr, const struct sumMeVMol * a_byNeutrinoAllPtr, struct sumMeVMol scatteredAry[SIZE_OF_SCATTERD])
+extern long double printMassDefectHeat(FILE * a_fp, const char * a_titlePtr, const struct sumMeVMol a_massDefectNow[COUNT_OF_MASS_DEFECT_HASH_TABLE], const struct sumMeVMol * a_massDefectAllPtr, const struct sumMeVMol * a_byNeutrinoAllPtr, struct sumMeVMol a_scatteredAry[SIZE_OF_SCATTERD])
 {
-	long double outputHeat;
+	long double outputHeat = 0.0;
+	int i;
 	fprintf(a_fp, "%s MASS DEFECT\n(gamma ray >= %lg [MeV], beta energy = %lg [MeV])\n", a_titlePtr, e_collideMiniMeV, e_betaEnergyMeV);
-	printSumMeVMol(a_fp, " ", SCAT_BIG_MASS_DEFECT_NOW, a_massDefectNowPtr, 0.0, "");
-	printSumMeVMol(a_fp, " ", SCAT_BIG_MASS_DEFECT_ALL, a_massDefectAllPtr, 0.0, "");
-	outputHeat = printScattered(a_fp, a_titlePtr, scatteredAry);
+	printSumMeVMol(a_fp, " ", SCAT_BIG_MASS_DEFECT_ALL, 0, a_massDefectAllPtr, 0.0, "");
+	for(i = 0; i < COUNT_OF_MASS_DEFECT_HASH_TABLE; ++i){
+		outputHeat += printSumMeVMol(a_fp, " ", SCAT_BIG_MASS_DEFECT_NOW, i, &a_massDefectNow[i], 0.0, "");
+	}
+	fprintf(a_fp, "(BIG_MASS_DEFECT_NOW toatl %Lg [MeV])\n", outputHeat);
+	outputHeat += printScattered(a_fp, a_titlePtr, a_scatteredAry);
 	fprintf(a_fp, "%s LOST HEAT =\n", a_titlePtr);
-	printSumMeVMol(a_fp, " ", SCAT_LOST_BY_NEUTRINO, a_byNeutrinoAllPtr, outputHeat, "[%(/Output heat)]");
+	printSumMeVMol(a_fp, " ", SCAT_LOST_BY_NEUTRINO, 0, a_byNeutrinoAllPtr, outputHeat, "[%(/Output heat)]");
 	return outputHeat;
 }
-extern double printElectrode(FILE * a_fp, struct electrode * a_electrodePtr, struct sumMeVMol * a_massDefectNowPtr, double * a_sumOfMassUMolIniPtr, double * a_sumOfMassUMolAddPtr, double * a_sumOfMassUMolSubPtr, double * a_heatCapacityPtr)
+extern double printElectrode(FILE * a_fp, struct electrode * a_electrodePtr, struct sumMeVMol a_massDefectNow[COUNT_OF_MASS_DEFECT_HASH_TABLE], double * a_sumOfMassUMolIniPtr, double * a_sumOfMassUMolAddPtr, double * a_sumOfMassUMolSubPtr, double * a_heatCapacityPtr)
 {
 	//long double grandTotal;
 	double sumOfMassUMol;
+	int i;
 
 	fprintf(a_fp, "%s detectLimitMolForIsotope %lg\n", a_electrodePtr->atomHashTable.tableName, a_electrodePtr->detectLimitMolForIsotope);
 	sumOfMassUMol = printAtomList(a_fp, &a_electrodePtr->atomHashTable, a_sumOfMassUMolIniPtr, a_sumOfMassUMolAddPtr, a_sumOfMassUMolSubPtr, a_heatCapacityPtr);
-	sumupBigMassDefect(a_electrodePtr, a_massDefectNowPtr);
-	/*grandTotal = */printMassDefectHeat(a_fp, a_electrodePtr->atomHashTable.tableName, a_massDefectNowPtr, &a_electrodePtr->massDefectAll, &a_electrodePtr->byNeutrinoAll, a_electrodePtr->scattered);
+	for(i = 0; i < COUNT_OF_MASS_DEFECT_HASH_TABLE; ++i){
+		sumupBigMassDefect(a_electrodePtr, i, a_massDefectNow);
+	}
+	/*grandTotal = */printMassDefectHeat(a_fp, a_electrodePtr->atomHashTable.tableName, a_massDefectNow, &a_electrodePtr->massDefectAll, &a_electrodePtr->byNeutrinoAll, a_electrodePtr->scattered);
 	fputs("\n", a_fp);
 	return sumOfMassUMol;
 }
@@ -11172,8 +11186,8 @@ extern void printSumup(FILE * a_fp, char * a_Titile, int a_loop, char * a_Tail, 
 	char timeMess[256];
 	char totalText[256];
 	int pretty = 1;
-	struct sumMeVMol massDefectNowN;
-	struct sumMeVMol massDefectNowP;
+	struct sumMeVMol massDefectNowN[COUNT_OF_MASS_DEFECT_HASH_TABLE];
+	struct sumMeVMol massDefectNowP[COUNT_OF_MASS_DEFECT_HASH_TABLE];
 	long double diffInputHeat = 0.0, diffInputKW = 0.0, outputHeat = 0.0, diffOutputHeat = 0.0, diffOutputKW = 0.0, COP = 0.0, diffCOP = 0.0;//COP is the coefficient of performance.
 	static long double oldInputHeat = 0.0, oldOutputHeat = 0.0, oldCOP = 0.0;
 	double /* sumOfMassUMol_NE, */ sumOfMassUMolIni_NE, sumOfMassUMolAdd_NE, sumOfMassUMolSub_NE, heatCapacity_NE;
@@ -11191,9 +11205,9 @@ extern void printSumup(FILE * a_fp, char * a_Titile, int a_loop, char * a_Tail, 
 	}
 	snprintf(timeMess, 256, "%s %s Title %s %d %s", timeTitle, timeText, a_Titile, a_loop, a_Tail);
 	fprintf(a_fp, "%s <<<<<\n\n", timeMess);
-	/* sumOfMassUMol_NE = */ printElectrode(a_fp, &e_negativeElectrode, &massDefectNowN, &sumOfMassUMolIni_NE, &sumOfMassUMolAdd_NE, &sumOfMassUMolSub_NE, &heatCapacity_NE);
+	/* sumOfMassUMol_NE = */ printElectrode(a_fp, &e_negativeElectrode, massDefectNowN, &sumOfMassUMolIni_NE, &sumOfMassUMolAdd_NE, &sumOfMassUMolSub_NE, &heatCapacity_NE);
 	fprintf(a_fp, "%s -----\n\n", timeMess);
-	/*sumOfMassUMol_PE = */ printElectrode(a_fp, &e_positiveElectrode, &massDefectNowP, &sumOfMassUMolIni_PE, &sumOfMassUMolAdd_PE, &sumOfMassUMolSub_PE, &heatCapacity_PE);
+	/*sumOfMassUMol_PE = */ printElectrode(a_fp, &e_positiveElectrode, massDefectNowP, &sumOfMassUMolIni_PE, &sumOfMassUMolAdd_PE, &sumOfMassUMolSub_PE, &heatCapacity_PE);
 	fprintf(a_fp, "%s -----\n\n", timeMess);
 	totalOfMassUMolIni = sumOfMassUMolIni_NE + sumOfMassUMolIni_PE;
 	totalOfMassUMolAdd = sumOfMassUMolAdd_NE + sumOfMassUMolAdd_PE;
@@ -11206,15 +11220,18 @@ extern void printSumup(FILE * a_fp, char * a_Titile, int a_loop, char * a_Tail, 
 	fprintf(a_fp, " = %lg [MeV]\n", totalOfMassUMol * NAvogadro * e_coefMassUToMeV);
 	fprintf(a_fp, " totalheatCapacity = %lg [J/k] upTempertureByInput = %lg [k]\n\n", totalheatCapacity, upTempertureByInput);
 	if(e_rc.inputTotalEnergy > 0.0L){
-		struct sumMeVMol massDefectNow;
+		struct sumMeVMol massDefectNow[COUNT_OF_MASS_DEFECT_HASH_TABLE];
 		struct sumMeVMol massDefectAll;
 		struct sumMeVMol byNeutrinoAll;
 		struct sumMeVMol scattered[SIZE_OF_SCATTERD];
-		mergeSumMeVMol(&massDefectNow, &massDefectNowN, &massDefectNowP);
+		int i;
+		for(i = 0; i < COUNT_OF_MASS_DEFECT_HASH_TABLE; ++i){
+			mergeSumMeVMol(&massDefectNow[i], &massDefectNowN[i], &massDefectNowP[i]);
+		}
 		mergeSumMeVMol(&massDefectAll, &e_negativeElectrode.massDefectAll, &e_positiveElectrode.massDefectAll);
 		mergeSumMeVMol(&byNeutrinoAll, &e_negativeElectrode.byNeutrinoAll, &e_positiveElectrode.byNeutrinoAll);
 		mergeScattered(scattered, e_negativeElectrode.scattered, e_positiveElectrode.scattered);
-		outputHeat = printMassDefectHeat(a_fp, "TOTAL ENERGY IN THE SYSTEM", &massDefectNow, &massDefectAll, &byNeutrinoAll, scattered);
+		outputHeat = printMassDefectHeat(a_fp, "TOTAL ENERGY IN THE SYSTEM", massDefectNow, &massDefectAll, &byNeutrinoAll, scattered);
 		diffInputHeat = e_rc.inputTotalEnergy - oldInputHeat;
 		diffOutputHeat = outputHeat - oldOutputHeat;
 		if(diffTime > 0.0){
