@@ -30,7 +30,7 @@ ElectronCaptureList:
 
 # testNi is :
 # (1) run 'sumulate' while 1 minute + many hour with default contitions.
-testNiLessProton:
+testNiLessProtonS:
 	mkdir -p testNiLessProton
 	cd testNiLessProton ; \
 	rm -f *.dat *.log test*.txt ; \
@@ -39,7 +39,10 @@ testNiLessProton:
 	echo "double e_emittedElectronMol = 4e-12;" >>testNiLessProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-11;" >>testNiLessProton.txt ; \
 	$(RUN_SIMULATE) -P=testNiLessProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testNiLessProton.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testNiLessProton.txt
+
+testNiLessProton: testNiLessProtonS
+	cd testNiLessProton ; \
 	$(RUN_SIMULATE) -t=1d -P=testNiLessProton.txt
 
 testAlLessProton:
@@ -186,7 +189,7 @@ testNiMuchD:
 	$(RUN_SIMULATE) -t=1h -P=testNiMuchD.txt ; \
 	$(RUN_SIMULATE) -t=1d -P=testNiMuchD.txt
 
-testAlMuchD:
+testAlMuchDS:
 	mkdir -p testAlMuchD
 	cd testAlMuchD ; \
 	rm -f *.dat *.log test*.txt ; \
@@ -195,7 +198,10 @@ testAlMuchD:
 	echo "double e_emittedElectronMol = 4e-11;" >>testAlMuchD.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testAlMuchD.txt ; \
 	$(RUN_SIMULATE) -P=testAlMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testAlMuchD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlMuchD.txt
+
+testAlMuchD:
+	cd testAlMuchD ; \
 	$(RUN_SIMULATE) -t=1d -P=testAlMuchD.txt
 
 testFeMuchD:
