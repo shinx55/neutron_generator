@@ -28,9 +28,21 @@ ElectronCaptureList:
 	rm -f data.dat s00*.log m*.log h*.log ; \
 	$(RUN_SIMULATE) -EC >ElectronCaptureList.txt
 
+testMAX:
+	mkdir -p testMAX
+	cd testMAX ; \
+	rm -f *.dat *.log test*.txt ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.05, D=0.05, Ni=0.8, Li=0.2\";" > testMAX.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"H=0.05, D=0.05, Ni=0.8, Li=0.2\";" >> testMAX.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testMAX.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testMAX.txt ; \
+	echo "double e_appliedVoltageScale = 10.0;" >>testMAX.txt ; \
+	$(RUN_SIMULATE) -P=testMAX.txt ; \
+	$(RUN_SIMULATE) -t=15m -P=testMAX.txt
+
 # testNi is :
 # (1) run 'sumulate' while 1 minute + many hour with default contitions.
-testNiLessProtonS:
+testNiLessProton:
 	mkdir -p testNiLessProton
 	cd testNiLessProton ; \
 	rm -f *.dat *.log test*.txt ; \
@@ -41,10 +53,6 @@ testNiLessProtonS:
 	$(RUN_SIMULATE) -P=testNiLessProton.txt ; \
 	$(RUN_SIMULATE) -t=1h -P=testNiLessProton.txt
 
-testNiLessProton: testNiLessProtonS
-	cd testNiLessProton ; \
-	$(RUN_SIMULATE) -t=1d -P=testNiLessProton.txt
-
 testAlLessProton:
 	mkdir -p testAlLessProton
 	cd testAlLessProton ; \
@@ -54,8 +62,7 @@ testAlLessProton:
 	echo "double e_emittedElectronMol = 4e-12;" >>testAlLessProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-11;" >>testAlLessProton.txt ; \
 	$(RUN_SIMULATE) -P=testAlLessProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testAlLessProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testAlLessProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testAlLessProton.txt
 
 testNiPoorProton:
 	mkdir -p testNiPoorProton
@@ -66,8 +73,7 @@ testNiPoorProton:
 	echo "double e_emittedElectronMol = 4e-12;" >>testNiPoorProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-11;" >>testNiPoorProton.txt ; \
 	$(RUN_SIMULATE) -P=testNiPoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testNiPoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testNiPoorProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testNiPoorProton.txt
 
 testAlPoorProton:
 	mkdir -p testAlPoorProton
@@ -78,8 +84,7 @@ testAlPoorProton:
 	echo "double e_emittedElectronMol = 4e-12;" >>testAlPoorProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-11;" >>testAlPoorProton.txt ; \
 	$(RUN_SIMULATE) -P=testAlPoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testAlPoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testAlPoorProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testAlPoorProton.txt
 
 testFePoorProton:
 	mkdir -p testFePoorProton
@@ -90,8 +95,7 @@ testFePoorProton:
 	echo "double e_emittedElectronMol = 4e-12;" >>testFePoorProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-11;" >>testFePoorProton.txt ; \
 	$(RUN_SIMULATE) -P=testFePoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testFePoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testFePoorProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testFePoorProton.txt
 
 testMnPoorProton:
 	mkdir -p testMnPoorProton
@@ -102,8 +106,7 @@ testMnPoorProton:
 	echo "double e_emittedElectronMol = 4e-12;" >>testMnPoorProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-11;" >>testMnPoorProton.txt ; \
 	$(RUN_SIMULATE) -P=testMnPoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testMnPoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testMnPoorProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testMnPoorProton.txt
 
 testLiPoorProton:
 	mkdir -p testLiPoorProton
@@ -114,8 +117,7 @@ testLiPoorProton:
 	echo "double e_emittedElectronMol = 4e-12;" >>testLiPoorProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-11;" >>testLiPoorProton.txt ; \
 	$(RUN_SIMULATE) -P=testLiPoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testLiPoorProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testLiPoorProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testLiPoorProton.txt
 
 testNiMuchProton:
 	mkdir -p testNiMuchProton
@@ -126,8 +128,7 @@ testNiMuchProton:
 	echo "double e_emittedElectronMol = 4e-11;" >>testNiMuchProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testNiMuchProton.txt ; \
 	$(RUN_SIMULATE) -P=testNiMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testNiMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testNiMuchProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testNiMuchProton.txt
 
 testAlMuchProton:
 	mkdir -p testAlMuchProton
@@ -138,8 +139,7 @@ testAlMuchProton:
 	echo "double e_emittedElectronMol = 4e-11;" >>testAlMuchProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testAlMuchProton.txt ; \
 	$(RUN_SIMULATE) -P=testAlMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testAlMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testAlMuchProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testAlMuchProton.txt
 
 testFeMuchProton:
 	mkdir -p testFeMuchProton
@@ -150,8 +150,7 @@ testFeMuchProton:
 	echo "double e_emittedElectronMol = 4e-11;" >>testFeMuchProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testFeMuchProton.txt ; \
 	$(RUN_SIMULATE) -P=testFeMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testFeMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testFeMuchProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testFeMuchProton.txt
 
 testMnMuchProton:
 	mkdir -p testMnMuchProton
@@ -162,8 +161,7 @@ testMnMuchProton:
 	echo "double e_emittedElectronMol = 4e-11;" >>testMnMuchProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testMnMuchProton.txt ; \
 	$(RUN_SIMULATE) -P=testMnMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testMnMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testMnMuchProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testMnMuchProton.txt
 
 testLiMuchProton:
 	mkdir -p testLiMuchProton
@@ -174,8 +172,7 @@ testLiMuchProton:
 	echo "double e_emittedElectronMol = 4e-11;" >>testLiMuchProton.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testLiMuchProton.txt ; \
 	$(RUN_SIMULATE) -P=testLiMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testLiMuchProton.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testLiMuchProton.txt
+	$(RUN_SIMULATE) -t=1h -P=testLiMuchProton.txt
 
 testNiMuchD:
 	mkdir -p testNiMuchD
@@ -186,10 +183,9 @@ testNiMuchD:
 	echo "double e_emittedElectronMol = 4e-11;" >>testNiMuchD.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testNiMuchD.txt ; \
 	$(RUN_SIMULATE) -P=testNiMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testNiMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testNiMuchD.txt
+	$(RUN_SIMULATE) -t=1h -P=testNiMuchD.txt
 
-testAlMuchDS:
+testAlMuchD:
 	mkdir -p testAlMuchD
 	cd testAlMuchD ; \
 	rm -f *.dat *.log test*.txt ; \
@@ -200,10 +196,6 @@ testAlMuchDS:
 	$(RUN_SIMULATE) -P=testAlMuchD.txt ; \
 	$(RUN_SIMULATE) -t=1h -P=testAlMuchD.txt
 
-testAlMuchD:
-	cd testAlMuchD ; \
-	$(RUN_SIMULATE) -t=1d -P=testAlMuchD.txt
-
 testFeMuchD:
 	mkdir -p testFeMuchD
 	cd testFeMuchD ; \
@@ -213,8 +205,7 @@ testFeMuchD:
 	echo "double e_emittedElectronMol = 4e-11;" >>testFeMuchD.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testFeMuchD.txt ; \
 	$(RUN_SIMULATE) -P=testFeMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testFeMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testFeMuchD.txt
+	$(RUN_SIMULATE) -t=1h -P=testFeMuchD.txt
 
 testMnMuchD:
 	mkdir -p testMnMuchD
@@ -225,8 +216,7 @@ testMnMuchD:
 	echo "double e_emittedElectronMol = 4e-11;" >>testMnMuchD.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testMnMuchD.txt ; \
 	$(RUN_SIMULATE) -P=testMnMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testMnMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testMnMuchD.txt
+	$(RUN_SIMULATE) -t=1h -P=testMnMuchD.txt
 
 testLiMuchD:
 	mkdir -p testLiMuchD
@@ -237,10 +227,69 @@ testLiMuchD:
 	echo "double e_emittedElectronMol = 4e-11;" >>testLiMuchD.txt ; \
 	echo "double e_emittedProtonMol = 4e-12;" >>testLiMuchD.txt ; \
 	$(RUN_SIMULATE) -P=testLiMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1h -P=testLiMuchD.txt ; \
-	$(RUN_SIMULATE) -t=1d -P=testLiMuchD.txt
+	$(RUN_SIMULATE) -t=1h -P=testLiMuchD.txt
 
-testMMM: testNiLessProton testAlLessProton testNiPoorProton testAlPoorProton testFePoorProton testMnPoorProton testLiPoorProton testNiMuchProton testAlMuchProton testFeMuchProton testMnMuchProton testLiMuchProton testNiMuchD testAlMuchD testFeMuchD testMnMuchD testLiMuchD
+testNiMaxD:
+	mkdir -p testNiMaxD
+	cd testNiMaxD ; \
+	rm -f *.dat *.log test*.txt ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Ni=1.0\";" > testNiMaxD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Ni=1.0\";" >> testNiMaxD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testNiMaxD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testNiMaxD.txt ; \
+	echo "double e_appliedVoltageScale = 10.0;" >>testNiMaxD.txt ; \
+	$(RUN_SIMULATE) -P=testNiMaxD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testNiMaxD.txt
+
+testAlMaxD:
+	mkdir -p testAlMaxD
+	cd testAlMaxD ; \
+	rm -f *.dat *.log test*.txt ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Al=1.0\";" > testAlMaxD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Al=1.0\";" >> testAlMaxD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testAlMaxD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testAlMaxD.txt ; \
+	echo "double e_appliedVoltageScale = 4.5;" >>testAlMaxD.txt ; \
+	$(RUN_SIMULATE) -P=testAlMaxD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testAlMaxD.txt
+
+testFeMaxD:
+	mkdir -p testFeMaxD
+	cd testFeMaxD ; \
+	rm -f *.dat *.log test*.txt ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Fe=1.0\";" > testFeMaxD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Fe=1.0\";" >> testFeMaxD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testFeMaxD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testFeMaxD.txt ; \
+	echo "double e_appliedVoltageScale = 10.0;" >>testFeMaxD.txt ; \
+	$(RUN_SIMULATE) -P=testFeMaxD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testFeMaxD.txt
+
+testMnMaxD:
+	mkdir -p testMnMaxD
+	cd testMnMaxD ; \
+	rm -f *.dat *.log test*.txt ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Mn=1.0\";" > testMnMaxD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Mn=1.0\";" >> testMnMaxD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testMnMaxD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testMnMaxD.txt ; \
+	echo "double e_appliedVoltageScale = 10.0;" >>testMnMaxD.txt ; \
+	$(RUN_SIMULATE) -P=testMnMaxD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testMnMaxD.txt
+
+testLiMaxD:
+	mkdir -p testLiMaxD
+	cd testLiMaxD ; \
+	rm -f *.dat *.log test*.txt ; \
+	echo "char e_negativeElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Li=1.0\";" > testLiMaxD.txt ; \
+	echo "char e_positiveElectrodeAtomicMols[TEXT_LEN_OF_MOLS] = \"D=0.1, Li=1.0\";" >> testLiMaxD.txt ; \
+	echo "double e_emittedElectronMol = 4e-11;" >>testLiMaxD.txt ; \
+	echo "double e_emittedProtonMol = 4e-12;" >>testLiMaxD.txt ; \
+	echo "double e_appliedVoltageScale = 4.5;" >>testLiMaxD.txt ; \
+	$(RUN_SIMULATE) -P=testLiMaxD.txt ; \
+	$(RUN_SIMULATE) -t=1h -P=testLiMaxD.txt
+
+testMMM: testNiLessProton testAlLessProton testNiPoorProton testAlPoorProton testFePoorProton testMnPoorProton testLiPoorProton testNiMuchProton testAlMuchProton testFeMuchProton testMnMuchProton testLiMuchProton testNiMuchD testAlMuchD testFeMuchD testMnMuchD testLiMuchD testNiMaxD testAlMaxD testFeMaxD testMnMaxD testLiMaxD
 
 # ---------------- old targets ----------------
 # testNistopcur is :

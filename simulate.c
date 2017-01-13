@@ -116,7 +116,7 @@ extern void initUserConditionsByDefault()
 	e_detectLimitRateForIsotope = 1.0E-21; //1.0E-15;
 	strcpy(e_negativeElectrodeAtomicMols, "Ni=1.0");
 	strcpy(e_positiveElectrodeAtomicMols, "H=0.1, Ni=1.0");
-	e_appliedVoltageScale = 1.06;// > 1.0516 = e_coulombBarrierOf2Protons / e_betaEnergyMeV
+	e_appliedVoltageScale = 1.06;// > 1.0516 = e_coulombBarrierOf2Protons / e_betaEnergyMeV, 4.5 => 3.5[MeV]for aluminum
 	e_emittedElectronMol = 0.04E-10;
 	e_collideElectronRateOnElectrode = 1.0;
 	e_collideElectronRateForMidiMeV = 1.0;
@@ -9517,7 +9517,7 @@ extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_co
 	}
 	electrodeId = (a_electrodePtr == &e_negativeElectrode) ? 0 : 1;//DEBUG
 	remTimes = e_timesOfCollide[electrodeId][a_collideType] % logCrossSectionTimes;//DEBUG
-	if(remTimes <= 1){//DEBUG
+	if(remTimes < 0){//DEBUG
 		e_debugElectroPotential = 1;
 		e_logElectroPotential = 1;
 		e_debugNewIsotope = 1;
@@ -9621,6 +9621,7 @@ extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_co
 	if(col.remainBulletMol < 0.0){
 		col.remainBulletMol = 0.0;//collect tolelance.
 	}
+	/* OLD
 	if(col.remainBulletMol > col.electrodePtr->detectLimitMolForIsotope){
 		if(a_nest < 8){
 			collideBulletToElectrode(a_electrodePtr, a_collideType, a_appliedVoltageMeV, col.remainBulletMol, a_collideBulletRate, a_decreaseBulletPtr, a_nest + 1);
@@ -9629,6 +9630,7 @@ extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_co
 			fprintf(stderr, "WARN:%s(%d):a_nest:%d reached to the limit at remainBulletMol:%lg a_collideType:%s\n", __FUNCTION__, __LINE__, a_nest, col.remainBulletMol, getCollideName(a_collideType));
 		}
 	}
+	*/
 	col.imperfectCollideMol += col.remainBulletMol;
 	//fprintf(stderr, "DEBUG:%s:col.imperfectCollideMol:%lg\n", __FUNCTION__, col.imperfectCollideMol);
 	if(col.imperfectCollideMol > 0.0){
@@ -9647,7 +9649,7 @@ extern void collideBulletToElectrode(struct electrode * a_electrodePtr, int a_co
 			;//The sacttering particles are in the electrode, they do not fly from a electrode to another electrodes.
 		}
 	}
-	if(remTimes <= 1){//DEBUG
+	if(remTimes < 0){//DEBUG
 		fprintf(stderr, "DEBUG:%d:}%s %s %d times appliedVoltage %lg [MeV]\n", __LINE__, a_electrodePtr->atomHashTable.tableName, getCollideName(a_collideType), e_timesOfCollide[electrodeId][a_collideType], a_appliedVoltageMeV);
 		fprintf(e_logFp, "[INFO]:%d:}%s %s %d times appliedVoltage %lg [MeV]\n", __LINE__, a_electrodePtr->atomHashTable.tableName, getCollideName(a_collideType), e_timesOfCollide[electrodeId][a_collideType], a_appliedVoltageMeV);
 	}
