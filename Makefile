@@ -546,7 +546,7 @@ testLiNiLessProtonHV:
 	$(RUN_SIMULATE) -P=testLiNiLessProtonHV.txt ; \
 	$(RUN_SIMULATE) -t=1h -P=testLiNiLessProtonHV.txt
 
-testLiNiLessProtonB10:
+testLiNiLessProtonB:
 	mkdir -p testLiNiLessProtonB
 	cd testLiNiLessProtonB ; \
 	rm -f *.dat *.log test*.txt ; \
