@@ -45,6 +45,8 @@ double e_massProtonKg = 1.672621898E-27;//[kg], the mass of a proton
 double e_massProtonMeV = 938.2720813;//[MeV/C^2], the mass of a proton
 double e_massElectronKg = 9.10938356E-31; //[kg], the mass of an electron
 double e_massElectronMeV = 0.5109989461;//[MeV/C^2], the mass of an electron
+double e_raduisH = 5.29e-11;//[m], alomost radius of hydrogen atom
+double e_raduisNi = 1.24e-10;//[m], alomost radius of Nickel atom
 double e_r0 = 1.2E-15;//[m], radius zero in "R = r0 * pow(A, 1/3)", alomost radius of proton
 //double e_radiusOfProtonByPion = 1.4138E-15;//[m], radius of proton by pion(pi-meson)
 double e_radiusOfProtonByRmsCharge = 0.8751E-15;//[m], radius of proton by RMS(root mean square) charge 
@@ -62,6 +64,8 @@ double e_betaEnergyMassU;//
 double e_betaEnergyMeV;// the kinetic energy that is released in beta decay, (It is random split into electrons and the anti-electron neutrino)
 double e_coulombBarrierOf2Protons;// 0.822743 = e_coefElectroPotentialMeV / (e_radiusOfProtonByRmsCharge + e_radiusOfProtonByRmsCharge);
 //0.822743 / 0.782333 = 1.0516531962731983 
+double e_maxApparentRelativeRadiusOfCrossSectionForElectron;
+double e_maxApparentRelativeRadiusOfCrossSectionForNecleus;
 //---------------------------------------------------------------------
 //[User conditions]
 int e_rangeDecimalDigitPrecision;//2 - 6;//The precision expressed by the number of dicimal digit, 6 means that the tolelance rate is 10^-6 = 0.000001, 2 means 10^-2 = 0.01. The function "registOutput" will treat that a gamma ray is almost equal to another gamma ray with in the tolelance specified by "e_rangeDecimalDigitPrecision". Why 2 and not 6? If you use 6, there are too many grades of strength of gamma, the program need very large memories and take long time of the computation of simulation.
@@ -313,6 +317,12 @@ extern void initiallyCalculatePhysicsContants()
 	e_betaEnergyMeV = e_massNeutronMeV - (e_massProtonMeV + e_massElectronMeV);	
 	e_coulombBarrierOf2Protons = e_coefElectroPotentialMeV / (e_radiusOfProtonByRmsCharge + e_radiusOfProtonByRmsCharge);
 	//fprintf(stderr, "e_betaEnergyMeV %lg e_coulombBarrierOf2Protons %lg\n", e_betaEnergyMeV, e_coulombBarrierOf2Protons);
+	e_maxApparentRelativeRadiusOfCrossSectionForElectron = pow((pow(e_raduisNi, 3.0) / 28.0), 1.0 / 3.0);//pow((pow(1.24e-10, 3.0)/28), 1.0 / 3.0) = 4.083529287251773e-11
+	if(e_maxApparentRelativeRadiusOfCrossSectionForElectron > e_raduisH){
+		e_maxApparentRelativeRadiusOfCrossSectionForElectron = e_raduisH;
+	}
+	e_maxApparentRelativeRadiusOfCrossSectionForElectron = e_maxApparentRelativeRadiusOfCrossSectionForElectron / e_r0;
+	e_maxApparentRelativeRadiusOfCrossSectionForNecleus = e_raduisNi / e_r0;
 	//exit(1);//debug
 }
 
@@ -416,6 +426,8 @@ extern void printContants(FILE * a_fp)
 	fprintf(a_fp, "P%d e_massProtonMeV %lg [MeV/C^2]\n", i++, e_massProtonMeV);
 	fprintf(a_fp, "P%d e_massElectronKg  %lg [kg]\n", i++, e_massElectronKg);
 	fprintf(a_fp, "P%d e_massElectronMeV %lg [MeV/C^2]\n", i++, e_massElectronMeV);
+	fprintf(a_fp, "P%d e_raduisH %lg [m]\n", i++, e_raduisH);
+	fprintf(a_fp, "P%d e_raduisNi %lg [m]\n", i++, e_raduisNi);
 	fprintf(a_fp, "P%d e_r0 %lg [m]\n", i++, e_r0);
 	//fprintf(a_fp, "P%d e_radiusOfProtonByPion %lg [m]\n", i++, e_radiusOfProtonByPion);
 	fprintf(a_fp, "P%d e_radiusOfProtonByRmsCharge %lg [m]\n", i++, e_radiusOfProtonByRmsCharge);
@@ -439,6 +451,8 @@ extern void printContants(FILE * a_fp)
 	fprintf(a_fp, "Q%d e_betaEnergyMassU %lg [u]\n", i++, e_betaEnergyMassU);
 	fprintf(a_fp, "Q%d e_betaEnergyMeV   %lg [MeV/C^2]\n", i++, e_betaEnergyMeV);
 	fprintf(a_fp, "Q%d e_coulombBarrierOf2Protons %lg [MeV/C^2]\n", i++, e_coulombBarrierOf2Protons);
+	fprintf(a_fp, "Q%d e_maxApparentRelativeRadiusOfCrossSectionForElectron %lg \n", i++, e_maxApparentRelativeRadiusOfCrossSectionForElectron);
+	fprintf(a_fp, "Q%d e_maxApparentRelativeRadiusOfCrossSectionForNecleus %lg \n", i++, e_maxApparentRelativeRadiusOfCrossSectionForNecleus);
 
 	fprintf(a_fp, "[User conditions]\n");
 	i = 1;
@@ -7514,20 +7528,40 @@ extern void increaseAtom(struct electrode * a_electrodePtr, int a_atomicNumber, 
 {
 	//fprintf(stderr, "DEBUG:%s:BEGIN{a_atomicNumber:%d massNumber:%d a_increaseMol:%lg \n", __FUNCTION__, a_atomicNumber, a_massNumber, a_increaseMol);
 	if(a_increaseMol >= 0.0){
-		//struct atomNodeConst * atomPtr;
 		struct atomKey akey;
 		akey.isotopePropertyPtr = getIsotopePropertyPtr(a_atomicNumber, a_massNumber);
 		if(akey.isotopePropertyPtr){
+			struct atomNodeConst * atomPtr;
+			double molNow;
 			struct atomValue aValue;
 			struct objectNodeConst nodeConst;
+			atomPtr = findAtom(a_electrodePtr, a_atomicNumber, a_massNumber);
+			if(atomPtr){
+				molNow = getMol(atomPtr->vPtr);
+			}else{
+				molNow = 0.0;
+			}
 			memset(&aValue, 0, sizeof(aValue));
 			aValue.molIni = a_increaseMol;
 			nodeConst.keyPtr = &akey;
 			nodeConst.valuePtr = &aValue;
-			if(a_increaseMol > 1.0){//DEBUG
-				fprintf(stderr, "DEBUG:%s(%d):%s a_atomicNumber:%d massNumber:%d a_increaseMol:%lg \n", __FUNCTION__, __LINE__, a_electrodePtr->atomHashTable.tableName, a_atomicNumber, a_massNumber, a_increaseMol);
-				exit(1);
-			}
+			//if(molNow > 0.0){
+				//double warnScale = 128.0;
+				if(a_increaseMol > 4.0 /* molNow * warnScale*/){//DEBUG
+					//double exitScale = 1.0e8;
+					char * levelPtr = "WARN";
+					//int doExit = 0;
+					//if(a_increaseMol > molNow * exitScale){
+					//	levelPtr = "FATAL";
+					//	doExit = 1;
+					//}
+					fprintf(stderr, "%s:%s(%d):%s %s a_atomicNumber:%d massNumber:%d a_increaseMol:%lg molNow:%lg\n", levelPtr, __FUNCTION__, __LINE__, a_electrodePtr->atomHashTable.tableName, akey.isotopePropertyPtr->symbol, a_atomicNumber, a_massNumber, a_increaseMol, molNow);
+					fprintf(e_logFp, "%s:%s(%d):%s %s a_atomicNumber:%d massNumber:%d a_increaseMol:%lg molNow:%lg\n", levelPtr, __FUNCTION__, __LINE__, a_electrodePtr->atomHashTable.tableName, akey.isotopePropertyPtr->symbol, a_atomicNumber, a_massNumber, a_increaseMol, molNow);
+					//if(doExit){
+					//	exit(1);
+					//}
+				}
+			//}
 			insertObjectInHashTable(&a_electrodePtr->atomHashTable, &nodeConst);
 		}
 	}else{
@@ -8460,6 +8494,7 @@ struct runningCondition {
 	double startTime;
 	double termTime;
 	double intervalTime;
+	int numberOfBreakingIntervals;
 	int loopBeg;
 	int loopEnd;
 	int logStep;
@@ -9065,14 +9100,27 @@ extern double getCrossSection(struct collide * a_pX)
 			
 			//I think that the radius of electrons is treated larger up to the Coulomb Barrier in the case of collision between an electron and an electron.
 			relativeR = e_coefElectroPotentialMeV / (a_pX->appliedVoltageMeV * e_r0);
+			if(relativeR > e_maxApparentRelativeRadiusOfCrossSectionForElectron){
+				fprintf(stderr, "WARN:%s(%d):relativeR:%lg > e_maxApparentRelativeRadiusOfCrossSectionForElectron:%lg, R:%lg > %lg \n", __FUNCTION__, __LINE__, relativeR, e_maxApparentRelativeRadiusOfCrossSectionForElectron, relativeR* e_r0, e_maxApparentRelativeRadiusOfCrossSectionForElectron * e_r0);
+				relativeR = e_maxApparentRelativeRadiusOfCrossSectionForElectron;
+			}
 			CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
 		}else{
-			//I think that the radius of nucleus is treated smaller down to the Weak Boson in the case of collision between an electron and a nucleus.
+			//I think that the radius of nucleus is treated smaller down to the runing distunce of a Weak Boson in the case of collision between an electron and a nucleus.
 			//The electron will collide two up-quark only in protons of a nucleus, not any up-quark in a nutron.
+			
+			//Although the lifetime of particles that move at a speed close to the speed of light increases due to the effect of the theory of relativity, this effect may not change the collision cross section that has significance in the direction perpendicular to the motion.
+			
+			//double relativeTheoryExpand = (e_massElectronMeV + a_pX->appliedVoltageMeV) / e_massElectronMeV;
+			//static double s_maxRelativeTheoryExpand = 1.0;
+			//if(relativeTheoryExpand > s_maxRelativeTheoryExpand){
+			//	s_maxRelativeTheoryExpand = relativeTheoryExpand;
+			//	fprintf(stderr, "WARN:%s(%d):s_maxRelativeTheoryExpand:%lg \n", __FUNCTION__, __LINE__, s_maxRelativeTheoryExpand);
+			//}
 			if(e_usebulletCrossSection){
-				relativeR = e_relativeRadiusOfElectronByWeakBoson + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+				relativeR = e_relativeRadiusOfElectronByWeakBoson + a_pX->bulletPropertyPtr->relativeNucleusRadius /* * relativeTheoryExpand */;
 			}else{
-				relativeR = e_relativeRadiusOfElectronByWeakBoson;
+				relativeR = e_relativeRadiusOfElectronByWeakBoson /* * relativeTheoryExpand */;
 			}
 			CrossSection = relativeR * relativeR * a_pX->targetIsotopePropertyPtr->atomicNumber * 2 * a_pX->targetAtomMol;
 		}
@@ -9082,18 +9130,25 @@ extern double getCrossSection(struct collide * a_pX)
 	|| a_pX->collideType == COLLIDE_ALPHA_S){
 		if(a_pX->targetIsotopePropertyPtr->atomicNumber == ATOMICNUMBER_ELECTRON 
 		&& a_pX->targetIsotopePropertyPtr->massNumber == MASSNUMBER_ELECTRON){
+			//Although the lifetime of particles that move at a speed close to the speed of light increases due to the effect of the theory of relativity, this effect may not change the collision cross section that has significance in the direction perpendicular to the motion.
+			
+			//double relativeTheoryExpand = (a_pX->bulletPropertyPtr->massMeV + a_pX->appliedVoltageMeV) / a_pX->bulletPropertyPtr->massMeV; 
+			//static double s_maxRelativeTheoryExpand = 1.0;
+			//if(relativeTheoryExpand > s_maxRelativeTheoryExpand){
+			//	s_maxRelativeTheoryExpand = relativeTheoryExpand;
+			//	fprintf(stderr, "WARN:%s(%d):s_maxRelativeTheoryExpand:%lg \n", __FUNCTION__, __LINE__, s_maxRelativeTheoryExpand);
+			//}
 			if(e_usebulletCrossSection){
-				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + e_relativeRadiusOfElectronByWeakBoson;
+				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + e_relativeRadiusOfElectronByWeakBoson /* * relativeTheoryExpand */;
 			}else{
-				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius /* * relativeTheoryExpand */;
 			}
 			CrossSection = relativeR * relativeR * a_pX->bulletPropertyPtr->atomicNumber * 2 * a_pX->targetAtomMol;
 		}else{
 			if(a_pX->appliedVoltageMeV >= a_pX->electroPotentialMeV){
+				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
 				if(e_usebulletCrossSection){
-					relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius;
-				}else{
-					relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+					relativeR += a_pX->bulletPropertyPtr->relativeNucleusRadius;
 				}
 				CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
 			}else{
@@ -9103,19 +9158,21 @@ extern double getCrossSection(struct collide * a_pX)
 				
 				//I think that the radius of electrons is treated larger up to the Coulomb Barrier in the case of collision between an electron and an electron.
 
+				relativeR = a_pX->bulletPropertyPtr->atomicNumber * a_pX->targetIsotopePropertyPtr->atomicNumber * e_coefElectroPotentialMeV / (a_pX->appliedVoltageMeV * e_r0);
+				if(relativeR > e_maxApparentRelativeRadiusOfCrossSectionForNecleus){
+					fprintf(stderr, "WARN:%s(%d):relativeR:%lg > e_maxApparentRelativeRadiusOfCrossSectionForNecleus:%lg, R:%lg > %lg \n", __FUNCTION__, __LINE__, relativeR, e_maxApparentRelativeRadiusOfCrossSectionForNecleus, relativeR* e_r0, e_maxApparentRelativeRadiusOfCrossSectionForNecleus * e_r0);
+					relativeR = e_maxApparentRelativeRadiusOfCrossSectionForNecleus;
+				}
 				if(e_usebulletCrossSection){
-					relativeR = a_pX->bulletPropertyPtr->atomicNumber * a_pX->targetIsotopePropertyPtr->atomicNumber * e_coefElectroPotentialMeV / (a_pX->appliedVoltageMeV * e_r0) + a_pX->bulletPropertyPtr->relativeNucleusRadius;
-				}else{
-					relativeR = a_pX->bulletPropertyPtr->atomicNumber * a_pX->targetIsotopePropertyPtr->atomicNumber * e_coefElectroPotentialMeV / (a_pX->appliedVoltageMeV * e_r0);
+					relativeR += a_pX->bulletPropertyPtr->relativeNucleusRadius;
 				}
 				CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
 				{//DEBUG
 					double relativeR2;
 					double CrossSection2;
+					relativeR2 = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
 					if(e_usebulletCrossSection){
-						relativeR2 = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius;
-					}else{
-						relativeR2 = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
+						relativeR2 += a_pX->bulletPropertyPtr->relativeNucleusRadius;
 					}
 					CrossSection2 = relativeR * relativeR * a_pX->targetAtomMol;
 					if(CrossSection < CrossSection2){
@@ -9127,10 +9184,10 @@ extern double getCrossSection(struct collide * a_pX)
 		}
 	}else{//COLLIDE_NEUTRON
 		if(a_pX->massDefectMeV[0] > 0.0){
+			relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
 			if(e_usebulletCrossSection){
-				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius + a_pX->bulletPropertyPtr->relativeNucleusRadius;
+				relativeR +=a_pX->bulletPropertyPtr->relativeNucleusRadius;
 			}else{
-				relativeR = a_pX->targetIsotopePropertyPtr->relativeNucleusRadius;
 			}
 			CrossSection = relativeR * relativeR * a_pX->targetAtomMol;
 		}else{
@@ -11192,14 +11249,24 @@ extern void pulseCurrent(double a_pastSecond)
 
 //---------------------------------------------------------------------
 
-#define VERSION_OF_serializeRunningCondition 1
+#define OLD_VERSION_OF_serializeRunningCondition 1
+#define VERSION_OF_serializeRunningCondition 2
 #define SERIALIZE_RUNNING_CONDITION(RW) \
 extern int RW ## RunningCondition(FILE * a_fp) \
 {\
-	SERIALIZE_VERSION_CHECK(RW, VERSION_OF_serializeRunningCondition, a_fp) \
+	SERIALIZE_VERSION_CHECK2(RW, VERSION_OF_serializeRunningCondition, OLD_VERSION_OF_serializeRunningCondition, a_fp) \
 	SERIALIZE_VALUE(RW, e_rc.startTime, a_fp)\
 	SERIALIZE_VALUE(RW, e_rc.termTime, a_fp)\
 	SERIALIZE_VALUE(RW, e_rc.intervalTime, a_fp)\
+	if((void *)RW == (void *)fread){\
+		if(version == OLD_VERSION_OF_serializeRunningCondition){\
+			e_rc.numberOfBreakingIntervals = 0;\
+		}else{\
+			SERIALIZE_VALUE(RW, e_rc.numberOfBreakingIntervals, a_fp)\
+		}\
+	}else{\
+		SERIALIZE_VALUE(RW, e_rc.numberOfBreakingIntervals, a_fp)\
+	}\
 	SERIALIZE_VALUE(RW, e_rc.loopBeg, a_fp)\
 	SERIALIZE_VALUE(RW, e_rc.loopEnd, a_fp)\
 	SERIALIZE_VALUE(RW, e_rc.logStep, a_fp)\
@@ -11339,6 +11406,7 @@ extern void initRunningCondition(struct runningCondition * a_rc)
 	a_rc->startTime = 0.0;
 	a_rc->termTime = DEFAULT_TERMTIMESEC;
 	a_rc->intervalTime = DEFAULT_INTERVALSEC;
+	a_rc->numberOfBreakingIntervals = 0;
 	a_rc->loopBeg = 0;
 	a_rc->loopEnd = 6;
 	a_rc->logStep = DEFAULT_LOGSTEP;
@@ -11384,6 +11452,7 @@ extern void printRunningCondition(FILE * a_fp, int a_BeginOrEnd, const char * a_
 		fprintf(a_fp, "%sR%d simulatedStartTime %s\n", a_title, i++, formatSecond(timeTxt, 80, e_rc.startTime, pretty));
 		fprintf(a_fp, "%sR%d simulatedTermTime %s\n", a_title, i++, formatSecond(timeTxt, 80, e_rc.termTime, pretty));
 		fprintf(a_fp, "%sR%d intervalTime %s\n", a_title, i++, formatSecond(timeTxt, 80, e_rc.intervalTime, pretty));
+		fprintf(a_fp, "%sR%d numberOfBreakingIntervals %d\n", a_title, i++, e_rc.numberOfBreakingIntervals);
 		fprintf(a_fp, "%sR%d loopBeg %d\n", a_title, i++, e_rc.loopBeg);
 		fprintf(a_fp, "%sR%d loopEnd %d\n", a_title, i++, e_rc.loopEnd);
 		fprintf(a_fp, "%sR%d logStep %d\n", a_title, i++, e_rc.logStep);
@@ -11549,6 +11618,14 @@ extern void checkArgs(int argc, char * argv[], time_t * a_timeBeginPtr)
 				fprintf(stderr, "FATAL ERROR:Too small divideCount:%lg, it can't run.\n", divideCount);
 				exit(1);
 			}
+		}else if(memcmp(argv[i], "-b=", 3) == 0){
+			//fprintf(stderr, "DEBUG:%s:numberOfBreakingIntervals -b\n", __FUNCTION__);
+			rc.numberOfBreakingIntervals = getNumber(argv[i]);
+			fprintf(stderr, "DEBUG:%s:numberOfBreakingIntervals:%d\n", __FUNCTION__, rc.numberOfBreakingIntervals);
+			if(rc.numberOfBreakingIntervals < 0){
+				fprintf(stderr, "FATAL ERROR:Wrong numberOfBreakingIntervals:%d\n", rc.numberOfBreakingIntervals);
+				exit(1);
+			}
 		}else if(memcmp(argv[i], "-j=", 3) == 0){
 			//fprintf(stderr, "DEBUG:%s:logIntervalMode -j\n", __FUNCTION__);
 			logIntervalMode = argv[i];
@@ -11668,6 +11745,14 @@ extern void checkArgs(int argc, char * argv[], time_t * a_timeBeginPtr)
    calculation.\n\
    The calculation is : (interval = termSecond / divideCount)\n\
    'divideCount' is not saved into the output data file 'data.dat'.\n\
+-b=numberOfBreakingIntervals :\n\
+   This is the number of breaking intervals with stopping the electric current.\n\
+   The 'numberOfBreakingIntervals' is zero (0) or a positive integer number.\n\
+   The zero (0) means that the electric current is not stopped.\n\
+   The default of numberOfBreakingIntervals is 0.\n\
+   If electricPulseLength is positive, \n\
+   it means that the the electric current is stopped \n\
+   while the following number of intervals.\n\
 -j=logInterval : It sets the step of logging by a calculation.\n\
    The 'logInterval' is the interval time of logging.\n\
    Its time format is as same as the option '-t=term'.\n\
@@ -12023,9 +12108,12 @@ int main(int argc, char * argv[])
 				fprintf(stderr, "ERROR:CALL_SERIALIZE_ALL(fwrite, %s)\n", e_rc.outputDataFname);
 			}
 		}
-		pulseCurrent(e_rc.intervalTime);
-		e_rc.inputTotalEnergy += (e_emittedPulseEnergyMeV * e_rc.intervalTime);
-		//printSumup(e_logFp, "after pulseCurrent", loop, tail, MID_PRINT);
+		if((e_rc.numberOfBreakingIntervals == 0)
+		|| (loop % (e_rc.numberOfBreakingIntervals + 1) == 0)){
+			pulseCurrent(e_rc.intervalTime);
+			e_rc.inputTotalEnergy += (e_emittedPulseEnergyMeV * e_rc.intervalTime);
+			//printSumup(e_logFp, "after pulseCurrent", loop, tail, MID_PRINT);
+		}
 
 		scatterIn(&e_negativeElectrode, MASS_DEFECT_BY_NEUTRON);//It must be here before absorbeOrDecayNeutronInElectrode()
 		scatterIn(&e_positiveElectrode, MASS_DEFECT_BY_NEUTRON);//It must be here before absorbeOrDecayNeutronInElectrode()
